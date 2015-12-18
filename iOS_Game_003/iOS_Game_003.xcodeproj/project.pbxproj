@@ -25,6 +25,8 @@
 		FAF15CE91C231C1E00CB5827 /* explosion.atlas in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CE81C231C1E00CB5827 /* explosion.atlas */; };
 		FAF15CEC1C240D3200CB5827 /* background_001.png in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CEA1C240D3200CB5827 /* background_001.png */; };
 		FAF15CED1C240D3200CB5827 /* background_002.png in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CEB1C240D3200CB5827 /* background_002.png */; };
+		FAF15CF21C2420D200CB5827 /* icon_120_001.png in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CF01C2420D200CB5827 /* icon_120_001.png */; };
+		FAF15CF31C2420D200CB5827 /* icon_180_001.png in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CF11C2420D200CB5827 /* icon_180_001.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,8 @@
 		FAF15CE81C231C1E00CB5827 /* explosion.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; name = explosion.atlas; path = ../Media/explosion.atlas; sourceTree = "<group>"; };
 		FAF15CEA1C240D3200CB5827 /* background_001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background_001.png; path = Media/background_001.png; sourceTree = SOURCE_ROOT; };
 		FAF15CEB1C240D3200CB5827 /* background_002.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background_002.png; path = Media/background_002.png; sourceTree = SOURCE_ROOT; };
+		FAF15CF01C2420D200CB5827 /* icon_120_001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_120_001.png; path = Media/icon_120_001.png; sourceTree = SOURCE_ROOT; };
+		FAF15CF11C2420D200CB5827 /* icon_180_001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_180_001.png; path = Media/icon_180_001.png; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +104,8 @@
 		FAE3E34C1C209BEF004F5D3A /* Media */ = {
 			isa = PBXGroup;
 			children = (
+				FAF15CF01C2420D200CB5827 /* icon_120_001.png */,
+				FAF15CF11C2420D200CB5827 /* icon_180_001.png */,
 				FAF15CE81C231C1E00CB5827 /* explosion.atlas */,
 				FAF15CE61C23171600CB5827 /* sounds */,
 				FAF15CE41C23077F00CB5827 /* effects */,
@@ -180,7 +186,9 @@
 			files = (
 				FAF15CE71C23171600CB5827 /* sounds in Resources */,
 				FAE3E3391C2096E1004F5D3A /* GameScene.sks in Resources */,
+				FAF15CF21C2420D200CB5827 /* icon_120_001.png in Resources */,
 				FAE3E3451C2096E1004F5D3A /* LaunchScreen.storyboard in Resources */,
+				FAF15CF31C2420D200CB5827 /* icon_180_001.png in Resources */,
 				FAF15CEC1C240D3200CB5827 /* background_001.png in Resources */,
 				FAF15CED1C240D3200CB5827 /* background_002.png in Resources */,
 				FAF15CE91C231C1E00CB5827 /* explosion.atlas in Resources */,

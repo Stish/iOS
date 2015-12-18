@@ -22,17 +22,17 @@ class TLBackground: SKSpriteNode {
 
         super.init(texture: nil,color: UIColor.blackColor(), size: CGSizeMake(size.height * ((flBackgroundRatio_001 * 2) + flBackgroundRatio_002), size.height))
         self.anchorPoint = CGPointMake(0.0, 0.0)
-        // Background 001
+        // --- Background 001 ---
         let snBackground_001 = SKSpriteNode(texture: txBackground_001,color: UIColor.blackColor(), size: CGSizeMake(size.height * flBackgroundRatio_001, size.height))
         snBackground_001.anchorPoint = CGPointMake(0.0, 0.0)
         snBackground_001.position = CGPoint(x: 0, y: 0)
         addChild(snBackground_001)
-        // Background 002
+        // --- Background 002 ---
         let snBackground_002 = SKSpriteNode(texture: txBackground_002,color: UIColor.blackColor(), size: CGSizeMake(size.height * flBackgroundRatio_002, size.height))
         snBackground_002.anchorPoint = CGPointMake(0.0, 0.0)
         snBackground_002.position = CGPoint(x: size.height * flBackgroundRatio_001, y: 0)
         addChild(snBackground_002)
-        // Background 003
+        // --- Background 003 ---
         let snBackground_003 = SKSpriteNode(texture: txBackground_001,color: UIColor.blackColor(), size: CGSizeMake(size.height * flBackgroundRatio_001, size.height))
         snBackground_003.anchorPoint = CGPointMake(0.0, 0.0)
         snBackground_003.position = CGPoint(x: size.height * (flBackgroundRatio_001 + flBackgroundRatio_002), y: 0)
@@ -48,10 +48,6 @@ class TLBackground: SKSpriteNode {
         let resetPosition = SKAction.moveToX(0, duration: 0)
         let seqMoveLeft = SKAction.sequence([actMoveLeft, resetPosition])
         runAction(SKAction.repeatActionForever(seqMoveLeft))
-//        self.runAction(actMoveLeft, completion: {() in
-//            self.fctResetPos()
-//            self.fctMoveLeft()
-//            })
     }
     
     func fctResetPos() {

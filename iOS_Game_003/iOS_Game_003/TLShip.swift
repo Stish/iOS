@@ -30,19 +30,12 @@ class TLShip: SKSpriteNode {
         self.anchorPoint = CGPointMake(0.5, 0.5)
         self.fctStartFlyAnimationFront()
         // --- physics body ---
-        // 1
         self.physicsBody = SKPhysicsBody(circleOfRadius: self.size.width/2)
-        // 2
         self.physicsBody?.dynamic = true
-        // 3
         self.physicsBody?.affectedByGravity = false
-        // 4
         self.physicsBody?.allowsRotation = false
-        // 5
         self.physicsBody?.categoryBitMask = enBodyType.ship.rawValue
-        // 6
-        self.physicsBody?.contactTestBitMask = enBodyType.metroid.rawValue
-        // 7
+        self.physicsBody?.contactTestBitMask = enBodyType.meteroite.rawValue
         self.physicsBody?.collisionBitMask = 0
         // --- Sounds: Shooting ---
         let path = NSBundle.mainBundle().pathForResource("/sounds/laser_002", ofType:"wav")
@@ -95,18 +88,8 @@ class TLShip: SKSpriteNode {
         self.runAction(SKAction.repeatActionForever(actFlyRight))
     }
     
-
-//        snLaser = SKSpriteNode(texture: SKTexture(imageNamed: "laser_001.png"), color: UIColor.clearColor(), size: CGSizeMake(60, 5))
-//        snLaser.anchorPoint = CGPointMake(0.0, 0.5)
-//        snLaser.position = CGPoint(x: self.frame.size.width, y: 0)
-//        addChild(snLaser)
-//        let actShoot = SKAction.moveByX(iScreenWidth, y: 0, duration: 1.0)
-//        snLaser.runAction(actShoot, completion: {() in
-//            self.snLaser.removeFromParent()
-//        })
-    
     func fctPlayShootingSound() {
-        //apShootingSound.prepareToPlay()
+        apShootingSound.prepareToPlay()
         apShootingSound.play()
     }
     

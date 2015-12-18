@@ -1,5 +1,5 @@
 //
-//  TLMetroid.swift
+//  TLmeteroite.swift
 //  iOS_Game_003
 //
 //  Created by Alexander Wegner on 17.12.15.
@@ -10,28 +10,21 @@ import Foundation
 import SpriteKit
 import AVFoundation
 
-class TLMetroid: SKSpriteNode {
+class TLmeteroite: SKSpriteNode {
     var blDestroyed = false
     
     init(size: CGSize) {
-        super.init(texture: SKTexture(imageNamed: "objects/metroid_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
+        super.init(texture: SKTexture(imageNamed: "objects/meteroite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
         self.anchorPoint = CGPointMake(0.5, 0.5)
         self.position = CGPoint(x: flScreenWidth + 88/2, y: CGFloat(arc4random_uniform(UInt32(flScreenHeight)) + 1))
-        // 1
+        // --- physics body ---
         self.physicsBody = SKPhysicsBody(circleOfRadius: self.size.width/2)
-        // 2
         self.physicsBody?.dynamic = true
-        // 3
         self.physicsBody?.affectedByGravity = false
-        // 4
         self.physicsBody?.allowsRotation = false
-        // 5
-        self.physicsBody?.categoryBitMask = enBodyType.metroid.rawValue
-        // 6
+        self.physicsBody?.categoryBitMask = enBodyType.meteroite.rawValue
         self.physicsBody?.contactTestBitMask = enBodyType.laser.rawValue | enBodyType.ship.rawValue
-        // 7
         self.physicsBody?.collisionBitMask = 0
-        // --- Sounds: Shooting ---
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -59,14 +52,13 @@ class TLMetroid: SKSpriteNode {
         let lbScore = SKLabelNode(fontNamed:"Menlo")
         lbScore.text = "+100"
         lbScore.fontSize = 25
-        lbScore.position = CGPoint(x: 0, y: 0)
+        lbScore.position = CGPoint(x: 0, y: 0 - (lbScore.frame.size.height / 2))
         lbScore.fontColor = UIColor.orangeColor()
         self.addChild(lbScore)
         
         self.runAction(actExplode, completion: {() in
             self.removeFromParent()
             lbScore.removeFromParent()
-            //aSnLaser01[0] = nil
             self.name = "inactive"
         })
     }

@@ -30,7 +30,7 @@ var aExplosion_01 = Array<SKTexture>()
 enum enBodyType: UInt32 {
     case ship = 1
     case laser = 2
-    case metroid = 4
+    case meteroite = 4
 }
 // --- sounds ---
 var apExplosionSound: AVAudioPlayer!
@@ -45,7 +45,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snInterfaceRight: SKSpriteNode!
     var selectedNodes = [UITouch:SKSpriteNode]()
     var aSnLaser01 = Array<TLLaser>()
-    var aSnMetroid = Array<TLMetroid>()
+    var aSnmeteroite = Array<TLmeteroite>()
     var iTimeSec: Int!
     var iTime100ms: Int!
     var iGameRestartCnt: Int!
@@ -54,7 +54,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
-        view.showsPhysics = true
+        //view.showsPhysics = true
         // --- explosion sprites ---
         let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_001"))
@@ -181,35 +181,60 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if blGameOver == true {
                 iGameRestartCnt = iGameRestartCnt + 1
             }
+            if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
+                //print(iTimeSec) // #debug
+                if aSnmeteroite.count == 0
+                {
+                    aSnmeteroite.append(TLmeteroite(size: CGSizeMake(88, 83)))
+                    aSnmeteroite[0].name = "inactive"
+                }
+                allElements: for var i = 0; i < aSnmeteroite.count; i++ {
+                    if aSnmeteroite[i].name == "inactive" {
+                        aSnmeteroite[i] = TLmeteroite(size: CGSizeMake(88, 83))
+                        aSnmeteroite[i].name = "active"
+                        addChild(aSnmeteroite[i])
+                        aSnmeteroite[i].fctMoveLeft()
+                        break allElements
+                    }
+                    if i == (aSnmeteroite.count - 1) {
+                        aSnmeteroite.append(TLmeteroite(size: CGSizeMake(88, 83)))
+                        aSnmeteroite[i+1].name = "active"
+                        addChild(aSnmeteroite[i+1])
+                        aSnmeteroite[i+1].fctMoveLeft()
+                        break allElements
+                    }
+                }
+                print(aSnmeteroite.count) // #debug
+            }
         }
         // --- every 1s ---
         if (iTimeSec != Int(currentTime)) && (blGameStarted == true) {
             iTimeSec = Int(currentTime)
-            if (iTimeSec % 3 == 0) && (blGameOver == false) {
-                //print(iTimeSec) // #debug
-                if aSnMetroid.count == 0
-                {
-                    aSnMetroid.append(TLMetroid(size: CGSizeMake(88, 83)))
-                    aSnMetroid[0].name = "inactive"
-                }
-                allElements: for var i = 0; i < aSnMetroid.count; i++ {
-                    if aSnMetroid[i].name == "inactive" {
-                        aSnMetroid[i] = TLMetroid(size: CGSizeMake(88, 83))
-                        aSnMetroid[i].name = "active"
-                        addChild(aSnMetroid[i])
-                        aSnMetroid[i].fctMoveLeft()
-                        break allElements
-                    }
-                    if i == (aSnMetroid.count - 1) {
-                        aSnMetroid.append(TLMetroid(size: CGSizeMake(88, 83)))
-                        aSnMetroid[i+1].name = "active"
-                        addChild(aSnMetroid[i+1])
-                        aSnMetroid[i+1].fctMoveLeft()
-                        break allElements
-                    }
-                }
-                print(aSnMetroid.count) // #debug
-            }
+//            if (iTimeSec % 1 == 0) && (blGameOver == false) {
+//                //print(iTimeSec) // #debug
+//                if aSnmeteroite.count == 0
+//                {
+//                    aSnmeteroite.append(TLmeteroite(size: CGSizeMake(88, 83)))
+//                    aSnmeteroite[0].name = "inactive"
+//                }
+//                allElements: for var i = 0; i < aSnmeteroite.count; i++ {
+//                    if aSnmeteroite[i].name == "inactive" {
+//                        aSnmeteroite[i] = TLmeteroite(size: CGSizeMake(88, 83))
+//                        aSnmeteroite[i].name = "active"
+//                        addChild(aSnmeteroite[i])
+//                        aSnmeteroite[i].fctMoveLeft()
+//                        break allElements
+//                    }
+//                    if i == (aSnmeteroite.count - 1) {
+//                        aSnmeteroite.append(TLmeteroite(size: CGSizeMake(88, 83)))
+//                        aSnmeteroite[i+1].name = "active"
+//                        addChild(aSnmeteroite[i+1])
+//                        aSnmeteroite[i+1].fctMoveLeft()
+//                        break allElements
+//                    }
+//                }
+//                print(aSnmeteroite.count) // #debug
+//            }
         }
     }
     
@@ -258,13 +283,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if blGameOver == false {
             switch(contactMask) {
-            case enBodyType.laser.rawValue | enBodyType.metroid.rawValue:
+            case enBodyType.laser.rawValue | enBodyType.meteroite.rawValue:
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
-                for var i = 0; i < aSnMetroid.count; i++ {
-                    if (secondNode == aSnMetroid[i] || firstNode == aSnMetroid[i]) && (aSnMetroid[i].blDestroyed == false) {
-                        aSnMetroid[i].physicsBody?.categoryBitMask = 0
-                        aSnMetroid[i].fctExplode()
+                for var i = 0; i < aSnmeteroite.count; i++ {
+                    if (secondNode == aSnmeteroite[i] || firstNode == aSnmeteroite[i]) && (aSnmeteroite[i].blDestroyed == false) {
+                        aSnmeteroite[i].physicsBody?.categoryBitMask = 0
+                        aSnmeteroite[i].fctExplode()
                     }
                 }
                 for var i = 0; i < aSnLaser01.count; i++ {
@@ -273,15 +298,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         aSnLaser01[i].fctExplode()
                     }
                 }
-            case (enBodyType.ship.rawValue | enBodyType.metroid.rawValue):
+            case (enBodyType.ship.rawValue | enBodyType.meteroite.rawValue):
                 blGameOver = true
                 iGameRestartCnt = 0
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
-                for var i = 0; i < aSnMetroid.count; i++ {
-                    if secondNode == aSnMetroid[i] || firstNode == aSnMetroid[i] {
-                        aSnMetroid[i].physicsBody?.categoryBitMask = 0
-                        aSnMetroid[i].fctExplode()
+                for var i = 0; i < aSnmeteroite.count; i++ {
+                    if secondNode == aSnmeteroite[i] || firstNode == aSnmeteroite[i] {
+                        aSnmeteroite[i].physicsBody?.categoryBitMask = 0
+                        aSnmeteroite[i].fctExplode()
                     }
                 }
                 //snShip.removeFromParent()
