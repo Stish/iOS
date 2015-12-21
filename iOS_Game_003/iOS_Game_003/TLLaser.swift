@@ -12,6 +12,7 @@ import AVFoundation
 
 class TLLaser: SKSpriteNode {
     var blDestroyed = false
+    var blActive = false
     
     init(size: CGSize) {
         super.init(texture: SKTexture(imageNamed: "effects/laser_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
@@ -35,13 +36,13 @@ class TLLaser: SKSpriteNode {
         let actShoot = SKAction.moveByX(flScreenWidth, y: 0, duration: 1.0)
         self.runAction(actShoot, completion: {() in
             self.removeFromParent()
-            self.name = "inactive"
+            self.blActive = false
         })
     }
     
     func fctExplode() {
         self.blDestroyed = true
         self.removeFromParent()
-        self.name = "inactive"
+        self.blActive = false
     }
 }

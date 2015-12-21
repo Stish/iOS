@@ -10,8 +10,9 @@ import Foundation
 import SpriteKit
 import AVFoundation
 
-class TLmeteroite: SKSpriteNode {
+class TLMeteroite: SKSpriteNode {
     var blDestroyed = false
+    var blActive = false
     
     init(size: CGSize) {
         super.init(texture: SKTexture(imageNamed: "objects/meteroite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
@@ -23,7 +24,7 @@ class TLmeteroite: SKSpriteNode {
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = false
         self.physicsBody?.categoryBitMask = enBodyType.meteroite.rawValue
-        self.physicsBody?.contactTestBitMask = enBodyType.laser.rawValue | enBodyType.ship.rawValue
+        self.physicsBody?.contactTestBitMask = enBodyType.laser.rawValue | enBodyType.ship.rawValue | enBodyType.meteroite.rawValue
         self.physicsBody?.collisionBitMask = 0
     }
 
@@ -32,11 +33,11 @@ class TLmeteroite: SKSpriteNode {
     }
 
     func fctMoveLeft() {
-        let actMoveLeft = SKAction.moveByX(-(flScreenWidth + 100), y: 0, duration: 2.5)
+        let actMoveLeft = SKAction.moveByX(-(flScreenWidth + 100), y: 0, duration: flMeteroiteSpeed)
 
         runAction(actMoveLeft, completion: {() in
             self.removeFromParent()
-            self.name = "inactive"
+            self.blActive = false
         })
     }
     
@@ -49,9 +50,9 @@ class TLmeteroite: SKSpriteNode {
         apExplosionSound.prepareToPlay()
         apExplosionSound.play()
         
-        let lbScore = SKLabelNode(fontNamed:"Menlo")
+        let lbScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbScore.text = "+100"
-        lbScore.fontSize = 25
+        lbScore.fontSize = 40
         lbScore.position = CGPoint(x: 0, y: 0 - (lbScore.frame.size.height / 2))
         lbScore.fontColor = UIColor.orangeColor()
         self.addChild(lbScore)
@@ -59,7 +60,7 @@ class TLmeteroite: SKSpriteNode {
         self.runAction(actExplode, completion: {() in
             self.removeFromParent()
             lbScore.removeFromParent()
-            self.name = "inactive"
+            self.blActive = false
         })
     }
 }

@@ -1,5 +1,11 @@
 # iOS_Game_003
 
+ver 0.16
+- meteorite speed and spawn time increases while playing
+- experimental HUD
+- custom fonts added
+- minor code improvements
+
 ver 0.15
 - meteorites renamed
 - more meteorites

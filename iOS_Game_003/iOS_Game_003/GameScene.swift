@@ -17,13 +17,27 @@ var flShipPosY: CGFloat!
 // --- game attributes ---
 var iGameScore = 0
 var blGameOver = false
+// --- game speed ---
+let flMeteroiteSpeedInit = Double(2.5)
+let iMeteroiteSpawnTimeInit = 10
+var flMeteroiteSpeed: Double!
+var iMeteroiteSpawnTime: Int!
 
 var myLabel: SKLabelNode!
 var lbGameScore: SKLabelNode!
 var lbGameOver: SKLabelNode!
+var lbGameTime: SKLabelNode!
+var lbLifes: SKLabelNode!
 var snBackground: TLBackground!
 var snShip: TLShip!
 var blGameStarted = false
+
+// --- game fonts ---
+//let fnGameFont = UIFont(name: "HomespunTTBRK", size: 10)
+//let fnGameFont = UIFont(name: "KarmaticArcade", size: 10)
+//let fnGameFont = UIFont(name: "Menlo", size: 10)
+let fnGameFont = UIFont(name: "Masaaki-Regular", size: 10)
+//let fnGameFont = UIFont(name: "OrigamiMommy", size: 10)
 
 var aExplosion_01 = Array<SKTexture>()
 
@@ -45,8 +59,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snInterfaceRight: SKSpriteNode!
     var selectedNodes = [UITouch:SKSpriteNode]()
     var aSnLaser01 = Array<TLLaser>()
-    var aSnmeteroite = Array<TLmeteroite>()
+    var aSnMeteroite = Array<TLMeteroite>()
     var iTimeSec: Int!
+    var iSpeedUpateCycleTimeSec: Int!
+    var iGameTimeSec: Int!
     var iTime100ms: Int!
     var iGameRestartCnt: Int!
     
@@ -54,7 +70,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
-        //view.showsPhysics = true
+        //view.showsPhysics = true // #debug
         // --- explosion sprites ---
         let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_001"))
@@ -70,6 +86,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_011"))
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_012"))
         
+//        for family: String in UIFont.familyNames()
+//        {
+//            print("\(family)")
+//            for names: String in UIFont.fontNamesForFamilyName(family)
+//            {
+//                print("== \(names)")
+//            }
+//        }
+        
+        flMeteroiteSpeed = flMeteroiteSpeedInit
+        iMeteroiteSpawnTime = iMeteroiteSpawnTimeInit
+        iSpeedUpateCycleTimeSec = 10
+        iGameTimeSec = 0
         iTimeSec = 0
         iTime100ms = 0
         iGameRestartCnt = 0
@@ -78,32 +107,61 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
         self.anchorPoint = CGPointMake(0, 0)
-        myLabel = SKLabelNode(fontNamed:"Arial")
-        myLabel.text = "Touch to start"
-        myLabel.fontSize = 45
-        myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - (myLabel.frame.size.height/2))
-        myLabel.fontColor = UIColor.whiteColor()
         
         snBackground = TLBackground(size: CGSizeMake(view.frame.width, view.frame.height))
         self.anchorPoint = CGPointMake(0.0, 0.0)
         //snGameMap.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
         snBackground.position = CGPoint(x: 0, y: 0)
         addChild(snBackground)
-        self.addChild(myLabel)
         
         snShip = TLShip(size: CGSizeMake(86.0, 78.0))
-        snShip.position = CGPoint(x: 120, y: view.frame.height/2)
+        snShip.position = CGPoint(x: 120, y: (view.frame.height/2) - 50)
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
         addChild(snShip)
         
+        //myLabel = SKLabelNode(fontNamed:"KarmaticArcade")
+        myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        myLabel.text = "Touch to start"
+        myLabel.fontSize = 60
+        myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - (myLabel.frame.size.height/2))
+        myLabel.fontColor = UIColor.whiteColor()
+        self.addChild(myLabel)
+        
         // --- Interface ---
-        lbGameScore = SKLabelNode(fontNamed:"Menlo")
+        //lbGameScore = SKLabelNode(fontNamed:"Menlo")
+        lbGameScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameScore.text = "0"
-        lbGameScore.fontSize = 25
-        lbGameScore.position = CGPoint(x:CGRectGetMidX(self.frame), y: self.frame.size.height - 30)
+        lbGameScore.fontSize = 30
+        lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + 220, y: 12)
         lbGameScore.fontColor = UIColor.orangeColor()
+        lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
+        lbGameScore.zPosition = 1.0
         self.addChild(lbGameScore)
+        
+        let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "hud_001.png"), color: UIColor.clearColor(), size: CGSizeMake(470, 50))
+        snHud.anchorPoint = CGPointMake(0.5, 0)
+        snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 0)
+        snHud.zPosition = 1.0
+        snHud.alpha = 0.75
+        addChild(snHud)
+        
+        lbGameTime = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbGameTime.text = "0s"
+        lbGameTime.fontSize = 30
+        lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 15)
+        lbGameTime.fontColor = UIColor.greenColor()
+        lbGameTime.zPosition = 1.0
+        self.addChild(lbGameTime)
+
+        lbLifes = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbLifes.text = "> > > >"
+        lbLifes.fontSize = 30
+        lbLifes.position = CGPoint(x: CGRectGetMidX(self.frame) - 220, y: 12)
+        lbLifes.fontColor = UIColor.blueColor()
+        lbLifes.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Left
+        lbLifes.zPosition = 1.0
+        self.addChild(lbLifes)
         
         // --- load sounds ---
         let path = NSBundle.mainBundle().pathForResource("/sounds/explosion_002", ofType:"wav")
@@ -136,6 +194,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         snShip.fctPlayShootingSound()
                         //print("right")
                         self.fctShootLaser01()
+                        print("Lasers: " + String(aSnLaser01.count))
                     }
                 }
             }
@@ -181,60 +240,45 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if blGameOver == true {
                 iGameRestartCnt = iGameRestartCnt + 1
             }
-            if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
+            if (iTime100ms % iMeteroiteSpawnTime == 0) && (blGameOver == false) && (blGameStarted == true) {
                 //print(iTimeSec) // #debug
-                if aSnmeteroite.count == 0
+                if aSnMeteroite.count == 0
                 {
-                    aSnmeteroite.append(TLmeteroite(size: CGSizeMake(88, 83)))
-                    aSnmeteroite[0].name = "inactive"
+                    aSnMeteroite.append(TLMeteroite(size: CGSizeMake(88, 83)))
+                    aSnMeteroite[0].blActive = false
                 }
-                allElements: for var i = 0; i < aSnmeteroite.count; i++ {
-                    if aSnmeteroite[i].name == "inactive" {
-                        aSnmeteroite[i] = TLmeteroite(size: CGSizeMake(88, 83))
-                        aSnmeteroite[i].name = "active"
-                        addChild(aSnmeteroite[i])
-                        aSnmeteroite[i].fctMoveLeft()
+                allElements: for var i = 0; i < aSnMeteroite.count; i++ {
+                    if aSnMeteroite[i].blActive == false {
+                        aSnMeteroite[i] = TLMeteroite(size: CGSizeMake(88, 83))
+                        aSnMeteroite[i].blActive = true
+                        addChild(aSnMeteroite[i])
+                        aSnMeteroite[i].fctMoveLeft()
                         break allElements
                     }
-                    if i == (aSnmeteroite.count - 1) {
-                        aSnmeteroite.append(TLmeteroite(size: CGSizeMake(88, 83)))
-                        aSnmeteroite[i+1].name = "active"
-                        addChild(aSnmeteroite[i+1])
-                        aSnmeteroite[i+1].fctMoveLeft()
+                    if i == (aSnMeteroite.count - 1) {
+                        aSnMeteroite.append(TLMeteroite(size: CGSizeMake(88, 83)))
+                        aSnMeteroite[i+1].blActive = true
+                        addChild(aSnMeteroite[i+1])
+                        aSnMeteroite[i+1].fctMoveLeft()
                         break allElements
                     }
                 }
-                print(aSnmeteroite.count) // #debug
+                print("Mets: " + String(aSnMeteroite.count)) // #debug
+                //print(iTime100ms) // #debug
             }
-        }
-        // --- every 1s ---
-        if (iTimeSec != Int(currentTime)) && (blGameStarted == true) {
-            iTimeSec = Int(currentTime)
-//            if (iTimeSec % 1 == 0) && (blGameOver == false) {
-//                //print(iTimeSec) // #debug
-//                if aSnmeteroite.count == 0
-//                {
-//                    aSnmeteroite.append(TLmeteroite(size: CGSizeMake(88, 83)))
-//                    aSnmeteroite[0].name = "inactive"
-//                }
-//                allElements: for var i = 0; i < aSnmeteroite.count; i++ {
-//                    if aSnmeteroite[i].name == "inactive" {
-//                        aSnmeteroite[i] = TLmeteroite(size: CGSizeMake(88, 83))
-//                        aSnmeteroite[i].name = "active"
-//                        addChild(aSnmeteroite[i])
-//                        aSnmeteroite[i].fctMoveLeft()
-//                        break allElements
-//                    }
-//                    if i == (aSnmeteroite.count - 1) {
-//                        aSnmeteroite.append(TLmeteroite(size: CGSizeMake(88, 83)))
-//                        aSnmeteroite[i+1].name = "active"
-//                        addChild(aSnmeteroite[i+1])
-//                        aSnmeteroite[i+1].fctMoveLeft()
-//                        break allElements
-//                    }
-//                }
-//                print(aSnmeteroite.count) // #debug
-//            }
+            // --- every 1s
+            if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
+                iGameTimeSec = iGameTimeSec + 1
+                lbGameTime.text = String(iGameTimeSec) + "s"
+                if iGameTimeSec % iSpeedUpateCycleTimeSec == 0 {
+                    if flMeteroiteSpeed > 0.1 {
+                        flMeteroiteSpeed = flMeteroiteSpeed - 0.1
+                    }
+                    if iMeteroiteSpawnTime > 1 {
+                        iMeteroiteSpawnTime = iMeteroiteSpawnTime - 1
+                    }
+                }
+            }
         }
     }
     
@@ -257,19 +301,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if aSnLaser01.count == 0
         {
             aSnLaser01.append(TLLaser(size: CGSizeMake(60, 5)))
-            aSnLaser01[0].name = "inactive"
+            aSnLaser01[0].blActive = false
         }
         allElements: for var i = 0; i < aSnLaser01.count; i++ {
-            if aSnLaser01[i].name == "inactive" {
+            if aSnLaser01[i].blActive == false {
                 aSnLaser01[i] = TLLaser(size: CGSizeMake(60, 5))
-                aSnLaser01[i].name = "active"
+                aSnLaser01[i].blActive = true
                 addChild(aSnLaser01[i])
                 aSnLaser01[i].fctMoveRight()
                 break allElements
             }
             if i == (aSnLaser01.count - 1) {
                 aSnLaser01.append(TLLaser(size: CGSizeMake(60, 5)))
-                aSnLaser01[i+1].name = "active"
+                aSnLaser01[i+1].blActive = true
                 addChild(aSnLaser01[i+1])
                 aSnLaser01[i+1].fctMoveRight()
                 break allElements
@@ -286,15 +330,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             case enBodyType.laser.rawValue | enBodyType.meteroite.rawValue:
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
-                for var i = 0; i < aSnmeteroite.count; i++ {
-                    if (secondNode == aSnmeteroite[i] || firstNode == aSnmeteroite[i]) && (aSnmeteroite[i].blDestroyed == false) {
-                        aSnmeteroite[i].physicsBody?.categoryBitMask = 0
-                        aSnmeteroite[i].fctExplode()
+                for var i = 0; i < aSnMeteroite.count; i++ {
+                    if (secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i]) && (aSnMeteroite[i].blDestroyed == false) {
+                        aSnMeteroite[i].physicsBody?.categoryBitMask = 0
+                        aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
+                        aSnMeteroite[i].fctExplode()
                     }
                 }
                 for var i = 0; i < aSnLaser01.count; i++ {
                     if (secondNode == aSnLaser01[i] || firstNode == aSnLaser01[i]) && (aSnLaser01[i].blDestroyed == false)  {
                         aSnLaser01[i].physicsBody?.categoryBitMask = 0
+                        aSnLaser01[i].physicsBody?.contactTestBitMask = 0
                         aSnLaser01[i].fctExplode()
                     }
                 }
@@ -303,16 +349,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 iGameRestartCnt = 0
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
-                for var i = 0; i < aSnmeteroite.count; i++ {
-                    if secondNode == aSnmeteroite[i] || firstNode == aSnmeteroite[i] {
-                        aSnmeteroite[i].physicsBody?.categoryBitMask = 0
-                        aSnmeteroite[i].fctExplode()
+                for var i = 0; i < aSnMeteroite.count; i++ {
+                    if secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i] {
+                        aSnMeteroite[i].physicsBody?.categoryBitMask = 0
+                        aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
+                        aSnMeteroite[i].fctExplode()
                     }
                 }
                 //snShip.removeFromParent()
                 self.fctGameOver()
                 snShip.physicsBody?.categoryBitMask = 0
                 snShip.fctExplode()
+            case (enBodyType.meteroite.rawValue):
+                let secondNode = contact.bodyB.node
+                let firstNode = contact.bodyA.node
+                for var i = 0; i < aSnMeteroite.count; i++ {
+                    if (secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i]) && (aSnMeteroite[i].blDestroyed == false) {
+                        aSnMeteroite[i].physicsBody?.categoryBitMask = 0
+                        aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
+                        aSnMeteroite[i].fctExplode()
+                    }
+                }
             default:
                 return
             }
@@ -321,15 +378,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func fctGameOver() {
         iGameRestartCnt = 0
-        lbGameOver = SKLabelNode(fontNamed:"Menlo")
+        lbGameOver = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameOver.text = "GAME OVER"
-        lbGameOver.fontSize = 70
+        lbGameOver.fontSize = 90
         lbGameOver.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame) - (lbGameOver.frame.size.height/2))
         lbGameOver.fontColor = UIColor.whiteColor()
         self.addChild(lbGameOver)
+        
+        for var i = 0; i < aSnMeteroite.count; i++ {
+            aSnMeteroite[i].physicsBody?.categoryBitMask = 0
+            aSnMeteroite[i].blActive = false
+            aSnMeteroite[i].removeFromParent()
+        }
     }
     
     func fctNewGame() {
+        flMeteroiteSpeed = flMeteroiteSpeedInit
+        iMeteroiteSpawnTime = iMeteroiteSpawnTimeInit
+        iGameTimeSec = 0
+        lbGameTime.text = "0s"
         blGameOver = false
         lbGameOver.removeFromParent()
         snBackground.removeAllActions()
@@ -341,7 +408,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameScore.text = "0"
         
         snShip = TLShip(size: CGSizeMake(86.0, 78.0))
-        snShip.position = CGPoint(x: 120, y: view!.frame.height/2)
+        snShip.position = CGPoint(x: 120, y: (view!.frame.height/2) - 50)
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
         addChild(snShip)

@@ -15,6 +15,7 @@ class TLShip: SKSpriteNode {
     var aShipFlyLeft = Array<SKTexture>()
     var aShipFlyRight = Array<SKTexture>()
     var apShootingSound: AVAudioPlayer!
+    var blActive = false
     
     init(size: CGSize) {
         let taShip = SKTextureAtlas(named:"ship.atlas")
@@ -30,7 +31,7 @@ class TLShip: SKSpriteNode {
         self.anchorPoint = CGPointMake(0.5, 0.5)
         self.fctStartFlyAnimationFront()
         // --- physics body ---
-        self.physicsBody = SKPhysicsBody(circleOfRadius: self.size.width/2)
+        self.physicsBody = SKPhysicsBody(circleOfRadius: (self.size.width/2) - 10)
         self.physicsBody?.dynamic = true
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = false
@@ -101,7 +102,7 @@ class TLShip: SKSpriteNode {
         
         self.runAction(actExplode, completion: {() in
             self.removeFromParent()
-            self.name = "inactive"
+            self.blActive = false
         })
     }
 }
