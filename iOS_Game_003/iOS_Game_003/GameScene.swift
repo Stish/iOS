@@ -19,9 +19,15 @@ var iGameScore = 0
 var blGameOver = false
 // --- game speed ---
 let flMeteroiteSpeedInit = Double(2.5)
-let iMeteroiteSpawnTimeInit = 10
+let iMeteroiteSpawnTimeInit = 15
 var flMeteroiteSpeed: Double!
 var iMeteroiteSpawnTime: Int!
+let iSpeedUpateCycleTimeSec = 15
+// --- game objects ---
+let flMeteroiteSizeMax = CGFloat(120)
+let flMeteroiteSizeMin = CGFloat(50)
+let flShipSizeWidth = CGFloat(70)
+let flShipSizeHeight = CGFloat(62)
 
 var myLabel: SKLabelNode!
 var lbGameScore: SKLabelNode!
@@ -61,7 +67,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var aSnLaser01 = Array<TLLaser>()
     var aSnMeteroite = Array<TLMeteroite>()
     var iTimeSec: Int!
-    var iSpeedUpateCycleTimeSec: Int!
     var iGameTimeSec: Int!
     var iTime100ms: Int!
     var iGameRestartCnt: Int!
@@ -70,7 +75,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
-        //view.showsPhysics = true // #debug
+        view.showsPhysics = true // #debug
         // --- explosion sprites ---
         let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_001"))
@@ -97,7 +102,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         flMeteroiteSpeed = flMeteroiteSpeedInit
         iMeteroiteSpawnTime = iMeteroiteSpawnTimeInit
-        iSpeedUpateCycleTimeSec = 10
+        
         iGameTimeSec = 0
         iTimeSec = 0
         iTime100ms = 0
@@ -114,7 +119,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snBackground.position = CGPoint(x: 0, y: 0)
         addChild(snBackground)
         
-        snShip = TLShip(size: CGSizeMake(86.0, 78.0))
+        snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
         snShip.position = CGPoint(x: 120, y: (view.frame.height/2) - 50)
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
@@ -185,7 +190,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             snBackground.fctMoveLeft()
         } else if blGameOver == false {
             for touch:AnyObject in touches {
-                if touch.locationInView(view).x <= view!.frame.size.width/2 {
+                if touch.locationInView(view).x <= 200.0 {
                     let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
                     snShip.fctMoveShipByY(deltaY)
                     //print("left")
@@ -208,7 +213,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if (blGameOver == false) && (blGameStarted == true) {
             for touch in touches {
-                if touch.locationInView(view).x <= view!.frame.size.width/2 {
+                if touch.locationInView(view).x <= 200.0 {
                     let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
                     if (deltaY >= 3 && deltaY <= 50) {
                         snShip.fctStartFlyAnimationLeft()
@@ -242,21 +247,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             if (iTime100ms % iMeteroiteSpawnTime == 0) && (blGameOver == false) && (blGameStarted == true) {
                 //print(iTimeSec) // #debug
+                // flMeteroiteSizeMax
+                let flMetSize = CGFloat(arc4random_uniform(UInt32(flMeteroiteSizeMax - flMeteroiteSizeMin)) + 1 + UInt32(flMeteroiteSizeMin))
+                let flRotSpeed = CGFloat(arc4random_uniform(5) + 1 + 5)
+                var iRotDirec = Int(arc4random_uniform(2))
+                if iRotDirec == 0 {
+                    iRotDirec = -1
+                }
+                print(flMetSize) // #debug
+                print(flRotSpeed) // #debug
+                print(iRotDirec) // #debug
                 if aSnMeteroite.count == 0
                 {
-                    aSnMeteroite.append(TLMeteroite(size: CGSizeMake(88, 83)))
+                    aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
                     aSnMeteroite[0].blActive = false
                 }
                 allElements: for var i = 0; i < aSnMeteroite.count; i++ {
                     if aSnMeteroite[i].blActive == false {
-                        aSnMeteroite[i] = TLMeteroite(size: CGSizeMake(88, 83))
+                        aSnMeteroite[i] = TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec)
                         aSnMeteroite[i].blActive = true
                         addChild(aSnMeteroite[i])
                         aSnMeteroite[i].fctMoveLeft()
                         break allElements
                     }
                     if i == (aSnMeteroite.count - 1) {
-                        aSnMeteroite.append(TLMeteroite(size: CGSizeMake(88, 83)))
+                        aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
                         aSnMeteroite[i+1].blActive = true
                         addChild(aSnMeteroite[i+1])
                         aSnMeteroite[i+1].fctMoveLeft()
@@ -407,7 +422,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         iGameScore = 0
         lbGameScore.text = "0"
         
-        snShip = TLShip(size: CGSizeMake(86.0, 78.0))
+        snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
         snShip.position = CGPoint(x: 120, y: (view!.frame.height/2) - 50)
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
