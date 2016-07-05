@@ -1,8 +1,7 @@
 # iOS_Game_003
 
 ToDo
-- improve background transitions
-- different textures for meteorites
+- shields for the space ship
 - health points for the space ship
 - health points for the meteorites
 - power ups
@@ -10,12 +9,19 @@ ToDo
 - ship inventory
 - enemies
 - high score list
-- options menu 
+- options menu
 - adjustable volume of sound effects
 - adjustable volume of music
 - game pause
 - nebulas
 - random backgrounds
+
+ver 0.18
+- improve background transitions
+- different backgrounds
+- different textures for meteorites
+- different health points for meteorites
+- minor bug fixes
 
 ver 0.17
 - meteorites appear random sizes
@@ -41,7 +47,7 @@ ver 0.1
 - sprites and backgrounds
 - movement of ship
 - movement of backgrounds
-- moving object: meteorite 
+- moving object: meteorite
 - laser weapon
 - collision detection
 - explosions

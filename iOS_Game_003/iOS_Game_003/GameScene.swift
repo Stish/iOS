@@ -9,6 +9,8 @@
 import SpriteKit
 import AVFoundation
 
+// Debugging
+var blGameTest = true
 // Game positions
 var flScreenWidth: CGFloat!
 var flScreenHeight: CGFloat!
@@ -24,6 +26,7 @@ var flMeteroiteSpeed: Double!
 var iMeteroiteSpawnTime: Int!
 let iSpeedUpateCycleTimeSec = 15
 // --- game objects ---
+let iMeteroiteSkinCnt = 6
 let flMeteroiteSizeMax = CGFloat(120)
 let flMeteroiteSizeMin = CGFloat(50)
 let flShipSizeWidth = CGFloat(70)
@@ -75,7 +78,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
-        view.showsPhysics = true // #debug
+        view.showsPhysics = false // #debug
         // --- explosion sprites ---
         let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_001"))
@@ -262,7 +265,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
                     aSnMeteroite[0].blActive = false
                 }
-                allElements: for var i = 0; i < aSnMeteroite.count; i++ {
+                allElements: for i in 0 ..< aSnMeteroite.count {
                     if aSnMeteroite[i].blActive == false {
                         aSnMeteroite[i] = TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec)
                         aSnMeteroite[i].blActive = true
@@ -318,7 +321,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             aSnLaser01.append(TLLaser(size: CGSizeMake(60, 5)))
             aSnLaser01[0].blActive = false
         }
-        allElements: for var i = 0; i < aSnLaser01.count; i++ {
+        allElements: for i in 0 ..< aSnLaser01.count {
             if aSnLaser01[i].blActive == false {
                 aSnLaser01[i] = TLLaser(size: CGSizeMake(60, 5))
                 aSnLaser01[i].blActive = true
@@ -345,14 +348,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             case enBodyType.laser.rawValue | enBodyType.meteroite.rawValue:
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
-                for var i = 0; i < aSnMeteroite.count; i++ {
+                for i in 0 ..< aSnMeteroite.count {
                     if (secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i]) && (aSnMeteroite[i].blDestroyed == false) {
-                        aSnMeteroite[i].physicsBody?.categoryBitMask = 0
-                        aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
-                        aSnMeteroite[i].fctExplode()
+                        aSnMeteroite[i].iHealth -= 100
+                        if aSnMeteroite[i].iHealth <= 0 {
+                            aSnMeteroite[i].physicsBody?.categoryBitMask = 0
+                            aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
+                            aSnMeteroite[i].fctExplode()
+                        } else {
+                            // ToDo
+                        }
                     }
                 }
-                for var i = 0; i < aSnLaser01.count; i++ {
+                for i in 0 ..< aSnLaser01.count {
                     if (secondNode == aSnLaser01[i] || firstNode == aSnLaser01[i]) && (aSnLaser01[i].blDestroyed == false)  {
                         aSnLaser01[i].physicsBody?.categoryBitMask = 0
                         aSnLaser01[i].physicsBody?.contactTestBitMask = 0
@@ -360,25 +368,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     }
                 }
             case (enBodyType.ship.rawValue | enBodyType.meteroite.rawValue):
-                blGameOver = true
-                iGameRestartCnt = 0
-                let secondNode = contact.bodyB.node
-                let firstNode = contact.bodyA.node
-                for var i = 0; i < aSnMeteroite.count; i++ {
-                    if secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i] {
-                        aSnMeteroite[i].physicsBody?.categoryBitMask = 0
-                        aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
-                        aSnMeteroite[i].fctExplode()
+                if blGameTest == false {
+                    blGameOver = true
+                    iGameRestartCnt = 0
+                    let secondNode = contact.bodyB.node
+                    let firstNode = contact.bodyA.node
+                    for i in 0 ..< aSnMeteroite.count {
+                        if secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i] {
+                            aSnMeteroite[i].physicsBody?.categoryBitMask = 0
+                            aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
+                            aSnMeteroite[i].fctExplode()
+                        }
                     }
+                    //snShip.removeFromParent()
+                    self.fctGameOver()
+                    snShip.physicsBody?.categoryBitMask = 0
+                    snShip.fctExplode()
                 }
-                //snShip.removeFromParent()
-                self.fctGameOver()
-                snShip.physicsBody?.categoryBitMask = 0
-                snShip.fctExplode()
             case (enBodyType.meteroite.rawValue):
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
-                for var i = 0; i < aSnMeteroite.count; i++ {
+                for i in 0 ..< aSnMeteroite.count {
                     if (secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i]) && (aSnMeteroite[i].blDestroyed == false) {
                         aSnMeteroite[i].physicsBody?.categoryBitMask = 0
                         aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
@@ -400,7 +410,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameOver.fontColor = UIColor.whiteColor()
         self.addChild(lbGameOver)
         
-        for var i = 0; i < aSnMeteroite.count; i++ {
+        for i in 0 ..< aSnMeteroite.count {
             aSnMeteroite[i].physicsBody?.categoryBitMask = 0
             aSnMeteroite[i].blActive = false
             aSnMeteroite[i].removeFromParent()

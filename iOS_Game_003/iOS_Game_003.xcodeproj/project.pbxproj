@@ -12,6 +12,8 @@
 		FA25BDD41C28551900BF0C3A /* Masaaki-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = FA25BDD21C28551900BF0C3A /* Masaaki-Regular.otf */; };
 		FA25BDD51C28551900BF0C3A /* origa___.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA25BDD31C28551900BF0C3A /* origa___.ttf */; };
 		FA25BDD71C28696500BF0C3A /* hud_001.png in Resources */ = {isa = PBXBuildFile; fileRef = FA25BDD61C28696500BF0C3A /* hud_001.png */; };
+		FAB007811D2BD19D00ED7FCE /* Media in Resources */ = {isa = PBXBuildFile; fileRef = FAB007801D2BD19D00ED7FCE /* Media */; };
+		FAB007831D2BD1B900ED7FCE /* backgrounds in Resources */ = {isa = PBXBuildFile; fileRef = FAB007821D2BD1B900ED7FCE /* backgrounds */; };
 		FAE3E3371C2096E1004F5D3A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE3E3361C2096E1004F5D3A /* AppDelegate.swift */; };
 		FAE3E3391C2096E1004F5D3A /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = FAE3E3381C2096E1004F5D3A /* GameScene.sks */; };
 		FAE3E33B1C2096E1004F5D3A /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE3E33A1C2096E1004F5D3A /* GameScene.swift */; };
@@ -28,8 +30,6 @@
 		FAF15CE51C23077F00CB5827 /* effects in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CE41C23077F00CB5827 /* effects */; };
 		FAF15CE71C23171600CB5827 /* sounds in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CE61C23171600CB5827 /* sounds */; };
 		FAF15CE91C231C1E00CB5827 /* explosion.atlas in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CE81C231C1E00CB5827 /* explosion.atlas */; };
-		FAF15CEC1C240D3200CB5827 /* background_001.png in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CEA1C240D3200CB5827 /* background_001.png */; };
-		FAF15CED1C240D3200CB5827 /* background_002.png in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CEB1C240D3200CB5827 /* background_002.png */; };
 		FAF15CF21C2420D200CB5827 /* icon_120_001.png in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CF01C2420D200CB5827 /* icon_120_001.png */; };
 		FAF15CF31C2420D200CB5827 /* icon_180_001.png in Resources */ = {isa = PBXBuildFile; fileRef = FAF15CF11C2420D200CB5827 /* icon_180_001.png */; };
 /* End PBXBuildFile section */
@@ -40,6 +40,8 @@
 		FA25BDD21C28551900BF0C3A /* Masaaki-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Masaaki-Regular.otf"; path = "Media/Masaaki-Regular.otf"; sourceTree = SOURCE_ROOT; };
 		FA25BDD31C28551900BF0C3A /* origa___.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "origa___.ttf"; path = "Media/origa___.ttf"; sourceTree = SOURCE_ROOT; };
 		FA25BDD61C28696500BF0C3A /* hud_001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hud_001.png; path = Media/hud_001.png; sourceTree = SOURCE_ROOT; };
+		FAB007801D2BD19D00ED7FCE /* Media */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Media; sourceTree = "<group>"; };
+		FAB007821D2BD1B900ED7FCE /* backgrounds */ = {isa = PBXFileReference; lastKnownFileType = folder; name = backgrounds; path = Media/backgrounds; sourceTree = SOURCE_ROOT; };
 		FAE3E3331C2096E1004F5D3A /* iOS_Game_003.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOS_Game_003.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAE3E3361C2096E1004F5D3A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FAE3E3381C2096E1004F5D3A /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -58,8 +60,6 @@
 		FAF15CE41C23077F00CB5827 /* effects */ = {isa = PBXFileReference; lastKnownFileType = folder; name = effects; path = ../Media/effects; sourceTree = "<group>"; };
 		FAF15CE61C23171600CB5827 /* sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sounds; path = ../Media/sounds; sourceTree = "<group>"; };
 		FAF15CE81C231C1E00CB5827 /* explosion.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; name = explosion.atlas; path = ../Media/explosion.atlas; sourceTree = "<group>"; };
-		FAF15CEA1C240D3200CB5827 /* background_001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background_001.png; path = Media/background_001.png; sourceTree = SOURCE_ROOT; };
-		FAF15CEB1C240D3200CB5827 /* background_002.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = background_002.png; path = Media/background_002.png; sourceTree = SOURCE_ROOT; };
 		FAF15CF01C2420D200CB5827 /* icon_120_001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_120_001.png; path = Media/icon_120_001.png; sourceTree = SOURCE_ROOT; };
 		FAF15CF11C2420D200CB5827 /* icon_180_001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_180_001.png; path = Media/icon_180_001.png; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -78,6 +78,7 @@
 		FAE3E32A1C2096E0004F5D3A = {
 			isa = PBXGroup;
 			children = (
+				FAB007801D2BD19D00ED7FCE /* Media */,
 				FAE3E3351C2096E1004F5D3A /* iOS_Game_003 */,
 				FAE3E3341C2096E1004F5D3A /* Products */,
 			);
@@ -114,6 +115,7 @@
 		FAE3E34C1C209BEF004F5D3A /* Media */ = {
 			isa = PBXGroup;
 			children = (
+				FAB007821D2BD1B900ED7FCE /* backgrounds */,
 				FA25BDD61C28696500BF0C3A /* hud_001.png */,
 				FA25BDD21C28551900BF0C3A /* Masaaki-Regular.otf */,
 				FA25BDD31C28551900BF0C3A /* origa___.ttf */,
@@ -126,18 +128,8 @@
 				FAF15CE41C23077F00CB5827 /* effects */,
 				FAF15CE01C22F9FF00CB5827 /* objects */,
 				FAE3E3561C2156FF004F5D3A /* ship.atlas */,
-				FAE3E34D1C209BF8004F5D3A /* backgrounds */,
 			);
 			name = Media;
-			sourceTree = "<group>";
-		};
-		FAE3E34D1C209BF8004F5D3A /* backgrounds */ = {
-			isa = PBXGroup;
-			children = (
-				FAF15CEA1C240D3200CB5827 /* background_001.png */,
-				FAF15CEB1C240D3200CB5827 /* background_002.png */,
-			);
-			name = backgrounds;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,18 +192,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA25BDD41C28551900BF0C3A /* Masaaki-Regular.otf in Resources */,
+				FAB007811D2BD19D00ED7FCE /* Media in Resources */,
 				FA25BDCF1C284F5E00BF0C3A /* ka1.ttf in Resources */,
 				FAF15CE71C23171600CB5827 /* sounds in Resources */,
 				FAE3E3391C2096E1004F5D3A /* GameScene.sks in Resources */,
 				FAF15CF21C2420D200CB5827 /* icon_120_001.png in Resources */,
 				FAE3E3451C2096E1004F5D3A /* LaunchScreen.storyboard in Resources */,
 				FAF15CF31C2420D200CB5827 /* icon_180_001.png in Resources */,
-				FAF15CEC1C240D3200CB5827 /* background_001.png in Resources */,
-				FAF15CED1C240D3200CB5827 /* background_002.png in Resources */,
 				FAF15CE91C231C1E00CB5827 /* explosion.atlas in Resources */,
 				FAE3E3421C2096E1004F5D3A /* Assets.xcassets in Resources */,
 				FAE3E3401C2096E1004F5D3A /* Main.storyboard in Resources */,
 				FAE3E3571C2156FF004F5D3A /* ship.atlas in Resources */,
+				FAB007831D2BD1B900ED7FCE /* backgrounds in Resources */,
 				FA25BDD11C28539700BF0C3A /* homespun.ttf in Resources */,
 				FAF15CE11C22F9FF00CB5827 /* objects in Resources */,
 				FAF15CE51C23077F00CB5827 /* effects in Resources */,

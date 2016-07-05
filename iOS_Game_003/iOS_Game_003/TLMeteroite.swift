@@ -13,9 +13,35 @@ import AVFoundation
 class TLMeteroite: SKSpriteNode {
     var blDestroyed = false
     var blActive = false
+    var iHealth = 100
+    var iScore = 100
     
     init(size: CGSize, rotSpeed: CGFloat, rotDirec: Int) {
         super.init(texture: SKTexture(imageNamed: "objects/meteroite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
+        // Different textures
+        switch (arc4random_uniform(UInt32(100)) + 1) {
+        case 1...30:
+            self.texture = SKTexture(imageNamed: "objects/meteroite_001.png")
+        case 31...60:
+            self.texture = SKTexture(imageNamed: "objects/meteroite_002.png")
+        case 61...90:
+            self.texture = SKTexture(imageNamed: "objects/meteroite_003.png")
+        case 91...93:
+            self.texture = SKTexture(imageNamed: "objects/meteroite_004.png")
+            iHealth = 200
+            iScore = 200
+        case 94...96:
+            self.texture = SKTexture(imageNamed: "objects/meteroite_005.png")
+            iHealth = 200
+            iScore = 200
+        case 97...100:
+            self.texture = SKTexture(imageNamed: "objects/meteroite_006.png")
+            iHealth = 200
+            iScore = 200
+        default:
+            return
+        }
+        
         self.anchorPoint = CGPointMake(0.5, 0.5)
         self.position = CGPoint(x: flScreenWidth + 88/2, y: CGFloat(arc4random_uniform(UInt32(flScreenHeight)) + 1))
         // --- physics body ---
@@ -52,14 +78,14 @@ class TLMeteroite: SKSpriteNode {
     func fctExplode() {
         let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.07)
         self.blDestroyed = true
-        iGameScore = iGameScore + 100
+        iGameScore = iGameScore + iScore
         lbGameScore.text = String(iGameScore)
         self.removeAllActions()
         apExplosionSound.prepareToPlay()
         apExplosionSound.play()
         
         let lbScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbScore.text = "+100"
+        lbScore.text = "+" + String(iScore)
         lbScore.fontSize = 40
         lbScore.position = CGPoint(x: 0, y: 0 - (lbScore.frame.size.height / 2))
         lbScore.fontColor = UIColor.orangeColor()
