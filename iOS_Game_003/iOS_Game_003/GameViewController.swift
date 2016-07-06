@@ -11,21 +11,29 @@ import SpriteKit
 
 class GameViewController: UIViewController {
     
-    var scene: GameScene!
+    var scGame: GameScene!
+    var scGameStart: TLGameStart!
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         
         // --- configure the view
         let skView = view as! SKView
         skView.multipleTouchEnabled = true // no multitouch allowed
+        skView.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
         
         // --- create and configure the scene
-        scene = GameScene(size: skView.bounds.size)
-        scene.scaleMode = .AspectFill
+        scGame = GameScene(size: skView.bounds.size)
+        scGame.scaleMode = .AspectFill
+        
+        scGameStart = TLGameStart(size: skView.bounds.size)
+        scGameStart.scaleMode = .AspectFill
+        
         
         // --- present the scene
-        skView.presentScene(scene)
+        
+        skView.presentScene(scGameStart)
     }
     
     override func shouldAutorotate() -> Bool {

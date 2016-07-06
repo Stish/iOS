@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var blGameTest = true
+var blGameTest = false
 // Game positions
 var flScreenWidth: CGFloat!
 var flScreenHeight: CGFloat!
@@ -57,7 +57,7 @@ enum enBodyType: UInt32 {
 }
 // --- sounds ---
 var apExplosionSound: AVAudioPlayer!
-
+var apHitSound: AVAudioPlayer!
 
 // Debug
 var debug_LaserCnt = 0
@@ -172,8 +172,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(lbLifes)
         
         // --- load sounds ---
-        let path = NSBundle.mainBundle().pathForResource("/sounds/explosion_002", ofType:"wav")
-        let fileURL = NSURL(fileURLWithPath: path!)
+        var path = NSBundle.mainBundle().pathForResource("/sounds/explosion_002", ofType:"wav")
+        var fileURL = NSURL(fileURLWithPath: path!)
         do {
             try apExplosionSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
         } catch {
@@ -181,6 +181,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             return
         }
         apExplosionSound.numberOfLoops = 0
+        
+        path = NSBundle.mainBundle().pathForResource("/sounds/hit_001", ofType:"mp3")
+        fileURL = NSURL(fileURLWithPath: path!)
+        do {
+            try apHitSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+        } catch {
+            print("Could not create audio player: \(error)")
+            return
+        }
+        apHitSound.numberOfLoops = 0
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -209,6 +219,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         if (blGameOver == true) && (iGameRestartCnt >= 7) {
             snShip.removeFromParent()
+            //fctNewGame()
+            let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.3)
+            
+            let nextScene = TLGameMenu(size: self.scene!.size)
+            nextScene.scaleMode = .AspectFill
+            
+            self.scene?.view?.presentScene(nextScene, transition: transition)
+            //fctNewGame()
+            //self.delete(self)
             fctNewGame()
         }
     }
@@ -357,6 +376,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             aSnMeteroite[i].fctExplode()
                         } else {
                             // ToDo
+                            aSnMeteroite[i].fctHit()
                         }
                     }
                 }
@@ -427,15 +447,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snBackground.removeAllActions()
         snBackground.fctResetPos()
         //sleep(2)
-        myLabel.hidden = false
+        //myLabel.hidden = false
         blGameStarted = false
         iGameScore = 0
         lbGameScore.text = "0"
         
-        snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
-        snShip.position = CGPoint(x: 120, y: (view!.frame.height/2) - 50)
-        flShipPosX = snShip.position.x
-        flShipPosY = snShip.position.y
-        addChild(snShip)
+        //snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
+        //snShip.position = CGPoint(x: 120, y: (view!.frame.height/2) - 50)
+        //flShipPosX = snShip.position.x
+        //flShipPosY = snShip.position.y
+        //addChild(snShip)
     }
 }

@@ -16,6 +16,12 @@ ToDo
 - nebulas
 - random backgrounds
 
+ver 0.19
+- Title screen added
+- Menu screen added
+- Hit sounds
+- minor bug fixes
+
 ver 0.18
 - improve background transitions
 - different backgrounds

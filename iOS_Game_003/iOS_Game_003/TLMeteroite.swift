@@ -98,4 +98,9 @@ class TLMeteroite: SKSpriteNode {
             self.blActive = false
         })
     }
+    
+    func fctHit() {
+        apHitSound.prepareToPlay()
+        apHitSound.play()
+    }
 }
