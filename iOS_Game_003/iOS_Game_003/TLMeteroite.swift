@@ -15,6 +15,8 @@ class TLMeteroite: SKSpriteNode {
     var blActive = false
     var iHealth = 100
     var iScore = 100
+    var apExplosionSound: AVAudioPlayer!
+    var apHitSound: AVAudioPlayer!
     
     init(size: CGSize, rotSpeed: CGFloat, rotDirec: Int) {
         super.init(texture: SKTexture(imageNamed: "objects/meteroite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
@@ -29,17 +31,17 @@ class TLMeteroite: SKSpriteNode {
         case 91...93:
             self.texture = SKTexture(imageNamed: "objects/meteroite_004.png")
             iHealth = 200
-            iScore = 200
+            iScore = 500
         case 94...96:
             self.texture = SKTexture(imageNamed: "objects/meteroite_005.png")
             iHealth = 200
-            iScore = 200
+            iScore = 500
         case 97...100:
             self.texture = SKTexture(imageNamed: "objects/meteroite_006.png")
             iHealth = 200
-            iScore = 200
+            iScore = 500
         default:
-            return
+            ()
         }
         
         self.anchorPoint = CGPointMake(0.5, 0.5)
@@ -81,25 +83,46 @@ class TLMeteroite: SKSpriteNode {
         iGameScore = iGameScore + iScore
         lbGameScore.text = String(iGameScore)
         self.removeAllActions()
+        // --- load sounds ---
+        let path = NSBundle.mainBundle().pathForResource("/sounds/explosion_002", ofType:"wav")
+        let fileURL = NSURL(fileURLWithPath: path!)
+        do {
+            apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            apExplosionSound.numberOfLoops = 0
+        } catch {
+            print("Could not create audio player: \(error)")
+            return
+        }
         apExplosionSound.prepareToPlay()
         apExplosionSound.play()
-        
+        // --- Score ---
         let lbScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbScore.text = "+" + String(iScore)
-        lbScore.fontSize = 40
+        lbScore.fontSize = 30
         lbScore.position = CGPoint(x: 0, y: 0 - (lbScore.frame.size.height / 2))
         lbScore.fontColor = UIColor.orangeColor()
         self.runAction(SKAction.rotateToAngle(0, duration: 0))
         self.addChild(lbScore)
         
         self.runAction(actExplode, completion: {() in
-            self.removeFromParent()
             lbScore.removeFromParent()
             self.blActive = false
+            self.removeAllActions()
+            self.removeFromParent()
         })
     }
     
     func fctHit() {
+        // --- load sounds ---
+        let path = NSBundle.mainBundle().pathForResource("/sounds/hit_001", ofType:"mp3")
+        let fileURL = NSURL(fileURLWithPath: path!)
+        do {
+            apHitSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            apHitSound.numberOfLoops = 0
+        } catch {
+            print("Could not create audio player: \(error)")
+            return
+        }
         apHitSound.prepareToPlay()
         apHitSound.play()
     }

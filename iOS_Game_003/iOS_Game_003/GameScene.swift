@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var blGameTest = false
+var blGameTest = true
 // Game positions
 var flScreenWidth: CGFloat!
 var flScreenHeight: CGFloat!
@@ -45,8 +45,8 @@ var blGameStarted = false
 //let fnGameFont = UIFont(name: "HomespunTTBRK", size: 10)
 //let fnGameFont = UIFont(name: "KarmaticArcade", size: 10)
 //let fnGameFont = UIFont(name: "Menlo", size: 10)
-let fnGameFont = UIFont(name: "Masaaki-Regular", size: 10)
-//let fnGameFont = UIFont(name: "OrigamiMommy", size: 10)
+//let fnGameFont = UIFont(name: "Masaaki-Regular", size: 10)
+let fnGameFont = UIFont(name: "OrigamiMommy", size: 10)
 
 var aExplosion_01 = Array<SKTexture>()
 
@@ -55,10 +55,6 @@ enum enBodyType: UInt32 {
     case laser = 2
     case meteroite = 4
 }
-// --- sounds ---
-var apExplosionSound: AVAudioPlayer!
-var apHitSound: AVAudioPlayer!
-
 // Debug
 var debug_LaserCnt = 0
 
@@ -73,14 +69,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var iGameTimeSec: Int!
     var iTime100ms: Int!
     var iGameRestartCnt: Int!
+////////
+    var defaults = NSUserDefaults()
+    var highscore = NSUserDefaults().integerForKey("highscore")
     
+    //if(Score>highscore)
+    //{
+    //    defaults.setInteger(Score, forKey: "highscore")
+    //}
+    var highscoreshow = NSUserDefaults().integerForKey("highscore")
+/////////
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
-        view.showsPhysics = false // #debug
+        view.showsPhysics = true // #debug
         // --- explosion sprites ---
         let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
+        aExplosion_01.removeAll()
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_001"))
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_002"))
         aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_003"))
@@ -123,6 +129,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(snBackground)
         
         snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
+        //snShip.position = CGPoint(x: 120*(flScreenWidth/667.0), y: (view.frame.height/2) - 50*(flScreenHeight/375.0))
         snShip.position = CGPoint(x: 120, y: (view.frame.height/2) - 50)
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
@@ -130,8 +137,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         //myLabel = SKLabelNode(fontNamed:"KarmaticArcade")
         myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        myLabel.text = "Touch to start"
-        myLabel.fontSize = 60
+        myLabel.text = "TOUCH TO START"
+        myLabel.fontSize = 40
         myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - (myLabel.frame.size.height/2))
         myLabel.fontColor = UIColor.whiteColor()
         self.addChild(myLabel)
@@ -140,57 +147,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //lbGameScore = SKLabelNode(fontNamed:"Menlo")
         lbGameScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameScore.text = "0"
-        lbGameScore.fontSize = 30
-        lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + 220, y: 12)
+        lbGameScore.fontSize = 22
+        lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + 216, y: 14)
         lbGameScore.fontColor = UIColor.orangeColor()
         lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
         lbGameScore.zPosition = 1.0
         self.addChild(lbGameScore)
         
-        let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "hud_001.png"), color: UIColor.clearColor(), size: CGSizeMake(470, 50))
+        let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_002.png"), color: UIColor.clearColor(), size: CGSizeMake(470, 60))
         snHud.anchorPoint = CGPointMake(0.5, 0)
-        snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 0)
+        snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3)
         snHud.zPosition = 1.0
         snHud.alpha = 0.75
         addChild(snHud)
         
         lbGameTime = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbGameTime.text = "0s"
-        lbGameTime.fontSize = 30
-        lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 15)
-        lbGameTime.fontColor = UIColor.greenColor()
+        lbGameTime.text = "0"
+        lbGameTime.fontSize = 22
+        lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 24)
+        lbGameTime.fontColor = UIColor(red: 102/255.0, green: 255/255.0, blue: 255/255.0, alpha: 1.0)
         lbGameTime.zPosition = 1.0
         self.addChild(lbGameTime)
 
-        lbLifes = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbLifes.text = "> > > >"
-        lbLifes.fontSize = 30
-        lbLifes.position = CGPoint(x: CGRectGetMidX(self.frame) - 220, y: 12)
-        lbLifes.fontColor = UIColor.blueColor()
-        lbLifes.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Left
-        lbLifes.zPosition = 1.0
-        self.addChild(lbLifes)
-        
-        // --- load sounds ---
-        var path = NSBundle.mainBundle().pathForResource("/sounds/explosion_002", ofType:"wav")
-        var fileURL = NSURL(fileURLWithPath: path!)
-        do {
-            try apExplosionSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
-        }
-        apExplosionSound.numberOfLoops = 0
-        
-        path = NSBundle.mainBundle().pathForResource("/sounds/hit_001", ofType:"mp3")
-        fileURL = NSURL(fileURLWithPath: path!)
-        do {
-            try apHitSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
-        }
-        apHitSound.numberOfLoops = 0
+        print("hhScore reported: \(highscoreshow)")
+        print("flScreenWidth: " + String(flScreenWidth))
+        print("flScreenHeight: " + String(flScreenHeight))
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -306,7 +287,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             // --- every 1s
             if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
                 iGameTimeSec = iGameTimeSec + 1
-                lbGameTime.text = String(iGameTimeSec) + "s"
+                lbGameTime.text = String(iGameTimeSec)
                 if iGameTimeSec % iSpeedUpateCycleTimeSec == 0 {
                     if flMeteroiteSpeed > 0.1 {
                         flMeteroiteSpeed = flMeteroiteSpeed - 0.1
@@ -315,6 +296,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         iMeteroiteSpawnTime = iMeteroiteSpawnTime - 1
                     }
                 }
+                //print("GameScene")
             }
         }
     }
@@ -416,16 +398,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     }
                 }
             default:
-                return
+                ()
             }
         }
     }
     
     func fctGameOver() {
+        // highscore
+        if (iGameScore > highscore)
+        {
+            defaults.setInteger(iGameScore, forKey: "highscore")
+        }
+        
         iGameRestartCnt = 0
         lbGameOver = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameOver.text = "GAME OVER"
-        lbGameOver.fontSize = 90
+        lbGameOver.fontSize = 70
         lbGameOver.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame) - (lbGameOver.frame.size.height/2))
         lbGameOver.fontColor = UIColor.whiteColor()
         self.addChild(lbGameOver)
@@ -435,6 +423,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             aSnMeteroite[i].blActive = false
             aSnMeteroite[i].removeFromParent()
         }
+        aSnMeteroite.removeAll()
+        for i in 0 ..< aSnLaser01.count {
+            aSnLaser01[i].physicsBody?.categoryBitMask = 0
+            aSnLaser01[i].blActive = false
+            aSnLaser01[i].removeFromParent()
+        }
+        aSnLaser01.removeAll()
+        //print("MetArrayCount: " + String(aSnMeteroite.count))
     }
     
     func fctNewGame() {

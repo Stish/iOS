@@ -22,17 +22,17 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
         self.anchorPoint = CGPointMake(0, 0)
         
         let flLogoRatio: CGFloat
-        let txLogo = SKTexture(imageNamed: "tinylabs_logo_03.png")
+        let txLogo = SKTexture(imageNamed: "Media/tinylabs_logo_04.png")
         flLogoRatio = txLogo.size().width / txLogo.size().height
         
-        let snlogo = SKSpriteNode(texture: txLogo, color: UIColor.clearColor(), size: CGSizeMake(500, 500 / flLogoRatio))
+        let snlogo = SKSpriteNode(texture: txLogo, color: UIColor.clearColor(), size: CGSizeMake(550 * (self.frame.width/667.0), 550 * (self.frame.height/375.0) / flLogoRatio))
         snlogo.anchorPoint = CGPointMake(0.5, 0.5)
         snlogo.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
         snlogo.zPosition = 1.0
         snlogo.alpha = 1.0
         addChild(snlogo)
         
-        let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), 1 * Int64(NSEC_PER_SEC))
+        let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), 2 * Int64(NSEC_PER_SEC))
         dispatch_after(time, dispatch_get_main_queue()) {
             let transition = SKTransition.fadeWithColor(.blackColor(), duration: 2)
             
@@ -46,19 +46,6 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         super.touchesBegan(touches, withEvent: event)
-        
-        //if let location = touches.first?.locationInNode(self) {
-          //  let touchedNode = nodeAtPoint(location)
-            
-            //if touchedNode.name == "Game Button" {
-        let transition = SKTransition.fadeWithColor(.blackColor(), duration: 2)
-                
-                let nextScene = GameScene(size: scene!.size)
-                nextScene.scaleMode = .AspectFill
-                
-                scene?.view?.presentScene(nextScene, transition: transition)
-            //}
-        //}
     }
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {

@@ -97,8 +97,18 @@ class TLShip: SKSpriteNode {
     func fctExplode() {
         let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.07)
         self.removeAllActions()
-        apExplosionSound.prepareToPlay()
-        apExplosionSound.play()
+        // --- load sounds ---
+        let path = NSBundle.mainBundle().pathForResource("/sounds/explosion_002", ofType:"wav")
+        let fileURL = NSURL(fileURLWithPath: path!)
+        do {
+            let apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            apExplosionSound.numberOfLoops = 0
+            apExplosionSound.prepareToPlay()
+            apExplosionSound.play()
+        } catch {
+            print("Could not create audio player: \(error)")
+            return
+        }
         
         self.runAction(actExplode, completion: {() in
             self.removeFromParent()

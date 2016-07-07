@@ -15,6 +15,13 @@ ToDo
 - game pause
 - nebulas
 - random backgrounds
+- ratios for all screen sizes
+
+ver 0.20
+- Error with explosions fixed
+- Sound problems fixed
+- New HUD design
+- Game menu with new design
 
 ver 0.19
 - Title screen added
