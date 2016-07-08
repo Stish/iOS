@@ -3,19 +3,22 @@
 ToDo
 - shields for the space ship
 - health points for the space ship
-- health points for the meteorites
 - power ups
 - different weapons
 - ship inventory
 - enemies
 - high score list
-- options menu
 - adjustable volume of sound effects
 - adjustable volume of music
 - game pause
 - nebulas
 - random backgrounds
-- ratios for all screen sizes
+
+ver 0.21
+- Sprites and fonts sizes are now dynamic to screen sizes
+- Game objects sizes and positions are now dynamic to screen sizes
+- Options menu added
+- About menu added
 
 ver 0.20
 - Error with explosions fixed

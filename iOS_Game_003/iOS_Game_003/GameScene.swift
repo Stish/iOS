@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var blGameTest = true
+var blGameTest = false
 // Game positions
 var flScreenWidth: CGFloat!
 var flScreenHeight: CGFloat!
@@ -27,10 +27,10 @@ var iMeteroiteSpawnTime: Int!
 let iSpeedUpateCycleTimeSec = 15
 // --- game objects ---
 let iMeteroiteSkinCnt = 6
-let flMeteroiteSizeMax = CGFloat(120)
-let flMeteroiteSizeMin = CGFloat(50)
-let flShipSizeWidth = CGFloat(70)
-let flShipSizeHeight = CGFloat(62)
+var flMeteroiteSizeMax = CGFloat(120)
+var flMeteroiteSizeMin = CGFloat(50)
+var flShipSizeWidth = CGFloat(70)
+var flShipSizeHeight = CGFloat(62)
 
 var myLabel: SKLabelNode!
 var lbGameScore: SKLabelNode!
@@ -85,20 +85,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.contactDelegate = self
         view.showsPhysics = true // #debug
         // --- explosion sprites ---
-        let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
+        //let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
         aExplosion_01.removeAll()
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_001"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_002"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_003"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_004"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_005"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_006"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_007"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_008"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_009"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_010"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_011"))
-        aExplosion_01.append(taExplosion_01.textureNamed("explosion_01_012"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_001"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_002"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_003"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_004"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_005"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_006"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_007"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_008"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_009"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_010"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_011"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_012"))
         
 //        for family: String in UIFont.familyNames()
 //        {
@@ -108,7 +108,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 //                print("== \(names)")
 //            }
 //        }
-        
+        // Game settings
+        flMeteroiteSizeMax = CGFloat(120) * (self.frame.height/375.0)
+        flMeteroiteSizeMin = CGFloat(50) * (self.frame.height/375.0)
+        flShipSizeWidth = CGFloat(70) * (self.frame.width/667.0)
+        flShipSizeHeight = CGFloat(62) * (self.frame.height/375.0)
+        //
         flMeteroiteSpeed = flMeteroiteSpeedInit
         iMeteroiteSpawnTime = iMeteroiteSpawnTimeInit
         
@@ -130,7 +135,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
         //snShip.position = CGPoint(x: 120*(flScreenWidth/667.0), y: (view.frame.height/2) - 50*(flScreenHeight/375.0))
-        snShip.position = CGPoint(x: 120, y: (view.frame.height/2) - 50)
+        snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
         addChild(snShip)
@@ -138,7 +143,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //myLabel = SKLabelNode(fontNamed:"KarmaticArcade")
         myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
         myLabel.text = "TOUCH TO START"
-        myLabel.fontSize = 40
+        myLabel.fontSize = 40 * (self.frame.width/667.0)
         myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - (myLabel.frame.size.height/2))
         myLabel.fontColor = UIColor.whiteColor()
         self.addChild(myLabel)
@@ -147,24 +152,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //lbGameScore = SKLabelNode(fontNamed:"Menlo")
         lbGameScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameScore.text = "0"
-        lbGameScore.fontSize = 22
-        lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + 216, y: 14)
+        lbGameScore.fontSize = 22 * (self.frame.width/667.0)
+        lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + (216  * (self.frame.width/667.0)), y: 14 * (self.frame.height/375.0))
         lbGameScore.fontColor = UIColor.orangeColor()
         lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
         lbGameScore.zPosition = 1.0
         self.addChild(lbGameScore)
         
-        let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_002.png"), color: UIColor.clearColor(), size: CGSizeMake(470, 60))
+        let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_002.png"), color: UIColor.clearColor(), size: CGSizeMake(470 * (self.frame.width/667.0), 60 * (self.frame.height/375.0)))
         snHud.anchorPoint = CGPointMake(0.5, 0)
-        snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3)
+        snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3 * (self.frame.height/375.0))
         snHud.zPosition = 1.0
         snHud.alpha = 0.75
         addChild(snHud)
         
         lbGameTime = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameTime.text = "0"
-        lbGameTime.fontSize = 22
-        lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 24)
+        lbGameTime.fontSize = 20 * (self.frame.width/667.0)
+        lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 24 * (self.frame.height/375.0))
         lbGameTime.fontColor = UIColor(red: 102/255.0, green: 255/255.0, blue: 255/255.0, alpha: 1.0)
         lbGameTime.zPosition = 1.0
         self.addChild(lbGameTime)
@@ -184,7 +189,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             snBackground.fctMoveLeft()
         } else if blGameOver == false {
             for touch:AnyObject in touches {
-                if touch.locationInView(view).x <= 200.0 {
+                if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
                     let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
                     snShip.fctMoveShipByY(deltaY)
                     //print("left")
@@ -216,15 +221,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if (blGameOver == false) && (blGameStarted == true) {
             for touch in touches {
-                if touch.locationInView(view).x <= 200.0 {
+                if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
                     let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
-                    if (deltaY >= 3 && deltaY <= 50) {
+                    if (deltaY >= (3 * (self.frame.height/375.0)) && deltaY <= (50 * (self.frame.height/375.0))) {
                         snShip.fctStartFlyAnimationLeft()
                         snShip.position.y = snShip.position.y + deltaY
-                    } else if (deltaY <= -3 && deltaY >= -50) {
+                    } else if (deltaY <= (-3 * (self.frame.height/375.0)) && deltaY >= (-50 * (self.frame.height/375.0))) {
                         snShip.fctStartFlyAnimationRight()
                         snShip.position.y = snShip.position.y + deltaY
-                    } else if (deltaY < 3 && deltaY > -3) {
+                    } else if (deltaY < (3 * (self.frame.height/375.0)) && deltaY > (-3 * (self.frame.height/375.0))) {
                         //snShip.fctStartFlyAnimationFront()
                     }
                 }
@@ -302,7 +307,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctPlayBackgroundMusic() {
-        let path = NSBundle.mainBundle().pathForResource("/sounds/music_001", ofType:"mp3")
+        let path = NSBundle.mainBundle().pathForResource("Media/sounds/music_001", ofType:"mp3")
         let fileURL = NSURL(fileURLWithPath: path!)
         do {
             try apBackgroundMusic = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
@@ -319,19 +324,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //snLaser.removeAllActions()
         if aSnLaser01.count == 0
         {
-            aSnLaser01.append(TLLaser(size: CGSizeMake(60, 5)))
+            aSnLaser01.append(TLLaser(size: CGSizeMake(60 * (self.frame.width/667.0), 5 * (self.frame.height/375.0))))
             aSnLaser01[0].blActive = false
         }
         allElements: for i in 0 ..< aSnLaser01.count {
             if aSnLaser01[i].blActive == false {
-                aSnLaser01[i] = TLLaser(size: CGSizeMake(60, 5))
+                aSnLaser01[i] = TLLaser(size: CGSizeMake(60 * (self.frame.width/667.0), 5 * (self.frame.height/375.0)))
                 aSnLaser01[i].blActive = true
                 addChild(aSnLaser01[i])
                 aSnLaser01[i].fctMoveRight()
                 break allElements
             }
             if i == (aSnLaser01.count - 1) {
-                aSnLaser01.append(TLLaser(size: CGSizeMake(60, 5)))
+                aSnLaser01.append(TLLaser(size: CGSizeMake(60 * (self.frame.width/667.0), 5 * (self.frame.height/375.0))))
                 aSnLaser01[i+1].blActive = true
                 addChild(aSnLaser01[i+1])
                 aSnLaser01[i+1].fctMoveRight()
@@ -413,7 +418,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         iGameRestartCnt = 0
         lbGameOver = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameOver.text = "GAME OVER"
-        lbGameOver.fontSize = 70
+        lbGameOver.fontSize = 70 * (self.frame.width/667.0)
         lbGameOver.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame) - (lbGameOver.frame.size.height/2))
         lbGameOver.fontColor = UIColor.whiteColor()
         self.addChild(lbGameOver)

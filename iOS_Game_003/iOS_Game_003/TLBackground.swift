@@ -18,22 +18,22 @@ class TLBackground: SKSpriteNode {
     let flBackgroundRatio_006: CGFloat
     
     init(size: CGSize) {
-        let txBackground_001 = SKTexture(imageNamed: "backgrounds/background_001.png")
+        let txBackground_001 = SKTexture(imageNamed: "Media/backgrounds/background_001.png")
         flBackgroundRatio_001 = txBackground_001.size().width / txBackground_001.size().height
         
-        let txBackground_002 = SKTexture(imageNamed: "backgrounds/background_002.png")
+        let txBackground_002 = SKTexture(imageNamed: "Media/backgrounds/background_002.png")
         flBackgroundRatio_002 = txBackground_002.size().width / txBackground_002.size().height
         
-        let txBackground_003 = SKTexture(imageNamed: "backgrounds/background_003.png")
+        let txBackground_003 = SKTexture(imageNamed: "Media/backgrounds/background_003.png")
         flBackgroundRatio_003 = txBackground_003.size().width / txBackground_003.size().height
         
-        let txBackground_004 = SKTexture(imageNamed: "backgrounds/background_004.png")
+        let txBackground_004 = SKTexture(imageNamed: "Media/backgrounds/background_004.png")
         flBackgroundRatio_004 = txBackground_004.size().width / txBackground_004.size().height
         
-        let txBackground_005 = SKTexture(imageNamed: "backgrounds/background_005.png")
+        let txBackground_005 = SKTexture(imageNamed: "Media/backgrounds/background_005.png")
         flBackgroundRatio_005 = txBackground_005.size().width / txBackground_005.size().height
         
-        let txBackground_006 = SKTexture(imageNamed: "backgrounds/background_006.png")
+        let txBackground_006 = SKTexture(imageNamed: "Media/backgrounds/background_006.png")
         flBackgroundRatio_006 = txBackground_006.size().width / txBackground_006.size().height
 
         super.init(texture: nil,color: UIColor.blackColor(), size: CGSizeMake(size.height * ((flBackgroundRatio_001 * 2) + flBackgroundRatio_002), size.height))

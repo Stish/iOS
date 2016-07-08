@@ -15,7 +15,7 @@ class TLLaser: SKSpriteNode {
     var blActive = false
     
     init(size: CGSize) {
-        super.init(texture: SKTexture(imageNamed: "effects/laser_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
+        super.init(texture: SKTexture(imageNamed: "Media/effects/laser_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
         self.anchorPoint = CGPointMake(0.5, 0.5)
         self.position = CGPoint(x: flShipPosX + (snShip.frame.size.width/2) + (size.width/2), y: flShipPosY)
         // --- physics body ---

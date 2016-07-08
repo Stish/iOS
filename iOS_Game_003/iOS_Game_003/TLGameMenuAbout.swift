@@ -1,5 +1,5 @@
 //
-//  TLGameMenuOptions.swift
+//  TLGameMenuAbout.swift
 //  iOS_Game_003
 //
 //  Created by Alexander Wegner on 07.07.16.
@@ -9,9 +9,9 @@
 import SpriteKit
 import AVFoundation
 
-class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
-    var lbMenuOptions: SKLabelNode!
-    var snMenuOptions: SKSpriteNode!
+class TLGameMenuAbout: SKScene, SKPhysicsContactDelegate {
+    var lbMenuAbout: SKLabelNode!
+    var snMenuAbout: SKSpriteNode!
     var snMenuBack: SKSpriteNode!
     var iButtonPressed: Int!
     var apClick: AVAudioPlayer!
@@ -34,24 +34,24 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         let flMenuBackSpriteWidth = (SKTexture(imageNamed: "Media/menu_back.png").size().width) * (self.frame.width/667.0)
         let flMenuBackSpriteHeight = (SKTexture(imageNamed: "Media/menu_back.png").size().height) * (self.frame.height/375.0)
         // Menu "Options" Sprite
-        snMenuOptions = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_headline.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
-        snMenuOptions.anchorPoint = CGPointMake(1.0, 0.5)
-        snMenuOptions.position = CGPoint(x: 15*(self.frame.width / 16), y: 5*(self.frame.height / 6))
-        snMenuOptions.zPosition = 1.0
-        snMenuOptions.alpha = 1.0
-        snMenuOptions.name = "MenuOptions"
-        addChild(snMenuOptions)
+        snMenuAbout = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_headline.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
+        snMenuAbout.anchorPoint = CGPointMake(1.0, 0.5)
+        snMenuAbout.position = CGPoint(x: 15*(self.frame.width / 16), y: 5*(self.frame.height / 6))
+        snMenuAbout.zPosition = 1.0
+        snMenuAbout.alpha = 1.0
+        snMenuAbout.name = "MenuAbout"
+        addChild(snMenuAbout)
         // Menu "Options" Text
-        lbMenuOptions = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbMenuOptions.horizontalAlignmentMode = .Center;
-        lbMenuOptions.verticalAlignmentMode = .Center
-        lbMenuOptions.text = "OPTIONS"
-        lbMenuOptions.fontSize = 30 * (self.frame.width/667.0)
-        lbMenuOptions.position = CGPoint(x: CGRectGetMidX(snMenuOptions.frame), y: 5*(self.frame.height / 6))
-        lbMenuOptions.fontColor = UIColor.whiteColor()
-        lbMenuOptions.zPosition = 1.0
-        lbMenuOptions.name = "MenuOptions"
-        self.addChild(lbMenuOptions)
+        lbMenuAbout = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbMenuAbout.horizontalAlignmentMode = .Center;
+        lbMenuAbout.verticalAlignmentMode = .Center
+        lbMenuAbout.text = "ABOUT"
+        lbMenuAbout.fontSize = 30 * (self.frame.width/667.0)
+        lbMenuAbout.position = CGPoint(x: CGRectGetMidX(snMenuAbout.frame), y: 5*(self.frame.height / 6))
+        lbMenuAbout.fontColor = UIColor.whiteColor()
+        lbMenuAbout.zPosition = 1.0
+        lbMenuAbout.name = "MenuAbout"
+        self.addChild(lbMenuAbout)
         // Menu "Back" Sprite
         snMenuBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
         snMenuBack.anchorPoint = CGPointMake(0.0, 0.5)
@@ -60,6 +60,17 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         snMenuBack.alpha = 1.0
         snMenuBack.name = "MenuBack"
         self.addChild(snMenuBack)
+        // TL Logo
+        let flLogoRatio: CGFloat
+        let txLogo = SKTexture(imageNamed: "Media/tinylabs_logo_05.png")
+        flLogoRatio = txLogo.size().width / txLogo.size().height
+        
+        let snlogo = SKSpriteNode(texture: txLogo, color: UIColor.clearColor(), size: CGSizeMake(300 * (self.frame.width/667.0), 300 * (self.frame.height/375.0) / flLogoRatio))
+        snlogo.anchorPoint = CGPointMake(0.5, 0.5)
+        snlogo.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
+        snlogo.zPosition = 1.0
+        snlogo.alpha = 1.0
+        addChild(snlogo)
         // --- Sounds: Click ---
         let path = NSBundle.mainBundle().pathForResource("Media/sounds/click_001", ofType:"wav")
         let fileURL = NSURL(fileURLWithPath: path!)

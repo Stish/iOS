@@ -18,20 +18,23 @@ class TLShip: SKSpriteNode {
     var blActive = false
     
     init(size: CGSize) {
-        let taShip = SKTextureAtlas(named:"ship.atlas")
+        //let taShip = SKTextureAtlas(named:"ship.atlas")
+        aShipFlyFront.removeAll()
+        aShipFlyLeft.removeAll()
+        aShipFlyRight.removeAll()
         
-        aShipFlyFront.append(taShip.textureNamed("ship_001"))
-        aShipFlyFront.append(taShip.textureNamed("ship_002"))
-        aShipFlyLeft.append(taShip.textureNamed("ship_left_001"))
-        aShipFlyLeft.append(taShip.textureNamed("ship_left_002"))
-        aShipFlyRight.append(taShip.textureNamed("ship_right_001"))
-        aShipFlyRight.append(taShip.textureNamed("ship_right_002"))
+        aShipFlyFront.append(SKTexture(imageNamed: "Media/ship.atlas/ship_001.png"))
+        aShipFlyFront.append(SKTexture(imageNamed: "Media/ship.atlas/ship_002"))
+        aShipFlyLeft.append(SKTexture(imageNamed: "Media/ship.atlas/ship_left_001"))
+        aShipFlyLeft.append(SKTexture(imageNamed: "Media/ship.atlas/ship_left_002"))
+        aShipFlyRight.append(SKTexture(imageNamed: "Media/ship.atlas/ship_right_001"))
+        aShipFlyRight.append(SKTexture(imageNamed: "Media/ship.atlas/ship_right_002"))
         
         super.init(texture: aShipFlyFront[0], color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
         self.anchorPoint = CGPointMake(0.5, 0.5)
         self.fctStartFlyAnimationFront()
         // --- physics body ---
-        self.physicsBody = SKPhysicsBody(circleOfRadius: (self.size.width/2) - 10)
+        self.physicsBody = SKPhysicsBody(circleOfRadius: (self.size.width/2) - (10 * (flScreenWidth/667.0)))
         self.physicsBody?.dynamic = true
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = false
@@ -39,7 +42,7 @@ class TLShip: SKSpriteNode {
         self.physicsBody?.contactTestBitMask = enBodyType.meteroite.rawValue
         self.physicsBody?.collisionBitMask = 0
         // --- Sounds: Shooting ---
-        let path = NSBundle.mainBundle().pathForResource("/sounds/laser_002", ofType:"wav")
+        let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
         let fileURL = NSURL(fileURLWithPath: path!)
         do {
             try apShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
@@ -98,7 +101,7 @@ class TLShip: SKSpriteNode {
         let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.07)
         self.removeAllActions()
         // --- load sounds ---
-        let path = NSBundle.mainBundle().pathForResource("/sounds/explosion_002", ofType:"wav")
+        let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
         let fileURL = NSURL(fileURLWithPath: path!)
         do {
             let apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)

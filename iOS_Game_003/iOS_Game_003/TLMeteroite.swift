@@ -19,25 +19,25 @@ class TLMeteroite: SKSpriteNode {
     var apHitSound: AVAudioPlayer!
     
     init(size: CGSize, rotSpeed: CGFloat, rotDirec: Int) {
-        super.init(texture: SKTexture(imageNamed: "objects/meteroite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
+        super.init(texture: SKTexture(imageNamed: "Media/objects/meteroite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
         // Different textures
         switch (arc4random_uniform(UInt32(100)) + 1) {
         case 1...30:
-            self.texture = SKTexture(imageNamed: "objects/meteroite_001.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_001.png")
         case 31...60:
-            self.texture = SKTexture(imageNamed: "objects/meteroite_002.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_002.png")
         case 61...90:
-            self.texture = SKTexture(imageNamed: "objects/meteroite_003.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_003.png")
         case 91...93:
-            self.texture = SKTexture(imageNamed: "objects/meteroite_004.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_004.png")
             iHealth = 200
             iScore = 500
         case 94...96:
-            self.texture = SKTexture(imageNamed: "objects/meteroite_005.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_005.png")
             iHealth = 200
             iScore = 500
         case 97...100:
-            self.texture = SKTexture(imageNamed: "objects/meteroite_006.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_006.png")
             iHealth = 200
             iScore = 500
         default:
@@ -84,7 +84,7 @@ class TLMeteroite: SKSpriteNode {
         lbGameScore.text = String(iGameScore)
         self.removeAllActions()
         // --- load sounds ---
-        let path = NSBundle.mainBundle().pathForResource("/sounds/explosion_002", ofType:"wav")
+        let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
         let fileURL = NSURL(fileURLWithPath: path!)
         do {
             apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
@@ -98,7 +98,7 @@ class TLMeteroite: SKSpriteNode {
         // --- Score ---
         let lbScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbScore.text = "+" + String(iScore)
-        lbScore.fontSize = 30
+        lbScore.fontSize = 30 * (flScreenWidth/667.0)
         lbScore.position = CGPoint(x: 0, y: 0 - (lbScore.frame.size.height / 2))
         lbScore.fontColor = UIColor.orangeColor()
         self.runAction(SKAction.rotateToAngle(0, duration: 0))
@@ -114,7 +114,7 @@ class TLMeteroite: SKSpriteNode {
     
     func fctHit() {
         // --- load sounds ---
-        let path = NSBundle.mainBundle().pathForResource("/sounds/hit_001", ofType:"mp3")
+        let path = NSBundle.mainBundle().pathForResource("Media/sounds/hit_001", ofType:"mp3")
         let fileURL = NSURL(fileURLWithPath: path!)
         do {
             apHitSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
