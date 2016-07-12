@@ -42,15 +42,18 @@ class TLShip: SKSpriteNode {
         self.physicsBody?.contactTestBitMask = enBodyType.meteroite.rawValue
         self.physicsBody?.collisionBitMask = 0
         // --- Sounds: Shooting ---
-        let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
-        let fileURL = NSURL(fileURLWithPath: path!)
-        do {
-            try apShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
+        if blSoundEffectsEnabled == true {
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                try apShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
+            apShootingSound.numberOfLoops = 0
+            apShootingSound.volume = flSoundsVolume
         }
-        apShootingSound.numberOfLoops = 0
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -93,24 +96,30 @@ class TLShip: SKSpriteNode {
     }
     
     func fctPlayShootingSound() {
-        apShootingSound.prepareToPlay()
-        apShootingSound.play()
+        if blSoundEffectsEnabled == true {
+            apShootingSound.volume = flSoundsVolume
+            apShootingSound.prepareToPlay()
+            apShootingSound.play()
+        }
     }
     
     func fctExplode() {
         let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.07)
         self.removeAllActions()
         // --- load sounds ---
-        let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
-        let fileURL = NSURL(fileURLWithPath: path!)
-        do {
-            let apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-            apExplosionSound.numberOfLoops = 0
-            apExplosionSound.prepareToPlay()
-            apExplosionSound.play()
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
+        if blSoundEffectsEnabled == true {
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                let apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                apExplosionSound.volume = flSoundsVolume
+                apExplosionSound.numberOfLoops = 0
+                apExplosionSound.prepareToPlay()
+                apExplosionSound.play()
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
         }
         
         self.runAction(actExplode, completion: {() in

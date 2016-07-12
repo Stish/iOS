@@ -137,7 +137,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         self.addChild(lbMenuAbout)
         // Version
         let lbVersion = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbVersion.text = "ver 0.21"
+        lbVersion.text = strVersion
         lbVersion.fontSize = 15 * (self.frame.width/667.0)
         lbVersion.position = CGPoint(x: (self.frame.width - 50), y: 5)
         lbVersion.fontColor = UIColor.whiteColor()

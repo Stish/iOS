@@ -10,8 +10,9 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
+var strVersion = "ver 0.22"
 var blGameTest = false
-// Game positions
+// --- Game positions ---
 var flScreenWidth: CGFloat!
 var flScreenHeight: CGFloat!
 var flShipPosX: CGFloat!
@@ -25,12 +26,18 @@ let iMeteroiteSpawnTimeInit = 15
 var flMeteroiteSpeed: Double!
 var iMeteroiteSpawnTime: Int!
 let iSpeedUpateCycleTimeSec = 15
+let iLaserShootInterval = 4
 // --- game objects ---
 let iMeteroiteSkinCnt = 6
 var flMeteroiteSizeMax = CGFloat(120)
 var flMeteroiteSizeMin = CGFloat(50)
 var flShipSizeWidth = CGFloat(70)
 var flShipSizeHeight = CGFloat(62)
+// --- game sounds ---
+var blSoundEffectsEnabled = true
+var blMusicEnabled = true
+var flSoundsVolume = Float(0.0)
+var flMusicVolume = Float(0.5)
 
 var myLabel: SKLabelNode!
 var lbGameScore: SKLabelNode!
@@ -40,6 +47,7 @@ var lbLifes: SKLabelNode!
 var snBackground: TLBackground!
 var snShip: TLShip!
 var blGameStarted = false
+var blLaserFired = false
 
 // --- game fonts ---
 //let fnGameFont = UIFont(name: "HomespunTTBRK", size: 10)
@@ -68,6 +76,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var iTimeSec: Int!
     var iGameTimeSec: Int!
     var iTime100ms: Int!
+    var iTime10ms: Int!
+    var iLaserShootingPause: Int!
     var iGameRestartCnt: Int!
 ////////
     var defaults = NSUserDefaults()
@@ -120,6 +130,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         iGameTimeSec = 0
         iTimeSec = 0
         iTime100ms = 0
+        iTime10ms = 0
+        iLaserShootingPause = 0
         iGameRestartCnt = 0
         flScreenWidth = view.frame.size.width
         flScreenHeight = view.frame.size.height
@@ -194,7 +206,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     snShip.fctMoveShipByY(deltaY)
                     //print("left")
                 } else {
-                    if snShip.apShootingSound.playing == false {
+                    if blLaserFired == false {
+                        blLaserFired = true
+                        iLaserShootingPause = 0
                         snShip.fctPlayShootingSound()
                         //print("right")
                         self.fctShootLaser01()
@@ -247,6 +261,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* Called before each frame is rendered */
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
+        // --- every 10ms ---
+        if iTime10ms != Int(currentTime * 10) {
+            iTime10ms = Int(currentTime * 10)
+            if blLaserFired == true {
+                print(iLaserShootingPause)
+                iLaserShootingPause = iLaserShootingPause + 1
+                if iLaserShootingPause >= iLaserShootInterval {
+                    iLaserShootingPause = 0
+                    blLaserFired = false
+                }
+            }
+        }
         // --- every 100ms ---
         if iTime100ms != Int(currentTime * 10) {
             iTime100ms = Int(currentTime * 10)
@@ -307,17 +333,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctPlayBackgroundMusic() {
-        let path = NSBundle.mainBundle().pathForResource("Media/sounds/music_001", ofType:"mp3")
-        let fileURL = NSURL(fileURLWithPath: path!)
-        do {
-            try apBackgroundMusic = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
+        if blMusicEnabled == true {
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/music_001", ofType:"mp3")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                try apBackgroundMusic = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
+            apBackgroundMusic.numberOfLoops = -1
+            apBackgroundMusic.volume = flMusicVolume
+            apBackgroundMusic.prepareToPlay()
+            apBackgroundMusic.play()
         }
-        apBackgroundMusic.numberOfLoops = -1
-        apBackgroundMusic.prepareToPlay()
-        apBackgroundMusic.play()
     }
     
     func fctShootLaser01() {

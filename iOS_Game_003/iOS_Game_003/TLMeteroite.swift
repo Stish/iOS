@@ -84,25 +84,29 @@ class TLMeteroite: SKSpriteNode {
         lbGameScore.text = String(iGameScore)
         self.removeAllActions()
         // --- load sounds ---
-        let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
-        let fileURL = NSURL(fileURLWithPath: path!)
-        do {
-            apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-            apExplosionSound.numberOfLoops = 0
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
+        if blSoundEffectsEnabled == true {
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                apExplosionSound.volume = flSoundsVolume
+                apExplosionSound.numberOfLoops = 0
+                apExplosionSound.prepareToPlay()
+                apExplosionSound.play()
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
         }
-        apExplosionSound.prepareToPlay()
-        apExplosionSound.play()
         // --- Score ---
         let lbScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbScore.text = "+" + String(iScore)
         lbScore.fontSize = 30 * (flScreenWidth/667.0)
         lbScore.position = CGPoint(x: 0, y: 0 - (lbScore.frame.size.height / 2))
         lbScore.fontColor = UIColor.orangeColor()
-        self.runAction(SKAction.rotateToAngle(0, duration: 0))
-        self.addChild(lbScore)
+        self.runAction(SKAction.rotateToAngle(0, duration: 0), completion: {() in
+            self.addChild(lbScore)
+        })
         
         self.runAction(actExplode, completion: {() in
             lbScore.removeFromParent()
@@ -114,16 +118,19 @@ class TLMeteroite: SKSpriteNode {
     
     func fctHit() {
         // --- load sounds ---
-        let path = NSBundle.mainBundle().pathForResource("Media/sounds/hit_001", ofType:"mp3")
-        let fileURL = NSURL(fileURLWithPath: path!)
-        do {
-            apHitSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-            apHitSound.numberOfLoops = 0
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
+        if blSoundEffectsEnabled == true {
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/hit_001", ofType:"mp3")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                apHitSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                apHitSound.numberOfLoops = 0
+                apHitSound.volume = flSoundsVolume
+                apHitSound.prepareToPlay()
+                apHitSound.play()
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
         }
-        apHitSound.prepareToPlay()
-        apHitSound.play()
     }
 }

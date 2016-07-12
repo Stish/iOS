@@ -8,11 +8,16 @@ ToDo
 - ship inventory
 - enemies
 - high score list
-- adjustable volume of sound effects
-- adjustable volume of music
 - game pause
 - nebulas
 - random backgrounds
+
+ver 0.22
+- adjustable volume of sound effects
+- adjustable volume of music
+- sound effects and music can be muted
+- laser shooting interval adjustable
+- issue with rotating scores has been fixed
 
 ver 0.21
 - Sprites and fonts sizes are now dynamic to screen sizes
