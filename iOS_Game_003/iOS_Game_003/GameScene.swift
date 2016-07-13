@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.22"
+var strVersion = "ver 0.23"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -18,6 +18,12 @@ var flScreenHeight: CGFloat!
 var flShipPosX: CGFloat!
 var flShipPosY: CGFloat!
 // --- game attributes ---
+var strPlayerName = "Player"
+var blScoreSwitchChecked = true
+var aHighscoresScore = Array<TLHighscoreMember>()
+var aHighscoresTime = Array<TLHighscoreMember>()
+var aSkHighscoresColumns = 4
+var aSkHighscoresRows = 5
 var iGameScore = 0
 var blGameOver = false
 // --- game speed ---
@@ -110,14 +116,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_011"))
         aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_012"))
         
-//        for family: String in UIFont.familyNames()
-//        {
-//            print("\(family)")
-//            for names: String in UIFont.fontNamesForFamilyName(family)
-//            {
-//                print("== \(names)")
-//            }
-//        }
         // Game settings
         flMeteroiteSizeMax = CGFloat(120) * (self.frame.height/375.0)
         flMeteroiteSizeMin = CGFloat(50) * (self.frame.height/375.0)
@@ -146,13 +144,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(snBackground)
         
         snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
-        //snShip.position = CGPoint(x: 120*(flScreenWidth/667.0), y: (view.frame.height/2) - 50*(flScreenHeight/375.0))
         snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
         addChild(snShip)
-        
-        //myLabel = SKLabelNode(fontNamed:"KarmaticArcade")
+
         myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
         myLabel.text = "TOUCH TO START"
         myLabel.fontSize = 40 * (self.frame.width/667.0)
@@ -161,7 +157,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(myLabel)
         
         // --- Interface ---
-        //lbGameScore = SKLabelNode(fontNamed:"Menlo")
         lbGameScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameScore.text = "0"
         lbGameScore.fontSize = 22 * (self.frame.width/667.0)
@@ -464,7 +459,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             aSnLaser01[i].removeFromParent()
         }
         aSnLaser01.removeAll()
-        //print("MetArrayCount: " + String(aSnMeteroite.count))
     }
     
     func fctNewGame() {
@@ -481,11 +475,5 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         blGameStarted = false
         iGameScore = 0
         lbGameScore.text = "0"
-        
-        //snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
-        //snShip.position = CGPoint(x: 120, y: (view!.frame.height/2) - 50)
-        //flShipPosX = snShip.position.x
-        //flShipPosY = snShip.position.y
-        //addChild(snShip)
     }
 }

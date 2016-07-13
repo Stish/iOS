@@ -31,7 +31,14 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
         snlogo.zPosition = 1.0
         snlogo.alpha = 1.0
         addChild(snlogo)
-        
+        // Highscore by score array
+        aHighscoresScore.removeAll()
+        aHighscoresTime.removeAll()
+        for row in 0...aSkHighscoresRows - 1 {
+            aHighscoresScore.append(TLHighscoreMember())
+            aHighscoresTime.append(TLHighscoreMember())
+            aHighscoresTime[row].strName = "N.A."
+        }
         let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), 2 * Int64(NSEC_PER_SEC))
         dispatch_after(time, dispatch_get_main_queue()) {
             let transition = SKTransition.fadeWithColor(.blackColor(), duration: 2)

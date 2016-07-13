@@ -12,6 +12,15 @@ ToDo
 - nebulas
 - random backgrounds
 
+ver 0.23
+- Player name input in options
+- Click sounds are adjusted with sound effect options
+- About menu complete
+- Twitter and website added to about menu
+- Highscore menu added
+- Highscores are read from array
+- Highscores can be switched between time or score based data
+
 ver 0.22
 - adjustable volume of sound effects
 - adjustable volume of music

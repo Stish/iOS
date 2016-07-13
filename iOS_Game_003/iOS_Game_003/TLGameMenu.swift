@@ -43,7 +43,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         // Menu "Play" Sprite
         snMenuPlay = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_top.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
         snMenuPlay.anchorPoint = CGPointMake(0.5, 0.5)
-        snMenuPlay.position = CGPoint(x: CGRectGetMidX(self.frame), y: 5*(self.frame.height / 6))
+        snMenuPlay.position = CGPoint(x: CGRectGetMidX(self.frame), y: 10*(self.frame.height / 12))
         snMenuPlay.zPosition = 1.0
         snMenuPlay.alpha = 1.0
         snMenuPlay.name = "MenuPlay"
@@ -54,7 +54,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         lbMenuPlay.verticalAlignmentMode = .Center
         lbMenuPlay.text = "PLAY"
         lbMenuPlay.fontSize = 30 * (self.frame.width/667.0)
-        lbMenuPlay.position = CGPoint(x: CGRectGetMidX(self.frame), y: 5*(self.frame.height / 6))
+        lbMenuPlay.position = CGPoint(x: CGRectGetMidX(self.frame), y: 10*(self.frame.height / 12))
         lbMenuPlay.fontColor = UIColor.whiteColor()
         lbMenuPlay.zPosition = 1.0
         lbMenuPlay.name = "MenuPlay"
@@ -62,7 +62,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         // Menu "Tutorial" Sprite
         snMenuTutorial = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_middle.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
         snMenuTutorial.anchorPoint = CGPointMake(0.5, 0.5)
-        snMenuTutorial.position = CGPoint(x: CGRectGetMidX(self.frame), y: 4*(self.frame.height / 6))
+        snMenuTutorial.position = CGPoint(x: CGRectGetMidX(self.frame), y: 8*(self.frame.height / 12))
         snMenuTutorial.zPosition = 1.0
         snMenuTutorial.alpha = 1.0
         snMenuTutorial.name = "MenuTutorial"
@@ -73,7 +73,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         lbMenuTutorial.verticalAlignmentMode = .Center
         lbMenuTutorial.text = "TUTORIAL"
         lbMenuTutorial.fontSize = 30 * (self.frame.width/667.0)
-        lbMenuTutorial.position = CGPoint(x: CGRectGetMidX(self.frame), y: 4*(self.frame.height / 6))
+        lbMenuTutorial.position = CGPoint(x: CGRectGetMidX(self.frame), y: 8*(self.frame.height / 12))
         lbMenuTutorial.fontColor = UIColor.whiteColor()
         lbMenuTutorial.zPosition = 1.0
         lbMenuTutorial.name = "MenuTutorial"
@@ -81,7 +81,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         // Menu "Options" Sprite
         snMenuOptions = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_middle.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
         snMenuOptions.anchorPoint = CGPointMake(0.5, 0.5)
-        snMenuOptions.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3*(self.frame.height / 6))
+        snMenuOptions.position = CGPoint(x: CGRectGetMidX(self.frame), y: 6*(self.frame.height / 12))
         snMenuOptions.zPosition = 1.0
         snMenuOptions.alpha = 1.0
         snMenuOptions.name = "MenuOptions"
@@ -92,7 +92,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         lbMenuOptions.verticalAlignmentMode = .Center
         lbMenuOptions.text = "OPTIONS"
         lbMenuOptions.fontSize = 30 * (self.frame.width/667.0)
-        lbMenuOptions.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3*(self.frame.height / 6))
+        lbMenuOptions.position = CGPoint(x: CGRectGetMidX(self.frame), y: 6*(self.frame.height / 12))
         lbMenuOptions.fontColor = UIColor.whiteColor()
         lbMenuOptions.zPosition = 1.0
         lbMenuOptions.name = "MenuOptions"
@@ -100,7 +100,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         // Menu "HighScore" Sprite
         snMenuHighScore = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_middle.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
         snMenuHighScore.anchorPoint = CGPointMake(0.5, 0.5)
-        snMenuHighScore.position = CGPoint(x: CGRectGetMidX(self.frame), y: 2*(self.frame.height / 6))
+        snMenuHighScore.position = CGPoint(x: CGRectGetMidX(self.frame), y: 4*(self.frame.height / 12))
         snMenuHighScore.zPosition = 1.0
         snMenuHighScore.alpha = 1.0
         snMenuHighScore.name = "MenuHighScore"
@@ -111,7 +111,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         lbMenuHighScore.verticalAlignmentMode = .Center
         lbMenuHighScore.text = "HIGHSCORE"
         lbMenuHighScore.fontSize = 30 * (self.frame.width/667.0)
-        lbMenuHighScore.position = CGPoint(x: CGRectGetMidX(self.frame), y: 2*(self.frame.height / 6))
+        lbMenuHighScore.position = CGPoint(x: CGRectGetMidX(self.frame), y: 4*(self.frame.height / 12))
         lbMenuHighScore.fontColor = UIColor.whiteColor()
         lbMenuHighScore.zPosition = 1.0
         lbMenuHighScore.name = "MenuHighScore"
@@ -119,7 +119,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         // Menu "About" Sprite
         snMenuAbout = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_bottom.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
         snMenuAbout.anchorPoint = CGPointMake(0.5, 0.5)
-        snMenuAbout.position = CGPoint(x: CGRectGetMidX(self.frame), y: 1*(self.frame.height / 6))
+        snMenuAbout.position = CGPoint(x: CGRectGetMidX(self.frame), y: 2*(self.frame.height / 12))
         snMenuAbout.zPosition = 1.0
         snMenuAbout.alpha = 1.0
         snMenuAbout.name = "MenuAbout"
@@ -130,7 +130,7 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         lbMenuAbout.verticalAlignmentMode = .Center
         lbMenuAbout.text = "ABOUT"
         lbMenuAbout.fontSize = 30 * (self.frame.width/667.0)
-        lbMenuAbout.position = CGPoint(x: CGRectGetMidX(self.frame), y: 1*(self.frame.height / 6))
+        lbMenuAbout.position = CGPoint(x: CGRectGetMidX(self.frame), y: 2*(self.frame.height / 12))
         lbMenuAbout.fontColor = UIColor.whiteColor()
         lbMenuAbout.zPosition = 1.0
         lbMenuAbout.name = "MenuAbout"
@@ -223,7 +223,13 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
                     self.removeFromParent()
                 }
             case "MenuHighScore"?:
-                ()
+                if iButtonPressed == 4 {
+                    let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
+                    let nextScene = TLGameMenuHighscore(size: scene!.size)
+                    nextScene.scaleMode = .AspectFill
+                    scene?.view?.presentScene(nextScene, transition: transition)
+                    self.removeFromParent()
+                }
             case "MenuAbout"?:
                 if iButtonPressed == 5 {
                     let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
@@ -256,8 +262,11 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctPlayClickSound() {
-        apClick.prepareToPlay()
-        apClick.play()
+        if blSoundEffectsEnabled == true {
+            apClick.volume = flSoundsVolume
+            apClick.prepareToPlay()
+            apClick.play()
+        }
     }
     
 }

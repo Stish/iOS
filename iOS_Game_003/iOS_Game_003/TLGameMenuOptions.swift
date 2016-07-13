@@ -9,10 +9,12 @@
 import SpriteKit
 import AVFoundation
 
-class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
+class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate {
     var lbMenuOptions: SKLabelNode!
+    var lbOptName: SKLabelNode!
     var lbOptMusic: SKLabelNode!
     var lbOptSounds: SKLabelNode!
+    var snOptName: SKSpriteNode!
     var snMenuOptions: SKSpriteNode!
     var snMenuBack: SKSpriteNode!
     var snOptMusicCheckbox: SKSpriteNode!
@@ -23,6 +25,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
     var snOptSoundsSliderKnob: SKSpriteNode!
     var iButtonPressed: Int!
     var apClick: AVAudioPlayer!
+    var tfPlayerName: UITextField!
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -50,10 +53,47 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         let flOptSliderBodyHeight = (SKTexture(imageNamed: "Media/slider_body.png").size().height) * (self.frame.height/375.0)
         let flOptSliderKnobWidth = (SKTexture(imageNamed: "Media/slider_knob.png").size().width) * (self.frame.width/667.0)
         let flOptSliderKnobHeight = (SKTexture(imageNamed: "Media/slider_knob.png").size().height) * (self.frame.height/375.0)
+        // +-----------------+
+        // |   Player name   |
+        // +-----------------+
+        // Menu "Name" Sprite
+        snOptName = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_middle.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
+        snOptName.anchorPoint = CGPointMake(1.0, 0.5)
+        snOptName.position = CGPoint(x: 15*(self.frame.width / 16), y: 6*(self.frame.height / 12))
+        snOptName.zPosition = 1.0
+        snOptName.alpha = 1.0
+        snOptName.name = "MenuName"
+        self.addChild(snOptName)
+        // Menu "Name" Text
+        lbOptName = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbOptName.horizontalAlignmentMode = .Left
+        lbOptName.verticalAlignmentMode = .Center
+        lbOptName.text = "NAME"
+        lbOptName.fontSize = 35 * (self.frame.width/667.0)
+        lbOptName.position = CGPoint(x: 1*(self.frame.width / 16), y: 6*(self.frame.height / 12))
+        lbOptName.fontColor = UIColor.whiteColor()
+        lbOptName.zPosition = 1.0
+        lbOptName.name = "OptName"
+        self.addChild(lbOptName)
+        // Menu "Name" textfield
+        tfPlayerName = UITextField(frame: CGRectMake(15*(self.frame.width / 16) - flMenuSpriteWidth, 6*(self.frame.height / 12) - (flMenuSpriteHeight / 2), flMenuSpriteWidth, flMenuSpriteHeight))
+        tfPlayerName.delegate = self
+        tfPlayerName.borderStyle = UITextBorderStyle.None
+        tfPlayerName.textColor = SKColor.whiteColor()
+        tfPlayerName.placeholder = ""
+        tfPlayerName.backgroundColor = SKColor.clearColor()
+        tfPlayerName.tintColor = SKColor.whiteColor()
+        tfPlayerName.autocorrectionType = UITextAutocorrectionType.No
+        tfPlayerName.font = UIFont(name: fnGameFont!.fontName, size: 30 * (self.frame.width/667.0))
+        tfPlayerName.text = strPlayerName
+        tfPlayerName.textAlignment = .Center
+        tfPlayerName.contentVerticalAlignment = .Center
+        tfPlayerName.clearButtonMode = UITextFieldViewMode.WhileEditing
+        self.view!.addSubview(tfPlayerName)
         // Menu "Options" Sprite
         snMenuOptions = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_headline.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
         snMenuOptions.anchorPoint = CGPointMake(1.0, 0.5)
-        snMenuOptions.position = CGPoint(x: 15*(self.frame.width / 16), y: 5*(self.frame.height / 6))
+        snMenuOptions.position = CGPoint(x: 15*(self.frame.width / 16), y: 10*(self.frame.height / 12))
         snMenuOptions.zPosition = 1.0
         snMenuOptions.alpha = 1.0
         snMenuOptions.name = "MenuOptions"
@@ -64,7 +104,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         lbMenuOptions.verticalAlignmentMode = .Center
         lbMenuOptions.text = "OPTIONS"
         lbMenuOptions.fontSize = 30 * (self.frame.width/667.0)
-        lbMenuOptions.position = CGPoint(x: CGRectGetMidX(snMenuOptions.frame), y: 5*(self.frame.height / 6))
+        lbMenuOptions.position = CGPoint(x: CGRectGetMidX(snMenuOptions.frame), y: 10*(self.frame.height / 12))
         lbMenuOptions.fontColor = UIColor.whiteColor()
         lbMenuOptions.zPosition = 1.0
         lbMenuOptions.name = "MenuOptions"
@@ -72,7 +112,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         // Menu "Back" Sprite
         snMenuBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
         snMenuBack.anchorPoint = CGPointMake(0.0, 0.5)
-        snMenuBack.position = CGPoint(x: 1*(self.frame.width / 16), y: 5*(self.frame.height / 6))
+        snMenuBack.position = CGPoint(x: 1*(self.frame.width / 16), y: 10*(self.frame.height / 12))
         snMenuBack.zPosition = 1.0
         snMenuBack.alpha = 1.0
         snMenuBack.name = "MenuBack"
@@ -92,9 +132,9 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         lbOptMusic = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbOptMusic.horizontalAlignmentMode = .Left
         lbOptMusic.verticalAlignmentMode = .Center
-        lbOptMusic.text = "Music"
+        lbOptMusic.text = "MUSIC"
         lbOptMusic.fontSize = 35 * (self.frame.width/667.0)
-        lbOptMusic.position = CGPoint(x: 1*(self.frame.width / 16), y: 3*(self.frame.height / 6))
+        lbOptMusic.position = CGPoint(x: 1*(self.frame.width / 16), y: 4*(self.frame.height / 12))
         lbOptMusic.fontColor = UIColor.whiteColor()
         lbOptMusic.zPosition = 1.0
         lbOptMusic.name = "OptMusic"
@@ -102,7 +142,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         // "Music" Checkbox
         snOptMusicCheckbox = SKSpriteNode(texture: SKTexture(imageNamed: "Media/checkbox_checked.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptCheckboxWidth, flOptCheckboxHeight))
         snOptMusicCheckbox.anchorPoint = CGPointMake(0.0, 0.5)
-        snOptMusicCheckbox.position = CGPoint(x: 6*(self.frame.width / 16), y: 3*(self.frame.height / 6))
+        snOptMusicCheckbox.position = CGPoint(x: 6*(self.frame.width / 16), y: 4*(self.frame.height / 12))
         snOptMusicCheckbox.zPosition = 1.0
         snOptMusicCheckbox.alpha = 1.0
         snOptMusicCheckbox.name = "OptMusicCheckbox"
@@ -115,7 +155,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         // "Music" Slider body
         snOptMusicSliderBody = SKSpriteNode(texture: SKTexture(imageNamed: "Media/slider_body.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptSliderBodyWidth, flOptSliderBodyHeight))
         snOptMusicSliderBody.anchorPoint = CGPointMake(1.0, 0.5)
-        snOptMusicSliderBody.position = CGPoint(x: 15*(self.frame.width / 16), y: 3*(self.frame.height / 6))
+        snOptMusicSliderBody.position = CGPoint(x: 15*(self.frame.width / 16), y: 4*(self.frame.height / 12))
         snOptMusicSliderBody.zPosition = 1.0
         snOptMusicSliderBody.alpha = 1.0
         snOptMusicSliderBody.name = "OptMusicSliderBody"
@@ -123,13 +163,13 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         // "Music" Slider knob
         snOptMusicSliderKnob = SKSpriteNode(texture: SKTexture(imageNamed: "Media/slider_knob.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptSliderKnobWidth, flOptSliderKnobHeight))
         snOptMusicSliderKnob.anchorPoint = CGPointMake(0.5, 0.5)
-        snOptMusicSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16)  - snOptMusicSliderBody.frame.size.width), y: (3*(self.frame.height / 6)))
+        snOptMusicSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16)  - snOptMusicSliderBody.frame.size.width), y: (4*(self.frame.height / 12)))
         snOptMusicSliderKnob.zPosition = 1.0
         snOptMusicSliderKnob.alpha = 1.0
         snOptMusicSliderKnob.name = "OptMusicSliderKnob"
         self.addChild(snOptMusicSliderKnob)
         let flOptMusicSliderKnobPos = (((snOptMusicSliderBody.frame.size.width - snOptMusicSliderKnob.frame.size.width) / 100.0) * CGFloat(flMusicVolume * 100.0)) + (snOptMusicSliderKnob.frame.size.width / 2)
-        snOptMusicSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16) - snOptMusicSliderBody.frame.size.width + flOptMusicSliderKnobPos), y: (3 * (self.frame.height / 6)))
+        snOptMusicSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16) - snOptMusicSliderBody.frame.size.width + flOptMusicSliderKnobPos), y: (4 * (self.frame.height / 12)))
         // +------------+
         // |   Sounds   |
         // +------------+
@@ -139,7 +179,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         lbOptSounds.verticalAlignmentMode = .Center
         lbOptSounds.text = "SOUNDS"
         lbOptSounds.fontSize = 35 * (self.frame.width/667.0)
-        lbOptSounds.position = CGPoint(x: 1*(self.frame.width / 16), y: 1*(self.frame.height / 6))
+        lbOptSounds.position = CGPoint(x: 1*(self.frame.width / 16), y: 2*(self.frame.height / 12))
         lbOptSounds.fontColor = UIColor.whiteColor()
         lbOptSounds.zPosition = 1.0
         lbOptSounds.name = "OptSounds"
@@ -147,7 +187,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         // "Sounds" Checkbox
         snOptSoundsCheckbox = SKSpriteNode(texture: SKTexture(imageNamed: "Media/checkbox_checked.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptCheckboxWidth, flOptCheckboxHeight))
         snOptSoundsCheckbox.anchorPoint = CGPointMake(0.0, 0.5)
-        snOptSoundsCheckbox.position = CGPoint(x: 6*(self.frame.width / 16), y: 1*(self.frame.height / 6))
+        snOptSoundsCheckbox.position = CGPoint(x: 6*(self.frame.width / 16), y: 2*(self.frame.height / 12))
         snOptSoundsCheckbox.zPosition = 1.0
         snOptSoundsCheckbox.alpha = 1.0
         snOptSoundsCheckbox.name = "OptSoundsCheckbox"
@@ -160,7 +200,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         // "Sounds" Slider body
         snOptSoundsSliderBody = SKSpriteNode(texture: SKTexture(imageNamed: "Media/slider_body.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptSliderBodyWidth, flOptSliderBodyHeight))
         snOptSoundsSliderBody.anchorPoint = CGPointMake(1.0, 0.5)
-        snOptSoundsSliderBody.position = CGPoint(x: 15*(self.frame.width / 16), y: 1*(self.frame.height / 6))
+        snOptSoundsSliderBody.position = CGPoint(x: 15*(self.frame.width / 16), y: 2*(self.frame.height / 12))
         snOptSoundsSliderBody.zPosition = 1.0
         snOptSoundsSliderBody.alpha = 1.0
         snOptSoundsSliderBody.name = "OptSoundsSliderBody"
@@ -168,13 +208,13 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
         // "Sounds" Slider knob
         snOptSoundsSliderKnob = SKSpriteNode(texture: SKTexture(imageNamed: "Media/slider_knob.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptSliderKnobWidth, flOptSliderKnobHeight))
         snOptSoundsSliderKnob.anchorPoint = CGPointMake(0.5, 0.5)
-        snOptSoundsSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16)  - snOptSoundsSliderBody.frame.size.width), y: (1*(self.frame.height / 6)))
+        snOptSoundsSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16)  - snOptSoundsSliderBody.frame.size.width), y: (2*(self.frame.height / 12)))
         snOptSoundsSliderKnob.zPosition = 1.0
         snOptSoundsSliderKnob.alpha = 1.0
         snOptSoundsSliderKnob.name = "OptSoundsSliderKnob"
         self.addChild(snOptSoundsSliderKnob)
         let flOptSoundsSliderKnobPos = (((snOptSoundsSliderBody.frame.size.width - snOptSoundsSliderKnob.frame.size.width) / 100.0) * CGFloat(flSoundsVolume * 100.0))
-        snOptSoundsSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16) - snOptSoundsSliderBody.frame.size.width + flOptSoundsSliderKnobPos + (snOptSoundsSliderKnob.frame.size.width / 2)), y: (1*(self.frame.height / 6)))
+        snOptSoundsSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16) - snOptSoundsSliderBody.frame.size.width + flOptSoundsSliderKnobPos + (snOptSoundsSliderKnob.frame.size.width / 2)), y: (2*(self.frame.height / 12)))
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -264,6 +304,8 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
             switch (touchedNode.name) {
             case "MenuBack"?:
                 if iButtonPressed == 1 {
+                    strPlayerName = tfPlayerName.text!
+                    tfPlayerName.removeFromSuperview()
                     let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
                     let nextScene = TLGameMenu(size: scene!.size)
                     nextScene.scaleMode = .AspectFill
@@ -304,8 +346,27 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctPlayClickSound() {
-        apClick.prepareToPlay()
-        apClick.play()
+        if blSoundEffectsEnabled == true {
+            apClick.volume = flSoundsVolume
+            apClick.prepareToPlay()
+            apClick.play()
+        }
+    }
+    
+    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange,
+                   replacementString string: String) -> Bool
+    {
+        let maxLength = 10
+        let currentString: NSString! = textField.text
+        let newString: NSString =
+            currentString.stringByReplacingCharactersInRange(range, withString: string)
+        return newString.length <= maxLength
+    }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        strPlayerName = tfPlayerName.text!
+        tfPlayerName.resignFirstResponder()
+        return true
     }
 }
 
