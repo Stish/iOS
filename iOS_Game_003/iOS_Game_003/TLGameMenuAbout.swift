@@ -42,7 +42,7 @@ class TLGameMenuAbout: SKScene, SKPhysicsContactDelegate {
         let flAboutTwitterHeight = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().height) * (self.frame.height/375.0) / 2.5
         let flAboutWwwWidth = (SKTexture(imageNamed: "Media/about_icon_www.png").size().width) * (self.frame.width/667.0) / 2.5
         let flAboutWwwHeight = (SKTexture(imageNamed: "Media/about_icon_www.png").size().height) * (self.frame.height/375.0) / 2.5
-        // Menu "Options" Sprite
+        // Menu "About" Sprite
         snMenuAbout = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_headline.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
         snMenuAbout.anchorPoint = CGPointMake(1.0, 0.5)
         snMenuAbout.position = CGPoint(x: 15*(self.frame.width / 16), y: 10*(self.frame.height / 12))
@@ -50,7 +50,7 @@ class TLGameMenuAbout: SKScene, SKPhysicsContactDelegate {
         snMenuAbout.alpha = 1.0
         snMenuAbout.name = "MenuAbout"
         addChild(snMenuAbout)
-        // Menu "Options" Text
+        // Menu "About" Text
         lbMenuAbout = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbMenuAbout.horizontalAlignmentMode = .Center;
         lbMenuAbout.verticalAlignmentMode = .Center
@@ -223,7 +223,7 @@ class TLGameMenuAbout: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctOpenWebsite(url: String) {
-        let webURL = NSURL(string: "https://\(url)")!
+        let webURL = NSURL(string: "http://\(url)")!
         let application = UIApplication.sharedApplication()
         
         if application.canOpenURL(webURL) {

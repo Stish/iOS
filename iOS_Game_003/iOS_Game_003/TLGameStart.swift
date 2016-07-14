@@ -17,7 +17,8 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
         physicsWorld.contactDelegate = self
         view.showsPhysics = false // #debug
         
-        
+        flScreenWidth = view.frame.size.width
+        flScreenHeight = view.frame.size.height
         self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
         self.anchorPoint = CGPointMake(0, 0)
         

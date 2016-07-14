@@ -12,6 +12,11 @@ ToDo
 - nebulas
 - random backgrounds
 
+ver 0.24
+- Tutorial menu added
+- Tutorial demo added, which shows the important game functions
+- Minor bug fixes
+
 ver 0.23
 - Player name input in options
 - Click sounds are adjusted with sound effect options

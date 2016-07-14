@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.23"
+var strVersion = "ver 0.24"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -42,7 +42,7 @@ var flShipSizeHeight = CGFloat(62)
 // --- game sounds ---
 var blSoundEffectsEnabled = true
 var blMusicEnabled = true
-var flSoundsVolume = Float(0.0)
+var flSoundsVolume = Float(0.5)
 var flMusicVolume = Float(0.5)
 
 var myLabel: SKLabelNode!
@@ -85,16 +85,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var iTime10ms: Int!
     var iLaserShootingPause: Int!
     var iGameRestartCnt: Int!
-////////
-    var defaults = NSUserDefaults()
-    var highscore = NSUserDefaults().integerForKey("highscore")
-    
-    //if(Score>highscore)
-    //{
-    //    defaults.setInteger(Score, forKey: "highscore")
-    //}
-    var highscoreshow = NSUserDefaults().integerForKey("highscore")
-/////////
+
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         // --- collision setup ---
@@ -181,7 +172,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameTime.zPosition = 1.0
         self.addChild(lbGameTime)
 
-        print("hhScore reported: \(highscoreshow)")
         print("flScreenWidth: " + String(flScreenWidth))
         print("flScreenHeight: " + String(flScreenHeight))
     }
@@ -433,12 +423,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctGameOver() {
-        // highscore
-        if (iGameScore > highscore)
-        {
-            defaults.setInteger(iGameScore, forKey: "highscore")
-        }
-        
         iGameRestartCnt = 0
         lbGameOver = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameOver.text = "GAME OVER"

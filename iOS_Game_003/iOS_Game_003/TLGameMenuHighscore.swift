@@ -223,10 +223,14 @@ class TLGameMenuHighscore: SKScene, SKPhysicsContactDelegate {
                 fctPlayClickSound()
             case "HighscoreCheckboxScore"?:
                 iButtonPressed = 2
-                fctPlayClickSound()
+                if blScoreSwitchChecked == false {
+                    fctPlayClickSound()
+                }
             case "HighscoreCheckboxTime"?:
                 iButtonPressed = 3
-                fctPlayClickSound()
+                if blScoreSwitchChecked == true {
+                    fctPlayClickSound()
+                }
             default:
                 ()
             }
