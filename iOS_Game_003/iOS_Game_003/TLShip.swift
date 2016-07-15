@@ -16,6 +16,7 @@ class TLShip: SKSpriteNode {
     var aShipFlyRight = Array<SKTexture>()
     var apShootingSound: AVAudioPlayer!
     var blActive = false
+    var iHealth = 500
     
     init(size: CGSize) {
         //let taShip = SKTextureAtlas(named:"ship.atlas")

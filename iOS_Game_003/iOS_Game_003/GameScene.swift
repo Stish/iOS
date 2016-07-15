@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.24"
+var strVersion = "ver 0.25"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -85,6 +85,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var iTime10ms: Int!
     var iLaserShootingPause: Int!
     var iGameRestartCnt: Int!
+    var snShieldBar1: SKSpriteNode!
+    var snShieldBar2: SKSpriteNode!
+    var snShieldBar3: SKSpriteNode!
+    var snShieldBar4: SKSpriteNode!
 
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -138,6 +142,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
         flShipPosX = snShip.position.x
         flShipPosY = snShip.position.y
+        snShip.iHealth = 500
         addChild(snShip)
 
         myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
@@ -148,6 +153,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(myLabel)
         
         // --- Interface ---
+        // Game score
         lbGameScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameScore.text = "0"
         lbGameScore.fontSize = 22 * (self.frame.width/667.0)
@@ -156,14 +162,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
         lbGameScore.zPosition = 1.0
         self.addChild(lbGameScore)
-        
-        let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_002.png"), color: UIColor.clearColor(), size: CGSizeMake(470 * (self.frame.width/667.0), 60 * (self.frame.height/375.0)))
+        // HUD sprites
+        let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_003.png"), color: UIColor.clearColor(), size: CGSizeMake(470 * (self.frame.width/667.0), 60 * (self.frame.height/375.0)))
         snHud.anchorPoint = CGPointMake(0.5, 0)
         snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3 * (self.frame.height/375.0))
         snHud.zPosition = 1.0
         snHud.alpha = 0.75
         addChild(snHud)
-        
+        // Game time
         lbGameTime = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameTime.text = "0"
         lbGameTime.fontSize = 20 * (self.frame.width/667.0)
@@ -171,9 +177,41 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameTime.fontColor = UIColor(red: 102/255.0, green: 255/255.0, blue: 255/255.0, alpha: 1.0)
         lbGameTime.zPosition = 1.0
         self.addChild(lbGameTime)
-
-        print("flScreenWidth: " + String(flScreenWidth))
-        print("flScreenHeight: " + String(flScreenHeight))
+        // Shields
+        // Menu sprite size
+        let flShieldSprite1Width = (SKTexture(imageNamed: "Media/shield_point_001.png").size().width) * (self.frame.width/667.0)
+        let flShieldSprite1Height = (SKTexture(imageNamed: "Media/shield_point_001.png").size().height) * (self.frame.height/375.0)
+        let flShieldSprite2Width = (SKTexture(imageNamed: "Media/shield_point_002.png").size().width) * (self.frame.width/667.0)
+        let flShieldSprite2Height = (SKTexture(imageNamed: "Media/shield_point_002.png").size().height) * (self.frame.height/375.0)
+        // Shield bar 1
+        snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite1Width, flShieldSprite1Height))
+        snShieldBar1.anchorPoint = CGPointMake(0.0, 0.5)
+        snShieldBar1.position = CGPoint(x: CGRectGetMidX(self.frame) - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+        snShieldBar1.zPosition = 1.0
+        snShieldBar1.alpha = 1.0
+        self.addChild(snShieldBar1)
+        // Shield bar 2
+        snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
+        snShieldBar2.anchorPoint = CGPointMake(0.0, 0.5)
+        snShieldBar2.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+        snShieldBar2.zPosition = 1.0
+        snShieldBar2.alpha = 1.0
+        self.addChild(snShieldBar2)
+        // Shield bar 3
+        snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
+        snShieldBar3.anchorPoint = CGPointMake(0.0, 0.5)
+        snShieldBar3.position = CGPoint(x: CGRectGetMidX(self.frame) - (136 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+        snShieldBar3.zPosition = 1.0
+        snShieldBar3.alpha = 1.0
+        self.addChild(snShieldBar3)
+        // Shield bar 4
+        snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
+        snShieldBar4.anchorPoint = CGPointMake(0.0, 0.5)
+        snShieldBar4.position = CGPoint(x: CGRectGetMidX(self.frame) - (92 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+        snShieldBar4.zPosition = 1.0
+        snShieldBar4.alpha = 1.0
+        self.addChild(snShieldBar4)
+        fctUpdateShields()
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -390,21 +428,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
             case (enBodyType.ship.rawValue | enBodyType.meteroite.rawValue):
                 if blGameTest == false {
-                    blGameOver = true
-                    iGameRestartCnt = 0
                     let secondNode = contact.bodyB.node
                     let firstNode = contact.bodyA.node
                     for i in 0 ..< aSnMeteroite.count {
                         if secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i] {
+                            snShip.iHealth = snShip.iHealth - aSnMeteroite[i].iHealth
+                            aSnMeteroite[i].iHealth = 0
                             aSnMeteroite[i].physicsBody?.categoryBitMask = 0
                             aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
                             aSnMeteroite[i].fctExplode()
+                            fctUpdateShields()
                         }
                     }
+                    print("ship healt: " + String(snShip.iHealth)) //debug
                     //snShip.removeFromParent()
-                    self.fctGameOver()
-                    snShip.physicsBody?.categoryBitMask = 0
-                    snShip.fctExplode()
+                    if snShip.iHealth <= 0 {
+                        self.fctGameOver()
+                        snShip.physicsBody?.categoryBitMask = 0
+                        snShip.fctExplode()
+                        blGameOver = true
+                        iGameRestartCnt = 0
+                    }
                 }
             case (enBodyType.meteroite.rawValue):
                 let secondNode = contact.bodyB.node
@@ -459,5 +503,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         blGameStarted = false
         iGameScore = 0
         lbGameScore.text = "0"
+        snShip.iHealth = 500
+        fctUpdateShields()
+    }
+    
+    func fctUpdateShields() {
+        if snShip.iHealth > 100 {
+            snShieldBar1.alpha = 1.0
+        } else {
+            snShieldBar1.alpha = 0.0
+        }
+        if snShip.iHealth > 200 {
+            snShieldBar2.alpha = 1.0
+        } else {
+            snShieldBar2.alpha = 0.0
+        }
+        if snShip.iHealth > 300 {
+            snShieldBar3.alpha = 1.0
+        } else {
+            snShieldBar3.alpha = 0.0
+        }
+        if snShip.iHealth > 400 {
+            snShieldBar4.alpha = 1.0
+        } else {
+            snShieldBar4.alpha = 0.0
+        }
     }
 }

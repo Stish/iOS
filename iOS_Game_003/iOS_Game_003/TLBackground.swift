@@ -100,7 +100,7 @@ class TLBackground: SKSpriteNode {
     }
     
     func fctMoveLeft() {
-        let actMoveLeft = SKAction.moveByX(-(size.height * ((flBackgroundRatio_001 * 5) + flBackgroundRatio_002 + flBackgroundRatio_003 + flBackgroundRatio_004 + flBackgroundRatio_005 + flBackgroundRatio_006)), y: 0, duration: 250.0)
+        let actMoveLeft = SKAction.moveByX(-(size.height * ((flBackgroundRatio_001 * 5) + flBackgroundRatio_002 + flBackgroundRatio_003 + flBackgroundRatio_004 + flBackgroundRatio_005 + flBackgroundRatio_006)), y: 0, duration: 400.0)
         let resetPosition = SKAction.moveToX(0, duration: 0)
         let seqMoveLeft = SKAction.sequence([actMoveLeft, resetPosition])
         runAction(SKAction.repeatActionForever(seqMoveLeft))

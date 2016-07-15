@@ -1,8 +1,6 @@
 # iOS_Game_003
 
 ToDo
-- shields for the space ship
-- health points for the space ship
 - power ups
 - different weapons
 - ship inventory
@@ -11,6 +9,11 @@ ToDo
 - game pause
 - nebulas
 - random backgrounds
+
+ver 0.25
+- Shields for the space ship
+- Health points for the space ship
+- Slower background scrolling speed
 
 ver 0.24
 - Tutorial menu added
