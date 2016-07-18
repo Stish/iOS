@@ -1,7 +1,6 @@
 # iOS_Game_003
 
 ToDo
-- power ups
 - different weapons
 - ship inventory
 - enemies
@@ -9,6 +8,13 @@ ToDo
 - game pause
 - nebulas
 - random backgrounds
+- Bomb explosion
+
+ver 0.26
+- Power ups: Bombs and shield power
+- Power up sound added
+- Bombs added to HUD 
+- Minor bug fixes
 
 ver 0.25
 - Shields for the space ship

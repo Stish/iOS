@@ -255,17 +255,17 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
                     flMusicVolume = Float(snOptMusicSliderKnob.position.x - (snOptMusicSliderBody.position.x - snOptMusicSliderBody.frame.size.width))
                     flMusicVolume = flMusicVolume - Float(snOptMusicSliderKnob.frame.size.width / 2.0)
                     flMusicVolume = flMusicVolume / Float(snOptMusicSliderBody.frame.size.width - snOptMusicSliderKnob.frame.size.width)
-                    print(flMusicVolume)
+                    //print(flMusicVolume) // #debug
                 }
                 if touch.locationInView(view).x < flOptMusicSliderKnobMin {
                     snOptMusicSliderKnob.position = CGPoint(x: flOptMusicSliderKnobMin, y: snOptMusicSliderKnob.position.y)
                     flMusicVolume = 0.0
-                    print(flMusicVolume)
+                    //print(flMusicVolume) // #debug
                 }
                 if touch.locationInView(view).x > flOptMusicSliderKnobMax {
                     snOptMusicSliderKnob.position = CGPoint(x: flOptMusicSliderKnobMax, y: snOptMusicSliderKnob.position.y)
                     flMusicVolume = 1.0
-                    print(flMusicVolume)
+                    //print(flMusicVolume) // #debug
                 }
             }
         }
@@ -279,17 +279,17 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
                     flSoundsVolume = Float(snOptSoundsSliderKnob.position.x - (snOptSoundsSliderBody.position.x - snOptSoundsSliderBody.frame.size.width))
                     flSoundsVolume = flSoundsVolume - Float(snOptSoundsSliderKnob.frame.size.width / 2.0)
                     flSoundsVolume = flSoundsVolume / Float(snOptSoundsSliderBody.frame.size.width - snOptSoundsSliderKnob.frame.size.width)
-                    print(flSoundsVolume)
+                    //print(flSoundsVolume)  // #debug
                 }
                 if touch.locationInView(view).x < flOptSoundsSliderKnobMin {
                     snOptSoundsSliderKnob.position = CGPoint(x: flOptSoundsSliderKnobMin, y: snOptSoundsSliderKnob.position.y)
                     flSoundsVolume = 0.0
-                    print(flSoundsVolume)
+                    //print(flSoundsVolume) // #debug
                 }
                 if touch.locationInView(view).x > flOptSoundsSliderKnobMax {
                     snOptSoundsSliderKnob.position = CGPoint(x: flOptSoundsSliderKnobMax, y: snOptSoundsSliderKnob.position.y)
                     flSoundsVolume = 1.0
-                    print(flSoundsVolume)
+                    //print(flSoundsVolume) // #debug
                 }
             }
         }

@@ -17,29 +17,42 @@ class TLMeteroite: SKSpriteNode {
     var iScore = 100
     var apExplosionSound: AVAudioPlayer!
     var apHitSound: AVAudioPlayer!
+    //var blHasPowerUp: Bool!
+    var iPowerUp = 0
     
     init(size: CGSize, rotSpeed: CGFloat, rotDirec: Int) {
         super.init(texture: SKTexture(imageNamed: "Media/objects/meteroite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
         // Different textures
+        //blHasPowerUp = false
+        iPowerUp = 0
         switch (arc4random_uniform(UInt32(100)) + 1) {
-        case 1...30:
+        case 1...26:
             self.texture = SKTexture(imageNamed: "Media/objects/meteroite_001.png")
-        case 31...60:
+        case 27...52:
             self.texture = SKTexture(imageNamed: "Media/objects/meteroite_002.png")
-        case 61...90:
+        case 53...79:
             self.texture = SKTexture(imageNamed: "Media/objects/meteroite_003.png")
-        case 91...93:
+        case 80...86:
             self.texture = SKTexture(imageNamed: "Media/objects/meteroite_004.png")
             iHealth = 200
             iScore = 500
-        case 94...96:
+            //blHasPowerUp = true
+            iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
+            print("PowerUp Type: " + String(iPowerUp))
+        case 87...93:
             self.texture = SKTexture(imageNamed: "Media/objects/meteroite_005.png")
             iHealth = 200
             iScore = 500
-        case 97...100:
+            //blHasPowerUp = true
+            iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
+            print("PowerUp Type: " + String(iPowerUp))
+        case 94...100:
             self.texture = SKTexture(imageNamed: "Media/objects/meteroite_006.png")
             iHealth = 200
             iScore = 500
+            //blHasPowerUp = true
+            iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
+            print("PowerUp Type: " + String(iPowerUp))
         default:
             ()
         }
@@ -72,6 +85,8 @@ class TLMeteroite: SKSpriteNode {
         let actMoveLeft = SKAction.moveByX(-(flScreenWidth + 100), y: 0, duration: flMeteroiteSpeed)
 
         runAction(actMoveLeft, completion: {() in
+            self.physicsBody?.categoryBitMask = 0
+            self.physicsBody?.contactTestBitMask = 0
             self.removeFromParent()
             self.blActive = false
         })
@@ -83,6 +98,8 @@ class TLMeteroite: SKSpriteNode {
         iGameScore = iGameScore + iScore
         lbGameScore.text = String(iGameScore)
         self.removeAllActions()
+        self.physicsBody?.categoryBitMask = 0
+        self.physicsBody?.contactTestBitMask = 0
         // --- load sounds ---
         if blSoundEffectsEnabled == true {
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
@@ -113,6 +130,7 @@ class TLMeteroite: SKSpriteNode {
             self.blActive = false
             self.removeAllActions()
             self.removeFromParent()
+            self.iPowerUp = 0
         })
     }
     

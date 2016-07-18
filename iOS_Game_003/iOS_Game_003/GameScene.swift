@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.25"
+var strVersion = "ver 0.26"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -68,6 +68,7 @@ enum enBodyType: UInt32 {
     case ship = 1
     case laser = 2
     case meteroite = 4
+    case powerup = 8
 }
 // Debug
 var debug_LaserCnt = 0
@@ -79,6 +80,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var selectedNodes = [UITouch:SKSpriteNode]()
     var aSnLaser01 = Array<TLLaser>()
     var aSnMeteroite = Array<TLMeteroite>()
+    var aSnPowerUp = Array<TLPowerUp>()
     var iTimeSec: Int!
     var iGameTimeSec: Int!
     var iTime100ms: Int!
@@ -89,6 +91,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snShieldBar2: SKSpriteNode!
     var snShieldBar3: SKSpriteNode!
     var snShieldBar4: SKSpriteNode!
+    var snBomb1: SKSpriteNode!
+    var snBomb2: SKSpriteNode!
+    var snBomb3: SKSpriteNode!
+    var iBombCount: Int!
 
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -126,6 +132,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         iTime10ms = 0
         iLaserShootingPause = 0
         iGameRestartCnt = 0
+        iBombCount = 0
         flScreenWidth = view.frame.size.width
         flScreenHeight = view.frame.size.height
         
@@ -212,6 +219,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snShieldBar4.alpha = 1.0
         self.addChild(snShieldBar4)
         fctUpdateShields()
+        // Bombs
+        let flBombWidth = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().width) * (self.frame.width/667.0)
+        let flBombHeight = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().height) * (self.frame.height/375.0)
+        // Bomb 1
+        snBomb1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+        snBomb1.anchorPoint = CGPointMake(0.5, 0.5)
+        snBomb1.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+        snBomb1.zPosition = 1.0
+        snBomb1.alpha = 1.0
+        self.addChild(snBomb1)
+        // Bomb 2
+        snBomb2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+        snBomb2.anchorPoint = CGPointMake(0.5, 0.5)
+        snBomb2.position = CGPoint(x: CGRectGetMidX(self.frame) - (145 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+        snBomb2.zPosition = 1.0
+        snBomb2.alpha = 1.0
+        self.addChild(snBomb2)
+        // Bomb 3
+        snBomb3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+        snBomb3.anchorPoint = CGPointMake(0.5, 0.5)
+        snBomb3.position = CGPoint(x: CGRectGetMidX(self.frame) - (110 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+        snBomb3.zPosition = 1.0
+        snBomb3.alpha = 1.0
+        self.addChild(snBomb3)
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -235,7 +266,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         snShip.fctPlayShootingSound()
                         //print("right")
                         self.fctShootLaser01()
-                        print("Lasers: " + String(aSnLaser01.count))
+                        //print("Lasers: " + String(aSnLaser01.count)) // #debug
                     }
                 }
             }
@@ -288,7 +319,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if iTime10ms != Int(currentTime * 10) {
             iTime10ms = Int(currentTime * 10)
             if blLaserFired == true {
-                print(iLaserShootingPause)
+                //print(iLaserShootingPause) // #debug
                 iLaserShootingPause = iLaserShootingPause + 1
                 if iLaserShootingPause >= iLaserShootInterval {
                     iLaserShootingPause = 0
@@ -311,9 +342,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if iRotDirec == 0 {
                     iRotDirec = -1
                 }
-                print(flMetSize) // #debug
-                print(flRotSpeed) // #debug
-                print(iRotDirec) // #debug
+                //print(flMetSize) // #debug
+                //print(flRotSpeed) // #debug
+                //print(iRotDirec) // #debug
                 if aSnMeteroite.count == 0
                 {
                     aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
@@ -335,7 +366,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         break allElements
                     }
                 }
-                print("Mets: " + String(aSnMeteroite.count)) // #debug
+                //print("Mets: " + String(aSnMeteroite.count)) // #debug
                 //print(iTime100ms) // #debug
             }
             // --- every 1s
@@ -396,13 +427,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
         debug_LaserCnt = aSnLaser01.count
-        print(debug_LaserCnt)
+        //print(debug_LaserCnt) // #debug
     }
     
     func didBeginContact(contact: SKPhysicsContact) {
         let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if blGameOver == false {
             switch(contactMask) {
+            // Laser hits meteroite
             case enBodyType.laser.rawValue | enBodyType.meteroite.rawValue:
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
@@ -410,8 +442,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     if (secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i]) && (aSnMeteroite[i].blDestroyed == false) {
                         aSnMeteroite[i].iHealth -= 100
                         if aSnMeteroite[i].iHealth <= 0 {
-                            aSnMeteroite[i].physicsBody?.categoryBitMask = 0
-                            aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
+                            if aSnMeteroite[i].iPowerUp > 0 {
+                                if aSnPowerUp.count == 0 {
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnMeteroite[i].position, type: aSnMeteroite[i].iPowerUp))
+                                    aSnPowerUp[0].blActive = false
+                                }
+                                allElements: for j in 0 ..< aSnPowerUp.count {
+                                    if aSnPowerUp[j].blActive == false {
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnMeteroite[i].position, type: aSnMeteroite[i].iPowerUp)
+                                        aSnPowerUp[j].blActive = true
+                                        addChild(aSnPowerUp[j])
+                                        aSnPowerUp[j].fctMoveLeft()
+                                        break allElements
+                                    }
+                                    if j == (aSnPowerUp.count - 1) {
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnMeteroite[i].position, type: aSnMeteroite[i].iPowerUp))
+                                        aSnPowerUp[j+1].blActive = true
+                                        addChild(aSnPowerUp[j+1])
+                                        aSnPowerUp[j+1].fctMoveLeft()
+                                        break allElements
+                                    }
+                                }
+                                let debug_PowerUpCnt = aSnPowerUp.count //debug
+                                //print("PowerUps: " + String(debug_PowerUpCnt)) // #debug
+                            }
                             aSnMeteroite[i].fctExplode()
                         } else {
                             // ToDo
@@ -426,21 +480,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         aSnLaser01[i].fctExplode()
                     }
                 }
+            // Ship hits meteroite
             case (enBodyType.ship.rawValue | enBodyType.meteroite.rawValue):
                 if blGameTest == false {
                     let secondNode = contact.bodyB.node
                     let firstNode = contact.bodyA.node
                     for i in 0 ..< aSnMeteroite.count {
                         if secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i] {
-                            snShip.iHealth = snShip.iHealth - aSnMeteroite[i].iHealth
-                            aSnMeteroite[i].iHealth = 0
-                            aSnMeteroite[i].physicsBody?.categoryBitMask = 0
-                            aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
-                            aSnMeteroite[i].fctExplode()
-                            fctUpdateShields()
+                            if aSnMeteroite[i].blDestroyed == false {
+                                snShip.iHealth = snShip.iHealth - aSnMeteroite[i].iHealth
+                                aSnMeteroite[i].iHealth = 0
+                                aSnMeteroite[i].physicsBody?.categoryBitMask = 0
+                                aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
+                                fctUpdateShields()
+                                if aSnMeteroite[i].iPowerUp == 1 {
+                                    if iBombCount < 3 {
+                                        self.iBombCount = iBombCount + 1
+                                        fctUpdateBombs()
+                                    }
+                                }
+                                if aSnMeteroite[i].iPowerUp == 2 {
+                                    if snShip.iHealth < 500 {
+                                        snShip.iHealth = snShip.iHealth + 100
+                                        fctUpdateShields()
+                                    }
+                                }
+                                aSnMeteroite[i].fctExplode()
+                            }
                         }
                     }
-                    print("ship healt: " + String(snShip.iHealth)) //debug
+                    //print("ship health: " + String(snShip.iHealth)) // #debug
                     //snShip.removeFromParent()
                     if snShip.iHealth <= 0 {
                         self.fctGameOver()
@@ -450,6 +519,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         iGameRestartCnt = 0
                     }
                 }
+            // Ship hits powerup
+            case (enBodyType.ship.rawValue | enBodyType.powerup.rawValue):
+                let secondNode = contact.bodyB.node
+                let firstNode = contact.bodyA.node
+                for i in 0 ..< aSnPowerUp.count {
+                    if secondNode == aSnPowerUp[i] || firstNode == aSnPowerUp[i] {
+                        if aSnPowerUp[i].blDestroyed == false {
+                            aSnPowerUp[i].physicsBody?.categoryBitMask = 0
+                            aSnPowerUp[i].physicsBody?.contactTestBitMask = 0
+                            if aSnPowerUp[i].iPowerUp == 1 {
+                                if iBombCount < 3 {
+                                    self.iBombCount = iBombCount + 1
+                                    fctUpdateBombs()
+                                }
+                            }
+                            if aSnPowerUp[i].iPowerUp == 2 {
+                                if snShip.iHealth < 500 {
+                                    snShip.iHealth = snShip.iHealth + 100
+                                    fctUpdateShields()
+                                }
+                            }
+                            aSnPowerUp[i].fctExplode()
+                        }
+                    }
+                }
+            // Meteroite hits meteroite
             case (enBodyType.meteroite.rawValue):
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
@@ -487,6 +582,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             aSnLaser01[i].removeFromParent()
         }
         aSnLaser01.removeAll()
+        for i in 0 ..< aSnPowerUp.count {
+            aSnPowerUp[i].physicsBody?.categoryBitMask = 0
+            aSnPowerUp[i].blActive = false
+            aSnPowerUp[i].removeFromParent()
+        }
+        aSnPowerUp.removeAll()
     }
     
     func fctNewGame() {
@@ -504,6 +605,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         iGameScore = 0
         lbGameScore.text = "0"
         snShip.iHealth = 500
+        iBombCount = 0
         fctUpdateShields()
     }
     
@@ -527,6 +629,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             snShieldBar4.alpha = 1.0
         } else {
             snShieldBar4.alpha = 0.0
+        }
+    }
+    
+    func fctUpdateBombs() {
+        if iBombCount > 0 {
+            snBomb1.texture = SKTexture(imageNamed: "Media/pu_bomb_001.png")
+        } else {
+            snBomb1.texture = SKTexture(imageNamed: "Media/pu_bomb_001_empty.png")
+        }
+        if iBombCount > 1 {
+            snBomb2.texture = SKTexture(imageNamed: "Media/pu_bomb_001.png")
+        } else {
+            snBomb2.texture = SKTexture(imageNamed: "Media/pu_bomb_001_empty.png")
+        }
+        if iBombCount > 2 {
+            snBomb3.texture = SKTexture(imageNamed: "Media/pu_bomb_001.png")
+        } else {
+            snBomb3.texture = SKTexture(imageNamed: "Media/pu_bomb_001_empty.png")
         }
     }
 }
