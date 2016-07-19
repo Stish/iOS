@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.26"
+var strVersion = "ver 0.27"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -61,6 +61,7 @@ var blLaserFired = false
 //let fnGameFont = UIFont(name: "Menlo", size: 10)
 //let fnGameFont = UIFont(name: "Masaaki-Regular", size: 10)
 let fnGameFont = UIFont(name: "OrigamiMommy", size: 10)
+let fnGameTextFont = UIFont(name: "Minecraft", size: 10)
 
 var aExplosion_01 = Array<SKTexture>()
 
@@ -69,6 +70,8 @@ enum enBodyType: UInt32 {
     case laser = 2
     case meteroite = 4
     case powerup = 8
+    case bomb = 16
+    case bombExplosion = 32
 }
 // Debug
 var debug_LaserCnt = 0
@@ -95,6 +98,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snBomb2: SKSpriteNode!
     var snBomb3: SKSpriteNode!
     var iBombCount: Int!
+    var snPowerUpInvFrame: SKSpriteNode!
+    var snPowerUpInv: SKSpriteNode!
+    var lbPowerUpInv: SKLabelNode!
+    var snPause: SKShapeNode!
+    var lbPause: SKLabelNode!
+    var flTouchMoveDist: CGFloat!
+    var snBombFired: TLBomb!
 
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -126,6 +136,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         flMeteroiteSpeed = flMeteroiteSpeedInit
         iMeteroiteSpawnTime = iMeteroiteSpawnTimeInit
         
+        flTouchMoveDist = 1000
         iGameTimeSec = 0
         iTimeSec = 0
         iTime100ms = 0
@@ -243,46 +254,109 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snBomb3.zPosition = 1.0
         snBomb3.alpha = 1.0
         self.addChild(snBomb3)
+        // "Power up to inventory" frame sprite
+        let flOptCheckboxWidth = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().width) * (self.frame.width/667.0)
+        let flOptCheckboxHeight = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().height) * (self.frame.height/375.0)
+        snPowerUpInvFrame = SKSpriteNode(texture: SKTexture(imageNamed: "Media/checkbox_unchecked.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptCheckboxWidth, flOptCheckboxHeight))
+        snPowerUpInvFrame.anchorPoint = CGPointMake(0.5, 0.5)
+        snPowerUpInvFrame.position = CGPoint(x: self.frame.width - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0)), y: self.frame.height - (flOptCheckboxHeight/2) - (5 * (self.frame.height/375.0)))
+        snPowerUpInvFrame.zPosition = 1.0
+        snPowerUpInvFrame.alpha = 0.0
+        self.addChild(snPowerUpInvFrame)
+        // "Power up to inventory" item sprite
+        let flPowerUpWidth = (SKTexture(imageNamed: "Media/pu_bomb_001.png").size().width) * (self.frame.width/667.0)
+        let flPowerUpHeight = (SKTexture(imageNamed: "Media/pu_bomb_001.png").size().height) * (self.frame.height/375.0)
+        snPowerUpInv = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flPowerUpWidth, flPowerUpHeight))
+        snPowerUpInv.anchorPoint = CGPointMake(0.5, 0.5)
+        snPowerUpInv.position = snPowerUpInvFrame.position
+        snPowerUpInv.zPosition = 1.0
+        snPowerUpInv.alpha = 0.0
+        self.addChild(snPowerUpInv)
+        // "Power up to inventory" text
+        lbPowerUpInv = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lbPowerUpInv.text = "Bombs +1"
+        lbPowerUpInv.horizontalAlignmentMode = .Right
+        lbPowerUpInv.verticalAlignmentMode = .Center
+        lbPowerUpInv.fontSize = 20 * (self.frame.width/667.0)
+        lbPowerUpInv.position = snPowerUpInvFrame.position
+        lbPowerUpInv.position.x = lbPowerUpInv.position.x - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0))
+        lbPowerUpInv.fontColor = UIColor.whiteColor()
+        lbPowerUpInv.zPosition = 1.0
+        lbPowerUpInv.alpha = 0.0
+        self.addChild(lbPowerUpInv)
+        // Pause screen sprite
+        snPause = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
+        snPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+        snPause.strokeColor = SKColor.blackColor()
+        snPause.glowWidth = 0.0
+        snPause.lineWidth = 0.0
+        snPause.fillColor = SKColor.blackColor()
+        snPause.zPosition = -0.1
+        snPause.alpha = 0.75
+        self.addChild(snPause)
+        // Pause screen text
+        lbPause = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbPause.text = "PAUSED"
+        lbPause.horizontalAlignmentMode = .Center
+        lbPause.verticalAlignmentMode = .Center
+        lbPause.fontSize = 40 * (self.frame.width/667.0)
+        lbPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+        lbPause.fontColor = UIColor.whiteColor()
+        lbPause.zPosition = -0.1
+        lbPause.alpha = 1.0
+        self.addChild(lbPause)
+        NSNotificationCenter.defaultCenter().addObserver(
+            self,
+            selector: "applicationWillResignActive:",
+            name: UIApplicationWillResignActiveNotification,
+            object: nil)
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
        /* Called when a touch begins */
-        if (blGameStarted == false) && (blGameOver == false) {
-            self.fctPlayBackgroundMusic()
-            myLabel.hidden = true
-            blGameStarted = true
-            blGameOver = false
-            snBackground.fctMoveLeft()
-        } else if blGameOver == false {
-            for touch:AnyObject in touches {
-                if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
-                    let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
-                    snShip.fctMoveShipByY(deltaY)
-                    //print("left")
-                } else {
-                    if blLaserFired == false {
-                        blLaserFired = true
-                        iLaserShootingPause = 0
-                        snShip.fctPlayShootingSound()
-                        //print("right")
-                        self.fctShootLaser01()
-                        //print("Lasers: " + String(aSnLaser01.count)) // #debug
+        if self.speed > 0.0 {
+            if (blGameStarted == false) && (blGameOver == false) {
+                self.fctPlayBackgroundMusic()
+                myLabel.hidden = true
+                blGameStarted = true
+                blGameOver = false
+                snBackground.fctMoveLeft()
+            } else if blGameOver == false {
+                for touch:AnyObject in touches {
+                    if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
+                        let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
+                        snShip.fctMoveShipByY(deltaY)
+                        //print("left")
+                    } else {
+                        if blLaserFired == false {
+                            blLaserFired = true
+                            iLaserShootingPause = 0
+                            snShip.fctPlayShootingSound()
+                            //print("right")
+                            self.fctShootLaser01()
+                            //print("Lasers: " + String(aSnLaser01.count)) // #debug
+                            flTouchMoveDist = touch.locationInView(view).x
+                        }
                     }
                 }
             }
-        }
-        if (blGameOver == true) && (iGameRestartCnt >= 7) {
-            snShip.removeFromParent()
-            //fctNewGame()
-            let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.3)
-            
-            let nextScene = TLGameMenu(size: self.scene!.size)
-            nextScene.scaleMode = .AspectFill
-            
-            self.scene?.view?.presentScene(nextScene, transition: transition)
-            //fctNewGame()
-            //self.delete(self)
-            fctNewGame()
+            if (blGameOver == true) && (iGameRestartCnt >= 7) {
+                snShip.removeFromParent()
+                //fctNewGame()
+                let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.3)
+                
+                let nextScene = TLGameMenu(size: self.scene!.size)
+                nextScene.scaleMode = .AspectFill
+                
+                self.scene?.view?.presentScene(nextScene, transition: transition)
+                //fctNewGame()
+                //self.delete(self)
+                fctNewGame()
+            }
+        } else {
+            self.speed = 1.0
+            snPause.zPosition = -0.1
+            lbPause.zPosition = -0.1
         }
     }
     
@@ -309,79 +383,92 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if (blGameOver == false)  && (blGameStarted == true) {
             snShip.fctStartFlyAnimationFront()
         }
-    }
-    
-    override func update(currentTime: CFTimeInterval) {
-        /* Called before each frame is rendered */
-        flShipPosX = snShip.position.x
-        flShipPosY = snShip.position.y
-        // --- every 10ms ---
-        if iTime10ms != Int(currentTime * 10) {
-            iTime10ms = Int(currentTime * 10)
-            if blLaserFired == true {
-                //print(iLaserShootingPause) // #debug
-                iLaserShootingPause = iLaserShootingPause + 1
-                if iLaserShootingPause >= iLaserShootInterval {
-                    iLaserShootingPause = 0
-                    blLaserFired = false
+        if (blGameOver == false)  && (blGameStarted == true) {
+            for touch in touches {
+                if touch.locationInView(view).x >= (200.0 * (self.frame.height/375.0)) {
+                    if touch.locationInView(view).x - flTouchMoveDist >= 100 {
+                        // Finger moved detected
+                        snShip.fctPlayBombShootingSound()
+                        fctShootBomb()
+                    }
                 }
             }
         }
-        // --- every 100ms ---
-        if iTime100ms != Int(currentTime * 10) {
-            iTime100ms = Int(currentTime * 10)
-            if blGameOver == true {
-                iGameRestartCnt = iGameRestartCnt + 1
-            }
-            if (iTime100ms % iMeteroiteSpawnTime == 0) && (blGameOver == false) && (blGameStarted == true) {
-                //print(iTimeSec) // #debug
-                // flMeteroiteSizeMax
-                let flMetSize = CGFloat(arc4random_uniform(UInt32(flMeteroiteSizeMax - flMeteroiteSizeMin)) + 1 + UInt32(flMeteroiteSizeMin))
-                let flRotSpeed = CGFloat(arc4random_uniform(5) + 1 + 5)
-                var iRotDirec = Int(arc4random_uniform(2))
-                if iRotDirec == 0 {
-                    iRotDirec = -1
-                }
-                //print(flMetSize) // #debug
-                //print(flRotSpeed) // #debug
-                //print(iRotDirec) // #debug
-                if aSnMeteroite.count == 0
-                {
-                    aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
-                    aSnMeteroite[0].blActive = false
-                }
-                allElements: for i in 0 ..< aSnMeteroite.count {
-                    if aSnMeteroite[i].blActive == false {
-                        aSnMeteroite[i] = TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec)
-                        aSnMeteroite[i].blActive = true
-                        addChild(aSnMeteroite[i])
-                        aSnMeteroite[i].fctMoveLeft()
-                        break allElements
+    }
+    
+    override func update(currentTime: CFTimeInterval) {
+        if self.speed > 0.0 {
+            /* Called before each frame is rendered */
+            flShipPosX = snShip.position.x
+            flShipPosY = snShip.position.y
+            // --- every 10ms ---
+            if iTime10ms != Int(currentTime * 10) {
+                iTime10ms = Int(currentTime * 10)
+                if blLaserFired == true {
+                    //print(iLaserShootingPause) // #debug
+                    iLaserShootingPause = iLaserShootingPause + 1
+                    if iLaserShootingPause >= iLaserShootInterval {
+                        iLaserShootingPause = 0
+                        blLaserFired = false
                     }
-                    if i == (aSnMeteroite.count - 1) {
+                }
+            }
+            // --- every 100ms ---
+            if iTime100ms != Int(currentTime * 10) {
+                iTime100ms = Int(currentTime * 10)
+                if blGameOver == true {
+                    iGameRestartCnt = iGameRestartCnt + 1
+                }
+                if (iTime100ms % iMeteroiteSpawnTime == 0) && (blGameOver == false) && (blGameStarted == true) {
+                    //print(iTimeSec) // #debug
+                    // flMeteroiteSizeMax
+                    let flMetSize = CGFloat(arc4random_uniform(UInt32(flMeteroiteSizeMax - flMeteroiteSizeMin)) + 1 + UInt32(flMeteroiteSizeMin))
+                    let flRotSpeed = CGFloat(arc4random_uniform(5) + 1 + 5)
+                    var iRotDirec = Int(arc4random_uniform(2))
+                    if iRotDirec == 0 {
+                        iRotDirec = -1
+                    }
+                    //print(flMetSize) // #debug
+                    //print(flRotSpeed) // #debug
+                    //print(iRotDirec) // #debug
+                    if aSnMeteroite.count == 0
+                    {
                         aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
-                        aSnMeteroite[i+1].blActive = true
-                        addChild(aSnMeteroite[i+1])
-                        aSnMeteroite[i+1].fctMoveLeft()
-                        break allElements
+                        aSnMeteroite[0].blActive = false
                     }
+                    allElements: for i in 0 ..< aSnMeteroite.count {
+                        if aSnMeteroite[i].blActive == false {
+                            aSnMeteroite[i] = TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec)
+                            aSnMeteroite[i].blActive = true
+                            addChild(aSnMeteroite[i])
+                            aSnMeteroite[i].fctMoveLeft()
+                            break allElements
+                        }
+                        if i == (aSnMeteroite.count - 1) {
+                            aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
+                            aSnMeteroite[i+1].blActive = true
+                            addChild(aSnMeteroite[i+1])
+                            aSnMeteroite[i+1].fctMoveLeft()
+                            break allElements
+                        }
+                    }
+                    //print("Mets: " + String(aSnMeteroite.count)) // #debug
+                    //print(iTime100ms) // #debug
                 }
-                //print("Mets: " + String(aSnMeteroite.count)) // #debug
-                //print(iTime100ms) // #debug
-            }
-            // --- every 1s
-            if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
-                iGameTimeSec = iGameTimeSec + 1
-                lbGameTime.text = String(iGameTimeSec)
-                if iGameTimeSec % iSpeedUpateCycleTimeSec == 0 {
-                    if flMeteroiteSpeed > 0.1 {
-                        flMeteroiteSpeed = flMeteroiteSpeed - 0.1
+                // --- every 1s
+                if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
+                    iGameTimeSec = iGameTimeSec + 1
+                    lbGameTime.text = String(iGameTimeSec)
+                    if iGameTimeSec % iSpeedUpateCycleTimeSec == 0 {
+                        if flMeteroiteSpeed > 0.1 {
+                            flMeteroiteSpeed = flMeteroiteSpeed - 0.1
+                        }
+                        if iMeteroiteSpawnTime > 1 {
+                            iMeteroiteSpawnTime = iMeteroiteSpawnTime - 1
+                        }
                     }
-                    if iMeteroiteSpawnTime > 1 {
-                        iMeteroiteSpawnTime = iMeteroiteSpawnTime - 1
-                    }
+                    //print("GameScene")
                 }
-                //print("GameScene")
             }
         }
     }
@@ -428,6 +515,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         debug_LaserCnt = aSnLaser01.count
         //print(debug_LaserCnt) // #debug
+    }
+    
+    func fctShootBomb() {
+        snBombFired = TLBomb(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)))
+        self.addChild(snBombFired)
+        print("Bomb fired") // #debug
+        snBombFired.fctMoveRight()
+        
     }
     
     func didBeginContact(contact: SKPhysicsContact) {
@@ -497,13 +592,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                     if iBombCount < 3 {
                                         self.iBombCount = iBombCount + 1
                                         fctUpdateBombs()
+                                        lbPowerUpInv.text = "Bombs +1"
+                                    } else {
+                                        lbPowerUpInv.text = "Bomb inventory full"
                                     }
+                                    snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_bomb_001.png")
+                                    fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                 }
                                 if aSnMeteroite[i].iPowerUp == 2 {
                                     if snShip.iHealth < 500 {
                                         snShip.iHealth = snShip.iHealth + 100
                                         fctUpdateShields()
+                                        lbPowerUpInv.text = "Shields +25%"
+                                    } else {
+                                        lbPowerUpInv.text = "Shields at 100%"
                                     }
+                                    snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_shield_001.png")
+                                    fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                 }
                                 aSnMeteroite[i].fctExplode()
                             }
@@ -532,13 +641,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                 if iBombCount < 3 {
                                     self.iBombCount = iBombCount + 1
                                     fctUpdateBombs()
+                                    lbPowerUpInv.text = "Bombs +1"
+                                } else {
+                                    lbPowerUpInv.text = "Bomb inventory full"
                                 }
+                                snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_bomb_001.png")
+                                fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                             }
                             if aSnPowerUp[i].iPowerUp == 2 {
                                 if snShip.iHealth < 500 {
                                     snShip.iHealth = snShip.iHealth + 100
                                     fctUpdateShields()
+                                    lbPowerUpInv.text = "Shields +25%"
+                                } else {
+                                    lbPowerUpInv.text = "Shields at 100%"
                                 }
+                                snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_shield_001.png")
+                                fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                             }
                             aSnPowerUp[i].fctExplode()
                         }
@@ -591,6 +714,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctNewGame() {
+        flTouchMoveDist = 1000
         flMeteroiteSpeed = flMeteroiteSpeedInit
         iMeteroiteSpawnTime = iMeteroiteSpawnTimeInit
         iGameTimeSec = 0
@@ -649,4 +773,106 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             snBomb3.texture = SKTexture(imageNamed: "Media/pu_bomb_001_empty.png")
         }
     }
+    
+    func applicationWillResignActive(notification: NSNotification) {
+        //print("I'm out of focus!")
+        snPause.zPosition = 1.1
+        lbPause.zPosition = 1.1
+        self.speed = 0.0
+        //self.view!.paused = true
+        print("Paused!")
+        
+    }
+    
+    deinit {
+        
+        // code here...
+        
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+    
+    func fctFadeInOutSKSpriteNode (node: SKSpriteNode, time: NSTimeInterval, alpha: CGFloat, pause: NSTimeInterval) {
+        node.alpha = 0.0
+        let deltaAlpha = alpha/5
+        let deltaTime = time/10
+        node.removeAllActions()
+        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+            node.alpha = node.alpha + deltaAlpha
+            node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                node.alpha = node.alpha + deltaAlpha
+                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                    node.alpha = node.alpha + deltaAlpha
+                    node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                        node.alpha = node.alpha + deltaAlpha
+                        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                            node.alpha = node.alpha + deltaAlpha
+                            node.runAction(SKAction.rotateToAngle(0, duration: pause), completion: {() in
+                                // Pause
+                                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                    // Fade out
+                                    node.alpha = node.alpha - deltaAlpha
+                                    node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                        node.alpha = node.alpha - deltaAlpha
+                                        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                            node.alpha = node.alpha - deltaAlpha
+                                            node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                                node.alpha = node.alpha - deltaAlpha
+                                                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                                    node.alpha = node.alpha - deltaAlpha
+                                                    node.removeAllActions()
+                                                })
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    }
+    
+    func fctFadeInOutSKLabelNode (node: SKLabelNode, time: NSTimeInterval, alpha: CGFloat, pause: NSTimeInterval) {
+        node.alpha = 0.0
+        let deltaAlpha = alpha/5
+        let deltaTime = time/10
+        node.removeAllActions()
+        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+            node.alpha = node.alpha + deltaAlpha
+            node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                node.alpha = node.alpha + deltaAlpha
+                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                    node.alpha = node.alpha + deltaAlpha
+                    node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                        node.alpha = node.alpha + deltaAlpha
+                        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                            node.alpha = node.alpha + deltaAlpha
+                            node.runAction(SKAction.rotateToAngle(0, duration: pause), completion: {() in
+                                // Pause
+                                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                    // Fade out
+                                    node.alpha = node.alpha - deltaAlpha
+                                    node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                        node.alpha = node.alpha - deltaAlpha
+                                        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                            node.alpha = node.alpha - deltaAlpha
+                                            node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                                node.alpha = node.alpha - deltaAlpha
+                                                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                                    node.alpha = node.alpha - deltaAlpha
+                                                    node.removeAllActions()
+                                                })
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    }
+
 }

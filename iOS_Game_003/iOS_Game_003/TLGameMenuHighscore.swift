@@ -46,7 +46,7 @@ class TLGameMenuHighscore: SKScene, SKPhysicsContactDelegate {
         }
         for column in 0...aSkHighscoresColumns - 1 {
             for row in 0...aSkHighscoresRows - 1 {
-                aSkHighscores[column][row] = SKLabelNode(fontNamed: fnGameFont?.fontName)
+                aSkHighscores[column][row] = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
                 aSkHighscores[column][row].horizontalAlignmentMode = .Center;
                 aSkHighscores[column][row].verticalAlignmentMode = .Center
                 aSkHighscores[column][row].fontSize = 26 * (self.frame.width/667.0)

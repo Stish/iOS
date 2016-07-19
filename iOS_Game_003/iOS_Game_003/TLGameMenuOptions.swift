@@ -84,7 +84,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
         tfPlayerName.backgroundColor = SKColor.clearColor()
         tfPlayerName.tintColor = SKColor.whiteColor()
         tfPlayerName.autocorrectionType = UITextAutocorrectionType.No
-        tfPlayerName.font = UIFont(name: fnGameFont!.fontName, size: 30 * (self.frame.width/667.0))
+        tfPlayerName.font = UIFont(name: fnGameTextFont!.fontName, size: 30 * (self.frame.width/667.0))
         tfPlayerName.text = strPlayerName
         tfPlayerName.textAlignment = .Center
         tfPlayerName.contentVerticalAlignment = .Center

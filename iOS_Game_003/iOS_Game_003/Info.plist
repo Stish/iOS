@@ -24,6 +24,7 @@
 	<true/>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Media/Minecraft.ttf</string>
 		<string>Media/ka1.ttf</string>
 		<string>Media/homespun.ttf</string>
 		<string>Media/origa___.ttf</string>

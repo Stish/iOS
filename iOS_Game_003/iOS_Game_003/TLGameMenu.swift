@@ -136,10 +136,11 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
         lbMenuAbout.name = "MenuAbout"
         self.addChild(lbMenuAbout)
         // Version
-        let lbVersion = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        let lbVersion = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
         lbVersion.text = strVersion
         lbVersion.fontSize = 15 * (self.frame.width/667.0)
-        lbVersion.position = CGPoint(x: (self.frame.width - 50), y: 5)
+        lbVersion.horizontalAlignmentMode = .Right;
+        lbVersion.position = CGPoint(x: (self.frame.width - 5), y: 5)
         lbVersion.fontColor = UIColor.whiteColor()
         lbVersion.zPosition = 1.0
         self.addChild(lbVersion)

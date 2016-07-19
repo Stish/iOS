@@ -28,6 +28,9 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
     var snTutTime: SKShapeNode!
     var snTutScore: SKShapeNode!
     var snTutShields: SKShapeNode!
+    var snBomb1: SKSpriteNode!
+    var snBomb2: SKSpriteNode!
+    var snBomb3: SKSpriteNode!
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -81,7 +84,7 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
         snShip.zPosition = 1.1
         self.addChild(snShip)
         // Tutorial text line 1
-        lbTutorialTextline1 = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbTutorialTextline1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
         lbTutorialTextline1.horizontalAlignmentMode = .Left;
         lbTutorialTextline1.verticalAlignmentMode = .Center
         lbTutorialTextline1.text = ""
@@ -92,7 +95,7 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
         lbTutorialTextline1.name = "TutorialTextline1"
         self.addChild(lbTutorialTextline1)
         // Tutorial text line 2
-        lbTutorialTextline2 = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbTutorialTextline2 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
         lbTutorialTextline2.horizontalAlignmentMode = .Left;
         lbTutorialTextline2.verticalAlignmentMode = .Center
         lbTutorialTextline2.text = "This is your ship."
@@ -103,7 +106,7 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
         lbTutorialTextline2.name = "TutorialTextline2"
         self.addChild(lbTutorialTextline2)
         // Tutorial text line 3
-        lbTutorialTextline3 = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbTutorialTextline3 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
         lbTutorialTextline3.horizontalAlignmentMode = .Left;
         lbTutorialTextline3.verticalAlignmentMode = .Center
         lbTutorialTextline3.text = ""
@@ -115,6 +118,30 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
         self.addChild(lbTutorialTextline3)
         iTime100ms = 0
         iTime100msCount = 0
+        // Bombs
+        let flBombWidth = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().width) * (self.frame.width/667.0)
+        let flBombHeight = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().height) * (self.frame.height/375.0)
+        // Bomb 1
+        snBomb1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+        snBomb1.anchorPoint = CGPointMake(0.5, 0.5)
+        snBomb1.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+        snBomb1.zPosition = 1.0
+        snBomb1.alpha = 0.0
+        self.addChild(snBomb1)
+        // Bomb 2
+        snBomb2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+        snBomb2.anchorPoint = CGPointMake(0.5, 0.5)
+        snBomb2.position = CGPoint(x: CGRectGetMidX(self.frame) - (145 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+        snBomb2.zPosition = 1.0
+        snBomb2.alpha = 0.0
+        self.addChild(snBomb2)
+        // Bomb 3
+        snBomb3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+        snBomb3.anchorPoint = CGPointMake(0.5, 0.5)
+        snBomb3.position = CGPoint(x: CGRectGetMidX(self.frame) - (110 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+        snBomb3.zPosition = 1.0
+        snBomb3.alpha = 0.0
+        self.addChild(snBomb3)
         // --- Sounds: Click ---
         let path = NSBundle.mainBundle().pathForResource("Media/sounds/click_001", ofType:"wav")
         let fileURL = NSURL(fileURLWithPath: path!)
@@ -277,6 +304,9 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
                 snHUD.zPosition = 1.0
                 snHUD.alpha = 0.1
                 addChild(snHUD)
+                snBomb1.alpha = 0.1
+                snBomb2.alpha = 0.1
+                snBomb3.alpha = 0.1
                 
                 lbGameTimeTut = SKLabelNode(fontNamed: fnGameFont?.fontName)
                 lbGameTimeTut.text = "12"
@@ -291,21 +321,39 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
             }
             if (iTime100msCount == 121) {
                 snHUD.alpha = 0.2
+                snBomb1.alpha = 0.2
+                snBomb2.alpha = 0.2
+                snBomb3.alpha = 0.2
             }
             if (iTime100msCount == 122) {
                 snHUD.alpha = 0.3
+                snBomb1.alpha = 0.3
+                snBomb2.alpha = 0.3
+                snBomb3.alpha = 0.3
             }
             if (iTime100msCount == 123) {
                 snHUD.alpha = 0.4
+                snBomb1.alpha = 0.4
+                snBomb2.alpha = 0.4
+                snBomb3.alpha = 0.4
             }
             if (iTime100msCount == 124) {
                 snHUD.alpha = 0.5
+                snBomb1.alpha = 0.5
+                snBomb2.alpha = 0.5
+                snBomb3.alpha = 0.5
             }
             if (iTime100msCount == 125) {
                 snHUD.alpha = 0.6
+                snBomb1.alpha = 0.6
+                snBomb2.alpha = 0.6
+                snBomb3.alpha = 0.6
             }
             if (iTime100msCount == 126) {
                 snHUD.alpha = 0.75
+                snBomb1.alpha = 0.75
+                snBomb2.alpha = 0.75
+                snBomb3.alpha = 0.75
             }
             if (iTime100msCount == 150) {
                 lbTutorialTextline1.text = "The power of your shields."
@@ -389,6 +437,9 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
                 snTutTime.removeFromParent()
                 snTutShields.removeFromParent()
                 snHUD.removeFromParent()
+                snBomb1.removeFromParent()
+                snBomb2.removeFromParent()
+                snBomb3.removeFromParent()
                 lbGameTimeTut.removeFromParent()
                 lbGameScoreTut.removeFromParent()
                 lbTutorialTextline1.fontColor = UIColor.whiteColor()
@@ -396,7 +447,7 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
                 lbTutorialTextline3.fontColor = UIColor.whiteColor()
                 lbTutorialTextline1.text = "Avoid or shoot the"
                 lbTutorialTextline2.text = "obstacles in your way."
-                lbTutorialTextline3.text = "Have fun :)"
+                lbTutorialTextline3.text = "Have fun :-)"
             }
             if (iTime100msCount == 260) {
                 lbTutorialTextline1.text = ""

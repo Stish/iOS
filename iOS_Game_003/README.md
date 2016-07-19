@@ -10,10 +10,20 @@ ToDo
 - random backgrounds
 - Bomb explosion
 
+ver 0.27
+- New game font for longer text passages
+- Bombs added to tutorial
+- Info of power ups will be displayed when picked up
+- Game pauses when home button is triggered
+- Touch gesture for firing bombs added
+- Bombs explosion sprites added
+- Bombs have now two hit boxes (bomb body and explosion radius)
+- Bomb dropping and exploding sounds added
+
 ver 0.26
 - Power ups: Bombs and shield power
 - Power up sound added
-- Bombs added to HUD 
+- Bombs added to HUD
 - Minor bug fixes
 
 ver 0.25

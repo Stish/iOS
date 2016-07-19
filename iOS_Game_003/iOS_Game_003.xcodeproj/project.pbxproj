@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FA13A5151D3E607C0076EC79 /* TLBomb.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA13A5141D3E607C0076EC79 /* TLBomb.swift */; };
 		FA19BBDF1D2DA59100157105 /* TLHighscore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBDE1D2DA59100157105 /* TLHighscore.swift */; };
 		FA19BBE11D2DA5E900157105 /* TLHighscoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBE01D2DA5E900157105 /* TLHighscoreManager.swift */; };
 		FA19BBE31D2EAA0B00157105 /* TLGameMenuOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBE21D2EAA0B00157105 /* TLGameMenuOptions.swift */; };
@@ -32,6 +33,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		FA13A5141D3E607C0076EC79 /* TLBomb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLBomb.swift; sourceTree = "<group>"; };
 		FA19BBDE1D2DA59100157105 /* TLHighscore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLHighscore.swift; sourceTree = "<group>"; };
 		FA19BBE01D2DA5E900157105 /* TLHighscoreManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLHighscoreManager.swift; sourceTree = "<group>"; };
 		FA19BBE21D2EAA0B00157105 /* TLGameMenuOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameMenuOptions.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 				FAD12A021D36636500338919 /* TLGameMenuHighscore.swift */,
 				FA19BBE41D3001CD00157105 /* TLGameMenuAbout.swift */,
 				FAD12A041D36804900338919 /* TLHighscoreMember.swift */,
+				FA13A5141D3E607C0076EC79 /* TLBomb.swift */,
 				FAF15CE21C2305CB00CB5827 /* TLLaser.swift */,
 				FA19BBDE1D2DA59100157105 /* TLHighscore.swift */,
 				FA19BBE01D2DA5E900157105 /* TLHighscoreManager.swift */,
@@ -202,6 +205,7 @@
 				FA19BBE51D3001CD00157105 /* TLGameMenuAbout.swift in Sources */,
 				FAD12A051D36804900338919 /* TLHighscoreMember.swift in Sources */,
 				FAE3E33D1C2096E1004F5D3A /* GameViewController.swift in Sources */,
+				FA13A5151D3E607C0076EC79 /* TLBomb.swift in Sources */,
 				FAD12A031D36636500338919 /* TLGameMenuHighscore.swift in Sources */,
 				FAD12A091D3CF85000338919 /* TLPowerUp.swift in Sources */,
 				FAB007931D2D423A00ED7FCE /* TLGameMenu.swift in Sources */,

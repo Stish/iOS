@@ -102,10 +102,10 @@ class TLGameMenuAbout: SKScene, SKPhysicsContactDelegate {
         snlogo.alpha = 1.0
         addChild(snlogo)
         // "by Alex" Text
-        lbTextBy = SKLabelNode(fontNamed: fnGameFont?.fontName)
+        lbTextBy = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
         lbTextBy.horizontalAlignmentMode = .Left
         lbTextBy.verticalAlignmentMode = .Center
-        lbTextBy.text = "CODE & DESIGN:  ALEX"
+        lbTextBy.text = "Code & design:  Alex"
         lbTextBy.fontSize = 28 * (self.frame.width/667.0)
         lbTextBy.position = CGPoint(x: 2*(self.frame.width / 20), y: 3*(self.frame.height / 12))
         lbTextBy.fontColor = UIColor.whiteColor()
@@ -114,7 +114,7 @@ class TLGameMenuAbout: SKScene, SKPhysicsContactDelegate {
         // About "Twitter" Sprite
         snAboutTwitter = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_twitter.png"), color: UIColor.clearColor(), size: CGSizeMake(flAboutTwitterWidth, flAboutTwitterHeight))
         snAboutTwitter.anchorPoint = CGPointMake(0.5, 0.5)
-        snAboutTwitter.position = CGPoint(x: 16*(self.frame.width / 20), y: 3*(self.frame.height / 12))
+        snAboutTwitter.position = CGPoint(x: 14*(self.frame.width / 20), y: 3*(self.frame.height / 12))
         snAboutTwitter.zPosition = 1.0
         snAboutTwitter.alpha = 1.0
         snAboutTwitter.name = "AboutTwitter"
@@ -122,7 +122,7 @@ class TLGameMenuAbout: SKScene, SKPhysicsContactDelegate {
         // About "WWW" Sprite
         snAboutWww = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_www.png"), color: UIColor.clearColor(), size: CGSizeMake(flAboutWwwWidth, flAboutWwwHeight))
         snAboutWww.anchorPoint = CGPointMake(1.0, 0.5)
-        snAboutWww.position = CGPoint(x: 18*(self.frame.width / 20), y: 3*(self.frame.height / 12))
+        snAboutWww.position = CGPoint(x: 16*(self.frame.width / 20), y: 3*(self.frame.height / 12))
         snAboutWww.zPosition = 1.0
         snAboutWww.alpha = 1.0
         snAboutWww.name = "AboutWww"

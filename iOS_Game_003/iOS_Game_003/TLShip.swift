@@ -15,6 +15,7 @@ class TLShip: SKSpriteNode {
     var aShipFlyLeft = Array<SKTexture>()
     var aShipFlyRight = Array<SKTexture>()
     var apShootingSound: AVAudioPlayer!
+    var apBombShootingSound: AVAudioPlayer!
     var blActive = false
     var iHealth = 500
     
@@ -44,8 +45,8 @@ class TLShip: SKSpriteNode {
         self.physicsBody?.collisionBitMask = 0
         // --- Sounds: Shooting ---
         if blSoundEffectsEnabled == true {
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
-            let fileURL = NSURL(fileURLWithPath: path!)
+            var path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
+            var fileURL = NSURL(fileURLWithPath: path!)
             do {
                 try apShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
             } catch {
@@ -54,6 +55,16 @@ class TLShip: SKSpriteNode {
             }
             apShootingSound.numberOfLoops = 0
             apShootingSound.volume = flSoundsVolume
+            path = NSBundle.mainBundle().pathForResource("Media/sounds/bomb_001", ofType:"wav")
+            fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                try apBombShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
+            apBombShootingSound.numberOfLoops = 0
+            apBombShootingSound.volume = flSoundsVolume
         }
     }
 
@@ -101,6 +112,14 @@ class TLShip: SKSpriteNode {
             apShootingSound.volume = flSoundsVolume
             apShootingSound.prepareToPlay()
             apShootingSound.play()
+        }
+    }
+    
+    func fctPlayBombShootingSound() {
+        if blSoundEffectsEnabled == true {
+            apBombShootingSound.volume = flSoundsVolume
+            apBombShootingSound.prepareToPlay()
+            apBombShootingSound.play()
         }
     }
     
