@@ -10,6 +10,11 @@ ToDo
 - random backgrounds
 - Bomb explosion
 
+ver 0.28
+- Bomb hits objects in explosion radius
+- Ship can be destroyed by bomb explosion
+- Shields light up when being hit by meteorite or bomb explosion
+
 ver 0.27
 - New game font for longer text passages
 - Bombs added to tutorial

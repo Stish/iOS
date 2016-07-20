@@ -55,7 +55,7 @@ class TLPowerUp: SKSpriteNode {
     }
     
     func fctMoveLeft() {
-        let actMoveLeft = SKAction.moveByX(-(flScreenWidth + 100), y: 0, duration: flMeteroiteSpeed * 2)
+        let actMoveLeft = SKAction.moveByX(-(flScreenWidth + 100), y: 0, duration: flmeteoriteSpeed * 2)
         
         runAction(actMoveLeft, completion: {() in
             self.physicsBody?.categoryBitMask = 0

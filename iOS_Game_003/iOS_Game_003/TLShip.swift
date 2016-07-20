@@ -18,6 +18,7 @@ class TLShip: SKSpriteNode {
     var apBombShootingSound: AVAudioPlayer!
     var blActive = false
     var iHealth = 500
+    var snShipShield: SKSpriteNode!
     
     init(size: CGSize) {
         //let taShip = SKTextureAtlas(named:"ship.atlas")
@@ -41,8 +42,15 @@ class TLShip: SKSpriteNode {
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = false
         self.physicsBody?.categoryBitMask = enBodyType.ship.rawValue
-        self.physicsBody?.contactTestBitMask = enBodyType.meteroite.rawValue
+        self.physicsBody?.contactTestBitMask = enBodyType.meteorite.rawValue
         self.physicsBody?.collisionBitMask = 0
+        // --- Shield ---
+        snShipShield = SKSpriteNode(texture: SKTexture(imageNamed: "Media/ship.atlas/ship_shield_001.png"), color: UIColor.blueColor(), size: CGSizeMake(40 * (flScreenWidth/667.0), 80 * (flScreenHeight/375.0)))
+        snShipShield.anchorPoint = CGPointMake(0.0, 0.5)
+        snShipShield.position = CGPoint(x: self.position.x, y: self.position.y)
+        snShipShield.zPosition = 1.0
+        snShipShield.alpha = 0.0
+        self.addChild(snShipShield)
         // --- Sounds: Shooting ---
         if blSoundEffectsEnabled == true {
             var path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")

@@ -1,5 +1,5 @@
 //
-//  TLmeteroite.swift
+//  TLMeteorite.swift
 //  iOS_Game_003
 //
 //  Created by Alexander Wegner on 17.12.15.
@@ -10,7 +10,7 @@ import Foundation
 import SpriteKit
 import AVFoundation
 
-class TLMeteroite: SKSpriteNode {
+class TLMeteorite: SKSpriteNode {
     var blDestroyed = false
     var blActive = false
     var iHealth = 100
@@ -19,35 +19,37 @@ class TLMeteroite: SKSpriteNode {
     var apHitSound: AVAudioPlayer!
     //var blHasPowerUp: Bool!
     var iPowerUp = 0
+    var blInBombRadius: Bool!
     
     init(size: CGSize, rotSpeed: CGFloat, rotDirec: Int) {
-        super.init(texture: SKTexture(imageNamed: "Media/objects/meteroite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
+        super.init(texture: SKTexture(imageNamed: "Media/objects/meteorite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
         // Different textures
         //blHasPowerUp = false
+        blInBombRadius = false
         iPowerUp = 0
         switch (arc4random_uniform(UInt32(100)) + 1) {
         case 1...26:
-            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_001.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteorite_001.png")
         case 27...52:
-            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_002.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteorite_002.png")
         case 53...79:
-            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_003.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteorite_003.png")
         case 80...86:
-            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_004.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteorite_004.png")
             iHealth = 200
             iScore = 500
             //blHasPowerUp = true
             iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
             print("PowerUp Type: " + String(iPowerUp))
         case 87...93:
-            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_005.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteorite_005.png")
             iHealth = 200
             iScore = 500
             //blHasPowerUp = true
             iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
             print("PowerUp Type: " + String(iPowerUp))
         case 94...100:
-            self.texture = SKTexture(imageNamed: "Media/objects/meteroite_006.png")
+            self.texture = SKTexture(imageNamed: "Media/objects/meteorite_006.png")
             iHealth = 200
             iScore = 500
             //blHasPowerUp = true
@@ -64,8 +66,8 @@ class TLMeteroite: SKSpriteNode {
         self.physicsBody?.dynamic = true
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = true
-        self.physicsBody?.categoryBitMask = enBodyType.meteroite.rawValue
-        self.physicsBody?.contactTestBitMask = enBodyType.laser.rawValue | enBodyType.ship.rawValue | enBodyType.meteroite.rawValue
+        self.physicsBody?.categoryBitMask = enBodyType.meteorite.rawValue
+        self.physicsBody?.contactTestBitMask = enBodyType.laser.rawValue | enBodyType.ship.rawValue | enBodyType.meteorite.rawValue
         self.physicsBody?.collisionBitMask = 0
         
         self.fctRotate(rotSpeed, iDirection: rotDirec)
@@ -82,7 +84,7 @@ class TLMeteroite: SKSpriteNode {
     }
 
     func fctMoveLeft() {
-        let actMoveLeft = SKAction.moveByX(-(flScreenWidth + 100), y: 0, duration: flMeteroiteSpeed)
+        let actMoveLeft = SKAction.moveByX(-(flScreenWidth + 100), y: 0, duration: flmeteoriteSpeed)
 
         runAction(actMoveLeft, completion: {() in
             self.physicsBody?.categoryBitMask = 0

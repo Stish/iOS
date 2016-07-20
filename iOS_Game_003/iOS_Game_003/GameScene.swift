@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.27"
+var strVersion = "ver 0.28"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -26,17 +26,18 @@ var aSkHighscoresColumns = 4
 var aSkHighscoresRows = 5
 var iGameScore = 0
 var blGameOver = false
+var blBombFired: Bool!
 // --- game speed ---
-let flMeteroiteSpeedInit = Double(2.5)
-let iMeteroiteSpawnTimeInit = 15
-var flMeteroiteSpeed: Double!
-var iMeteroiteSpawnTime: Int!
+let flmeteoriteSpeedInit = Double(2.5)
+let imeteoriteSpawnTimeInit = 15
+var flmeteoriteSpeed: Double!
+var imeteoriteSpawnTime: Int!
 let iSpeedUpateCycleTimeSec = 15
 let iLaserShootInterval = 4
 // --- game objects ---
-let iMeteroiteSkinCnt = 6
-var flMeteroiteSizeMax = CGFloat(120)
-var flMeteroiteSizeMin = CGFloat(50)
+let imeteoriteSkinCnt = 6
+var flmeteoriteSizeMax = CGFloat(120)
+var flmeteoriteSizeMin = CGFloat(50)
 var flShipSizeWidth = CGFloat(70)
 var flShipSizeHeight = CGFloat(62)
 // --- game sounds ---
@@ -68,7 +69,7 @@ var aExplosion_01 = Array<SKTexture>()
 enum enBodyType: UInt32 {
     case ship = 1
     case laser = 2
-    case meteroite = 4
+    case meteorite = 4
     case powerup = 8
     case bomb = 16
     case bombExplosion = 32
@@ -82,8 +83,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snInterfaceRight: SKSpriteNode!
     var selectedNodes = [UITouch:SKSpriteNode]()
     var aSnLaser01 = Array<TLLaser>()
-    var aSnMeteroite = Array<TLMeteroite>()
     var aSnPowerUp = Array<TLPowerUp>()
+    var aSnmeteorite = Array<TLMeteorite>()
     var iTimeSec: Int!
     var iGameTimeSec: Int!
     var iTime100ms: Int!
@@ -128,14 +129,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_012"))
         
         // Game settings
-        flMeteroiteSizeMax = CGFloat(120) * (self.frame.height/375.0)
-        flMeteroiteSizeMin = CGFloat(50) * (self.frame.height/375.0)
+        flmeteoriteSizeMax = CGFloat(120) * (self.frame.height/375.0)
+        flmeteoriteSizeMin = CGFloat(50) * (self.frame.height/375.0)
         flShipSizeWidth = CGFloat(70) * (self.frame.width/667.0)
         flShipSizeHeight = CGFloat(62) * (self.frame.height/375.0)
         //
-        flMeteroiteSpeed = flMeteroiteSpeedInit
-        iMeteroiteSpawnTime = iMeteroiteSpawnTimeInit
-        
+        flmeteoriteSpeed = flmeteoriteSpeedInit
+        imeteoriteSpawnTime = imeteoriteSpawnTimeInit
+        blBombFired = false
         flTouchMoveDist = 1000
         iGameTimeSec = 0
         iTimeSec = 0
@@ -388,8 +389,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if touch.locationInView(view).x >= (200.0 * (self.frame.height/375.0)) {
                     if touch.locationInView(view).x - flTouchMoveDist >= 100 {
                         // Finger moved detected
-                        snShip.fctPlayBombShootingSound()
-                        fctShootBomb()
+                        if (blBombFired == false) && (iBombCount > 0) {
+                            iBombCount = iBombCount - 1
+                            fctUpdateBombs()
+                            snShip.fctPlayBombShootingSound()
+                            fctShootBomb()
+                        }
                     }
                 }
             }
@@ -419,55 +424,47 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if blGameOver == true {
                     iGameRestartCnt = iGameRestartCnt + 1
                 }
-                if (iTime100ms % iMeteroiteSpawnTime == 0) && (blGameOver == false) && (blGameStarted == true) {
-                    //print(iTimeSec) // #debug
-                    // flMeteroiteSizeMax
-                    let flMetSize = CGFloat(arc4random_uniform(UInt32(flMeteroiteSizeMax - flMeteroiteSizeMin)) + 1 + UInt32(flMeteroiteSizeMin))
+                if (iTime100ms % imeteoriteSpawnTime == 0) && (blGameOver == false) && (blGameStarted == true) {
+                    let flMetSize = CGFloat(arc4random_uniform(UInt32(flmeteoriteSizeMax - flmeteoriteSizeMin)) + 1 + UInt32(flmeteoriteSizeMin))
                     let flRotSpeed = CGFloat(arc4random_uniform(5) + 1 + 5)
                     var iRotDirec = Int(arc4random_uniform(2))
                     if iRotDirec == 0 {
                         iRotDirec = -1
                     }
-                    //print(flMetSize) // #debug
-                    //print(flRotSpeed) // #debug
-                    //print(iRotDirec) // #debug
-                    if aSnMeteroite.count == 0
+                    if aSnmeteorite.count == 0
                     {
-                        aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
-                        aSnMeteroite[0].blActive = false
+                        aSnmeteorite.append(TLMeteorite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
+                        aSnmeteorite[0].blActive = false
                     }
-                    allElements: for i in 0 ..< aSnMeteroite.count {
-                        if aSnMeteroite[i].blActive == false {
-                            aSnMeteroite[i] = TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec)
-                            aSnMeteroite[i].blActive = true
-                            addChild(aSnMeteroite[i])
-                            aSnMeteroite[i].fctMoveLeft()
+                    allElements: for i in 0 ..< aSnmeteorite.count {
+                        if aSnmeteorite[i].blActive == false {
+                            aSnmeteorite[i] = TLMeteorite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec)
+                            aSnmeteorite[i].blActive = true
+                            addChild(aSnmeteorite[i])
+                            aSnmeteorite[i].fctMoveLeft()
                             break allElements
                         }
-                        if i == (aSnMeteroite.count - 1) {
-                            aSnMeteroite.append(TLMeteroite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
-                            aSnMeteroite[i+1].blActive = true
-                            addChild(aSnMeteroite[i+1])
-                            aSnMeteroite[i+1].fctMoveLeft()
+                        if i == (aSnmeteorite.count - 1) {
+                            aSnmeteorite.append(TLMeteorite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
+                            aSnmeteorite[i+1].blActive = true
+                            addChild(aSnmeteorite[i+1])
+                            aSnmeteorite[i+1].fctMoveLeft()
                             break allElements
                         }
                     }
-                    //print("Mets: " + String(aSnMeteroite.count)) // #debug
-                    //print(iTime100ms) // #debug
                 }
                 // --- every 1s
                 if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
                     iGameTimeSec = iGameTimeSec + 1
                     lbGameTime.text = String(iGameTimeSec)
                     if iGameTimeSec % iSpeedUpateCycleTimeSec == 0 {
-                        if flMeteroiteSpeed > 0.1 {
-                            flMeteroiteSpeed = flMeteroiteSpeed - 0.1
+                        if flmeteoriteSpeed > 0.1 {
+                            flmeteoriteSpeed = flmeteoriteSpeed - 0.1
                         }
-                        if iMeteroiteSpawnTime > 1 {
-                            iMeteroiteSpawnTime = iMeteroiteSpawnTime - 1
+                        if imeteoriteSpawnTime > 1 {
+                            imeteoriteSpawnTime = imeteoriteSpawnTime - 1
                         }
                     }
-                    //print("GameScene")
                 }
             }
         }
@@ -518,6 +515,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctShootBomb() {
+        blBombFired = true
         snBombFired = TLBomb(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)))
         self.addChild(snBombFired)
         print("Bomb fired") // #debug
@@ -529,42 +527,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if blGameOver == false {
             switch(contactMask) {
-            // Laser hits meteroite
-            case enBodyType.laser.rawValue | enBodyType.meteroite.rawValue:
+            // Laser hits meteorite
+            case enBodyType.laser.rawValue | enBodyType.meteorite.rawValue:
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
-                for i in 0 ..< aSnMeteroite.count {
-                    if (secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i]) && (aSnMeteroite[i].blDestroyed == false) {
-                        aSnMeteroite[i].iHealth -= 100
-                        if aSnMeteroite[i].iHealth <= 0 {
-                            if aSnMeteroite[i].iPowerUp > 0 {
+                for i in 0 ..< aSnmeteorite.count {
+                    if (secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i]) && (aSnmeteorite[i].blDestroyed == false) {
+                        aSnmeteorite[i].iHealth -= 100
+                        if aSnmeteorite[i].iHealth <= 0 {
+                            if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnMeteroite[i].position, type: aSnMeteroite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnMeteroite[i].position, type: aSnMeteroite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnMeteroite[i].position, type: aSnMeteroite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
                                         break allElements
                                     }
                                 }
-                                let debug_PowerUpCnt = aSnPowerUp.count //debug
-                                //print("PowerUps: " + String(debug_PowerUpCnt)) // #debug
                             }
-                            aSnMeteroite[i].fctExplode()
+                            aSnmeteorite[i].fctExplode()
                         } else {
                             // ToDo
-                            aSnMeteroite[i].fctHit()
+                            aSnmeteorite[i].fctHit()
                         }
                     }
                 }
@@ -575,20 +571,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         aSnLaser01[i].fctExplode()
                     }
                 }
-            // Ship hits meteroite
-            case (enBodyType.ship.rawValue | enBodyType.meteroite.rawValue):
+            // Ship hits meteorite
+            case (enBodyType.ship.rawValue | enBodyType.meteorite.rawValue):
                 if blGameTest == false {
                     let secondNode = contact.bodyB.node
                     let firstNode = contact.bodyA.node
-                    for i in 0 ..< aSnMeteroite.count {
-                        if secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i] {
-                            if aSnMeteroite[i].blDestroyed == false {
-                                snShip.iHealth = snShip.iHealth - aSnMeteroite[i].iHealth
-                                aSnMeteroite[i].iHealth = 0
-                                aSnMeteroite[i].physicsBody?.categoryBitMask = 0
-                                aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
+                    for i in 0 ..< aSnmeteorite.count {
+                        if secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i] {
+                            if aSnmeteorite[i].blDestroyed == false {
+                                if snShip.iHealth > 100 {
+                                    fctFadeInOutSKSpriteNode(snShip.snShipShield, time: 0.5, alpha: 0.75, pause: 0.1)
+                                }
+                                snShip.iHealth = snShip.iHealth - aSnmeteorite[i].iHealth
+                                aSnmeteorite[i].iHealth = 0
+                                aSnmeteorite[i].physicsBody?.categoryBitMask = 0
+                                aSnmeteorite[i].physicsBody?.contactTestBitMask = 0
                                 fctUpdateShields()
-                                if aSnMeteroite[i].iPowerUp == 1 {
+                                if aSnmeteorite[i].iPowerUp == 1 {
                                     if iBombCount < 3 {
                                         self.iBombCount = iBombCount + 1
                                         fctUpdateBombs()
@@ -601,7 +600,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                     fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                     fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                 }
-                                if aSnMeteroite[i].iPowerUp == 2 {
+                                if aSnmeteorite[i].iPowerUp == 2 {
                                     if snShip.iHealth < 500 {
                                         snShip.iHealth = snShip.iHealth + 100
                                         fctUpdateShields()
@@ -614,7 +613,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                     fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                     fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                 }
-                                aSnMeteroite[i].fctExplode()
+                                aSnmeteorite[i].fctExplode()
                             }
                         }
                     }
@@ -667,15 +666,114 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         }
                     }
                 }
-            // Meteroite hits meteroite
-            case (enBodyType.meteroite.rawValue):
+            // meteorite hits meteorite
+            case (enBodyType.meteorite.rawValue):
                 let secondNode = contact.bodyB.node
                 let firstNode = contact.bodyA.node
-                for i in 0 ..< aSnMeteroite.count {
-                    if (secondNode == aSnMeteroite[i] || firstNode == aSnMeteroite[i]) && (aSnMeteroite[i].blDestroyed == false) {
-                        aSnMeteroite[i].physicsBody?.categoryBitMask = 0
-                        aSnMeteroite[i].physicsBody?.contactTestBitMask = 0
-                        aSnMeteroite[i].fctExplode()
+                for i in 0 ..< aSnmeteorite.count {
+                    if (secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i]) && (aSnmeteorite[i].blDestroyed == false) {
+                        aSnmeteorite[i].physicsBody?.categoryBitMask = 0
+                        aSnmeteorite[i].physicsBody?.contactTestBitMask = 0
+                        aSnmeteorite[i].fctExplode()
+                    }
+                }
+            // Bomb hits meteorite
+            case enBodyType.bomb.rawValue | enBodyType.meteorite.rawValue:
+                let secondNode = contact.bodyB.node
+                let firstNode = contact.bodyA.node
+                for i in 0 ..< aSnmeteorite.count {
+                    if (secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i]) && (aSnmeteorite[i].blDestroyed == false) {
+                        aSnmeteorite[i].iHealth = 0
+                        if aSnmeteorite[i].iHealth <= 0 {
+                            if aSnmeteorite[i].iPowerUp > 0 {
+                                if aSnPowerUp.count == 0 {
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp[0].blActive = false
+                                }
+                                allElements: for j in 0 ..< aSnPowerUp.count {
+                                    if aSnPowerUp[j].blActive == false {
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j].blActive = true
+                                        addChild(aSnPowerUp[j])
+                                        aSnPowerUp[j].fctMoveLeft()
+                                        break allElements
+                                    }
+                                    if j == (aSnPowerUp.count - 1) {
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp[j+1].blActive = true
+                                        addChild(aSnPowerUp[j+1])
+                                        aSnPowerUp[j+1].fctMoveLeft()
+                                        break allElements
+                                    }
+                                }
+                            }
+                            aSnmeteorite[i].fctExplode()
+                            snBombFired.fctExplode()
+                            snBombFired.blExploded = true
+                        } else {
+                            // ToDo
+                            aSnmeteorite[i].fctHit()
+                        }
+                    }
+                }
+            // Bomb explosion hits meteorite
+            case enBodyType.bombExplosion.rawValue | enBodyType.meteorite.rawValue:
+                if snBombFired.blExploded == true {
+                    let secondNode = contact.bodyB.node
+                    let firstNode = contact.bodyA.node
+                    for i in 0 ..< aSnmeteorite.count {
+                        if (secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i]) && (aSnmeteorite[i].blDestroyed == false){
+                            aSnmeteorite[i].iHealth = 0
+                            if aSnmeteorite[i].iHealth <= 0 {
+                                if aSnmeteorite[i].iPowerUp > 0 {
+                                    if aSnPowerUp.count == 0 {
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp[0].blActive = false
+                                    }
+                                    allElements: for j in 0 ..< aSnPowerUp.count {
+                                        if aSnPowerUp[j].blActive == false {
+                                            aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                            aSnPowerUp[j].blActive = true
+                                            addChild(aSnPowerUp[j])
+                                            aSnPowerUp[j].fctMoveLeft()
+                                            break allElements
+                                        }
+                                        if j == (aSnPowerUp.count - 1) {
+                                            aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                            aSnPowerUp[j+1].blActive = true
+                                            addChild(aSnPowerUp[j+1])
+                                            aSnPowerUp[j+1].fctMoveLeft()
+                                            break allElements
+                                        }
+                                    }
+                                }
+                                aSnmeteorite[i].fctExplode()
+                                snBombFired.fctExplode()
+                                snBombFired.blExploded = true
+                            } else {
+                                // ToDo
+                                aSnmeteorite[i].fctHit()
+                            }
+                        }
+                    }
+                }
+            // Bomb explosion hits ship
+            case enBodyType.bombExplosion.rawValue | enBodyType.ship.rawValue:
+                if snBombFired.blExploded == true {
+                    let secondNode = contact.bodyB.node
+                    let firstNode = contact.bodyA.node
+                    if (secondNode == snShip || firstNode == snShip){
+                        if snShip.iHealth > 100 {
+                            fctFadeInOutSKSpriteNode(snShip.snShipShield, time: 0.5, alpha: 0.75, pause: 0.1)
+                        }
+                        snShip.iHealth = snShip.iHealth - 100
+                        if snShip.iHealth <= 0 {
+                            self.fctGameOver()
+                            snShip.physicsBody?.categoryBitMask = 0
+                            snShip.fctExplode()
+                            blGameOver = true
+                            iGameRestartCnt = 0
+                        }
                     }
                 }
             default:
@@ -683,6 +781,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
     }
+    
+//    func didEndContact(contact: SKPhysicsContact) {
+//        let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+//        if blGameOver == false {
+//            switch(contactMask) {
+//                // Laser hits meteorite
+//            // Bomb explosion hits meteorite
+//            case enBodyType.bombExplosion.rawValue | enBodyType.meteorite.rawValue:
+//                let secondNode = contact.bodyB.node
+//                let firstNode = contact.bodyA.node
+//                for i in 0 ..< aSnmeteorite.count {
+//                    if (secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i]) && (aSnmeteorite[i].blDestroyed == false) && (snBombFired.blExploded == false){
+//                        aSnmeteorite[i].blInBombRadius = false
+//                    }
+//                }
+//            default:
+//                ()
+//            }
+//        }
+//    }
     
     func fctGameOver() {
         iGameRestartCnt = 0
@@ -693,12 +811,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameOver.fontColor = UIColor.whiteColor()
         self.addChild(lbGameOver)
         
-        for i in 0 ..< aSnMeteroite.count {
-            aSnMeteroite[i].physicsBody?.categoryBitMask = 0
-            aSnMeteroite[i].blActive = false
-            aSnMeteroite[i].removeFromParent()
+        for i in 0 ..< aSnmeteorite.count {
+            aSnmeteorite[i].physicsBody?.categoryBitMask = 0
+            aSnmeteorite[i].blActive = false
+            aSnmeteorite[i].removeFromParent()
         }
-        aSnMeteroite.removeAll()
+        aSnmeteorite.removeAll()
         for i in 0 ..< aSnLaser01.count {
             aSnLaser01[i].physicsBody?.categoryBitMask = 0
             aSnLaser01[i].blActive = false
@@ -714,9 +832,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctNewGame() {
+        blBombFired = false
         flTouchMoveDist = 1000
-        flMeteroiteSpeed = flMeteroiteSpeedInit
-        iMeteroiteSpawnTime = iMeteroiteSpawnTimeInit
+        flmeteoriteSpeed = flmeteoriteSpeedInit
+        imeteoriteSpawnTime = imeteoriteSpawnTimeInit
         iGameTimeSec = 0
         lbGameTime.text = "0s"
         blGameOver = false

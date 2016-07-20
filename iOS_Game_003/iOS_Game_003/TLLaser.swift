@@ -24,7 +24,7 @@ class TLLaser: SKSpriteNode {
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = false
         self.physicsBody?.categoryBitMask = enBodyType.laser.rawValue
-        self.physicsBody?.contactTestBitMask = enBodyType.meteroite.rawValue
+        self.physicsBody?.contactTestBitMask = enBodyType.meteorite.rawValue
         self.physicsBody?.collisionBitMask = 0
     }
     
