@@ -12,6 +12,7 @@
 		FA19BBE11D2DA5E900157105 /* TLHighscoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBE01D2DA5E900157105 /* TLHighscoreManager.swift */; };
 		FA19BBE31D2EAA0B00157105 /* TLGameMenuOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBE21D2EAA0B00157105 /* TLGameMenuOptions.swift */; };
 		FA19BBE51D3001CD00157105 /* TLGameMenuAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBE41D3001CD00157105 /* TLGameMenuAbout.swift */; };
+		FAADFBA51D40FCB200AFADE2 /* TLLaserSphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAADFBA41D40FCB200AFADE2 /* TLLaserSphere.swift */; };
 		FAB007811D2BD19D00ED7FCE /* Media in Resources */ = {isa = PBXBuildFile; fileRef = FAB007801D2BD19D00ED7FCE /* Media */; };
 		FAB0078F1D2D25C800ED7FCE /* TLGameStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB0078E1D2D25C800ED7FCE /* TLGameStart.swift */; };
 		FAB007931D2D423A00ED7FCE /* TLGameMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB007921D2D423A00ED7FCE /* TLGameMenu.swift */; };
@@ -38,6 +39,7 @@
 		FA19BBE01D2DA5E900157105 /* TLHighscoreManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLHighscoreManager.swift; sourceTree = "<group>"; };
 		FA19BBE21D2EAA0B00157105 /* TLGameMenuOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameMenuOptions.swift; sourceTree = "<group>"; };
 		FA19BBE41D3001CD00157105 /* TLGameMenuAbout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameMenuAbout.swift; sourceTree = "<group>"; };
+		FAADFBA41D40FCB200AFADE2 /* TLLaserSphere.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLLaserSphere.swift; sourceTree = "<group>"; };
 		FAB007801D2BD19D00ED7FCE /* Media */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Media; sourceTree = "<group>"; };
 		FAB0078E1D2D25C800ED7FCE /* TLGameStart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameStart.swift; sourceTree = "<group>"; };
 		FAB007921D2D423A00ED7FCE /* TLGameMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameMenu.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				FAD12A021D36636500338919 /* TLGameMenuHighscore.swift */,
 				FA19BBE41D3001CD00157105 /* TLGameMenuAbout.swift */,
 				FAD12A041D36804900338919 /* TLHighscoreMember.swift */,
+				FAADFBA41D40FCB200AFADE2 /* TLLaserSphere.swift */,
 				FA13A5141D3E607C0076EC79 /* TLBomb.swift */,
 				FAF15CE21C2305CB00CB5827 /* TLLaser.swift */,
 				FA19BBDE1D2DA59100157105 /* TLHighscore.swift */,
@@ -199,6 +202,7 @@
 				FAE3E3531C20A751004F5D3A /* TLShip.swift in Sources */,
 				FA19BBE31D2EAA0B00157105 /* TLGameMenuOptions.swift in Sources */,
 				FAD12A071D3796A600338919 /* TLGameMenuTutorial.swift in Sources */,
+				FAADFBA51D40FCB200AFADE2 /* TLLaserSphere.swift in Sources */,
 				FAF15CE31C2305CB00CB5827 /* TLLaser.swift in Sources */,
 				FAB0078F1D2D25C800ED7FCE /* TLGameStart.swift in Sources */,
 				FAE3E3511C209C40004F5D3A /* TLBackground.swift in Sources */,

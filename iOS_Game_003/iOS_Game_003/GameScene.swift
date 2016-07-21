@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.28"
+var strVersion = "ver 0.29"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -27,6 +27,7 @@ var aSkHighscoresRows = 5
 var iGameScore = 0
 var blGameOver = false
 var blBombFired: Bool!
+var iSelectedWeapon: Int! // 0: Laser 1: Laser sphere 2: Tripple laser
 // --- game speed ---
 let flmeteoriteSpeedInit = Double(2.5)
 let imeteoriteSpawnTimeInit = 15
@@ -34,6 +35,7 @@ var flmeteoriteSpeed: Double!
 var imeteoriteSpawnTime: Int!
 let iSpeedUpateCycleTimeSec = 15
 let iLaserShootInterval = 4
+let iLaserSphereShootInterval = 10
 // --- game objects ---
 let imeteoriteSkinCnt = 6
 var flmeteoriteSizeMax = CGFloat(120)
@@ -55,6 +57,7 @@ var snBackground: TLBackground!
 var snShip: TLShip!
 var blGameStarted = false
 var blLaserFired = false
+var blLaserSphereFired = false
 
 // --- game fonts ---
 //let fnGameFont = UIFont(name: "HomespunTTBRK", size: 10)
@@ -73,6 +76,7 @@ enum enBodyType: UInt32 {
     case powerup = 8
     case bomb = 16
     case bombExplosion = 32
+    case laserSphere = 64
 }
 // Debug
 var debug_LaserCnt = 0
@@ -83,6 +87,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snInterfaceRight: SKSpriteNode!
     var selectedNodes = [UITouch:SKSpriteNode]()
     var aSnLaser01 = Array<TLLaser>()
+    var aSnLaserSphere = Array<TLLaserSphere>()
     var aSnPowerUp = Array<TLPowerUp>()
     var aSnmeteorite = Array<TLMeteorite>()
     var iTimeSec: Int!
@@ -90,6 +95,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var iTime100ms: Int!
     var iTime10ms: Int!
     var iLaserShootingPause: Int!
+    var iLaserSphereShootingPause: Int!
     var iGameRestartCnt: Int!
     var snShieldBar1: SKSpriteNode!
     var snShieldBar2: SKSpriteNode!
@@ -111,7 +117,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
-        view.showsPhysics = true // #debug
+        view.showsPhysics = false // #debug
         // --- explosion sprites ---
         //let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
         aExplosion_01.removeAll()
@@ -134,6 +140,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         flShipSizeWidth = CGFloat(70) * (self.frame.width/667.0)
         flShipSizeHeight = CGFloat(62) * (self.frame.height/375.0)
         //
+        iSelectedWeapon = 1
         flmeteoriteSpeed = flmeteoriteSpeedInit
         imeteoriteSpawnTime = imeteoriteSpawnTimeInit
         blBombFired = false
@@ -143,6 +150,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         iTime100ms = 0
         iTime10ms = 0
         iLaserShootingPause = 0
+        iLaserSphereShootingPause = 0
         iGameRestartCnt = 0
         iBombCount = 0
         flScreenWidth = view.frame.size.width
@@ -329,14 +337,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         snShip.fctMoveShipByY(deltaY)
                         //print("left")
                     } else {
-                        if blLaserFired == false {
-                            blLaserFired = true
-                            iLaserShootingPause = 0
-                            snShip.fctPlayShootingSound()
-                            //print("right")
-                            self.fctShootLaser01()
-                            //print("Lasers: " + String(aSnLaser01.count)) // #debug
-                            flTouchMoveDist = touch.locationInView(view).x
+                        switch (iSelectedWeapon) {
+                        case 0:
+                            if blLaserFired == false {
+                                blLaserFired = true
+                                iLaserShootingPause = 0
+                                snShip.fctPlayShootingSound()
+                                //print("right")
+                                self.fctShootLaser01()
+                                flTouchMoveDist = touch.locationInView(view).x
+                            }
+                        case 1:
+                            if blLaserSphereFired == false {
+                                blLaserSphereFired = true
+                                iLaserSphereShootingPause = 0
+                                snShip.fctPlayShootingSound()
+                                self.fctShootLaserSphere()
+                                flTouchMoveDist = touch.locationInView(view).x
+                                print("Laser spheres: " + String(aSnLaserSphere.count)) // #debug
+                            }
+                        default:
+                            ()
                         }
                     }
                 }
@@ -415,6 +436,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     if iLaserShootingPause >= iLaserShootInterval {
                         iLaserShootingPause = 0
                         blLaserFired = false
+                    }
+                }
+                if blLaserSphereFired == true {
+                    iLaserSphereShootingPause = iLaserSphereShootingPause + 1
+                    if iLaserSphereShootingPause >= iLaserSphereShootInterval {
+                        iLaserSphereShootingPause = 0
+                        blLaserSphereFired = false
                     }
                 }
             }
@@ -510,8 +538,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 break allElements
             }
         }
-        debug_LaserCnt = aSnLaser01.count
-        //print(debug_LaserCnt) // #debug
+    }
+    
+    func fctShootLaserSphere() {
+        //snLaser.removeAllActions()
+        if aSnLaserSphere.count == 0
+        {
+            aSnLaserSphere.append(TLLaserSphere(size: CGSizeMake(41 * (self.frame.width/667.0), 41 * (self.frame.height/375.0))))
+            aSnLaserSphere[0].blActive = false
+        }
+        allElements: for i in 0 ..< aSnLaserSphere.count {
+            if aSnLaserSphere[i].blActive == false {
+                aSnLaserSphere[i] = TLLaserSphere(size: CGSizeMake(41 * (self.frame.width/667.0), 41 * (self.frame.height/375.0)))
+                aSnLaserSphere[i].blActive = true
+                addChild(aSnLaserSphere[i])
+                aSnLaserSphere[i].fctMoveRight()
+                break allElements
+            }
+            if i == (aSnLaserSphere.count - 1) {
+                aSnLaserSphere.append(TLLaserSphere(size: CGSizeMake(41 * (self.frame.width/667.0), 41 * (self.frame.height/375.0))))
+                aSnLaserSphere[i+1].blActive = true
+                addChild(aSnLaserSphere[i+1])
+                aSnLaserSphere[i+1].fctMoveRight()
+                break allElements
+            }
+        }
     }
     
     func fctShootBomb() {
@@ -829,9 +880,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             aSnPowerUp[i].removeFromParent()
         }
         aSnPowerUp.removeAll()
+        
+        aSnLaserSphere.removeAll()
+        for i in 0 ..< aSnLaserSphere.count {
+            aSnLaserSphere[i].physicsBody?.categoryBitMask = 0
+            aSnLaserSphere[i].blActive = false
+            aSnLaserSphere[i].removeFromParent()
+        }
+        aSnLaserSphere.removeAll()
     }
     
     func fctNewGame() {
+        blLaserFired = false
+        blLaserSphereFired = false
+        iSelectedWeapon = 0
         blBombFired = false
         flTouchMoveDist = 1000
         flmeteoriteSpeed = flmeteoriteSpeedInit

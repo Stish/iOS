@@ -8,7 +8,11 @@ ToDo
 - game pause
 - nebulas
 - random backgrounds
-- Bomb explosion
+
+ver 0.29
+- New weapon: laser sphere
+- Animation for laser sphere added
+- Basic mechanics for laser sphere added
 
 ver 0.28
 - Bomb hits objects in explosion radius
