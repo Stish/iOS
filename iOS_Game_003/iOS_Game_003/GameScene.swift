@@ -117,7 +117,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
-        view.showsPhysics = false // #debug
+        view.showsPhysics = true // #debug
         // --- explosion sprites ---
         //let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
         aExplosion_01.removeAll()
@@ -827,6 +827,50 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         }
                     }
                 }
+            // Laser sphere hits meteorite
+            case enBodyType.laserSphere.rawValue | enBodyType.meteorite.rawValue:
+                let secondNode = contact.bodyB.node
+                let firstNode = contact.bodyA.node
+                for i in 0 ..< aSnmeteorite.count {
+                    if (secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i]) && (aSnmeteorite[i].blDestroyed == false) {
+                        aSnmeteorite[i].iHealth -= 200
+                        if aSnmeteorite[i].iHealth <= 0 {
+                            if aSnmeteorite[i].iPowerUp > 0 {
+                                if aSnPowerUp.count == 0 {
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp[0].blActive = false
+                                }
+                                allElements: for j in 0 ..< aSnPowerUp.count {
+                                    if aSnPowerUp[j].blActive == false {
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j].blActive = true
+                                        addChild(aSnPowerUp[j])
+                                        aSnPowerUp[j].fctMoveLeft()
+                                        break allElements
+                                    }
+                                    if j == (aSnPowerUp.count - 1) {
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp[j+1].blActive = true
+                                        addChild(aSnPowerUp[j+1])
+                                        aSnPowerUp[j+1].fctMoveLeft()
+                                        break allElements
+                                    }
+                                }
+                            }
+                            aSnmeteorite[i].fctExplode()
+                        } else {
+                            // ToDo
+                            aSnmeteorite[i].fctHit()
+                        }
+                    }
+                }
+//                for i in 0 ..< aSnLaser01.count {
+//                    if (secondNode == aSnLaser01[i] || firstNode == aSnLaser01[i]) && (aSnLaser01[i].blDestroyed == false)  {
+//                        aSnLaser01[i].physicsBody?.categoryBitMask = 0
+//                        aSnLaser01[i].physicsBody?.contactTestBitMask = 0
+//                        aSnLaser01[i].fctExplode()
+//                    }
+//                }
             default:
                 ()
             }

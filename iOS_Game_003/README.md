@@ -9,6 +9,9 @@ ToDo
 - nebulas
 - random backgrounds
 
+ver 0.30
+- Laser sphere implemented
+
 ver 0.29
 - New weapon: laser sphere
 - Animation for laser sphere added

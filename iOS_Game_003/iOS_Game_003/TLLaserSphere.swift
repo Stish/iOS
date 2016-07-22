@@ -20,7 +20,7 @@ class TLLaserSphere: SKSpriteNode {
         self.anchorPoint = CGPointMake(0.5, 0.5)
         self.position = CGPoint(x: flShipPosX + (snShip.frame.size.width/2) + (size.width/2), y: flShipPosY)
         // --- physics body ---
-        self.physicsBody = SKPhysicsBody(circleOfRadius: self.size.width/2)
+        self.physicsBody = SKPhysicsBody(circleOfRadius: (self.size.width/2) - (4 * (flScreenWidth/667.0)))
         self.physicsBody?.dynamic = false
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = false
