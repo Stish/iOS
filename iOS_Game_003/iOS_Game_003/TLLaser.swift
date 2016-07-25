@@ -13,6 +13,7 @@ import AVFoundation
 class TLLaser: SKSpriteNode {
     var blDestroyed = false
     var blActive = false
+    var apLaserShootingSound: AVAudioPlayer!
     
     init(size: CGSize) {
         super.init(texture: SKTexture(imageNamed: "Media/effects/laser_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
@@ -26,6 +27,21 @@ class TLLaser: SKSpriteNode {
         self.physicsBody?.categoryBitMask = enBodyType.laser.rawValue
         self.physicsBody?.contactTestBitMask = enBodyType.meteorite.rawValue
         self.physicsBody?.collisionBitMask = 0
+        self.zPosition = 1.1
+        if blSoundEffectsEnabled == true {
+            // Sounds for laser
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                try apLaserShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
+            apLaserShootingSound.numberOfLoops = 0
+            apLaserShootingSound.volume = flSoundsVolume
+        }
+
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -44,5 +60,13 @@ class TLLaser: SKSpriteNode {
         self.blDestroyed = true
         self.removeFromParent()
         self.blActive = false
+    }
+    
+    func fctPlayShootingSound() {
+        if blSoundEffectsEnabled == true {
+            apLaserShootingSound.volume = flSoundsVolume
+            apLaserShootingSound.prepareToPlay()
+            apLaserShootingSound.play()
+        }
     }
 }

@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.29"
+var strVersion = "ver 0.31"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -35,6 +35,7 @@ var flmeteoriteSpeed: Double!
 var imeteoriteSpawnTime: Int!
 let iSpeedUpateCycleTimeSec = 15
 let iLaserShootInterval = 4
+let iLaserConeShootInterval = 4
 let iLaserSphereShootInterval = 10
 // --- game objects ---
 let imeteoriteSkinCnt = 6
@@ -58,6 +59,7 @@ var snShip: TLShip!
 var blGameStarted = false
 var blLaserFired = false
 var blLaserSphereFired = false
+var blLaserConeFired = false
 
 // --- game fonts ---
 //let fnGameFont = UIFont(name: "HomespunTTBRK", size: 10)
@@ -77,6 +79,7 @@ enum enBodyType: UInt32 {
     case bomb = 16
     case bombExplosion = 32
     case laserSphere = 64
+    case laserCone = 128
 }
 // Debug
 var debug_LaserCnt = 0
@@ -88,6 +91,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var selectedNodes = [UITouch:SKSpriteNode]()
     var aSnLaser01 = Array<TLLaser>()
     var aSnLaserSphere = Array<TLLaserSphere>()
+    var aSnLaserCone = Array<TLLaserCone>()
     var aSnPowerUp = Array<TLPowerUp>()
     var aSnmeteorite = Array<TLMeteorite>()
     var iTimeSec: Int!
@@ -96,6 +100,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var iTime10ms: Int!
     var iLaserShootingPause: Int!
     var iLaserSphereShootingPause: Int!
+    var iLaserConeShootingPause: Int!
     var iGameRestartCnt: Int!
     var snShieldBar1: SKSpriteNode!
     var snShieldBar2: SKSpriteNode!
@@ -112,6 +117,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var lbPause: SKLabelNode!
     var flTouchMoveDist: CGFloat!
     var snBombFired: TLBomb!
+    var snNebula: TLNebula!
 
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -134,13 +140,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_011"))
         aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_012"))
         
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Could not create audio player: \(error)")
+            return
+        }
+
         // Game settings
         flmeteoriteSizeMax = CGFloat(120) * (self.frame.height/375.0)
         flmeteoriteSizeMin = CGFloat(50) * (self.frame.height/375.0)
         flShipSizeWidth = CGFloat(70) * (self.frame.width/667.0)
         flShipSizeHeight = CGFloat(62) * (self.frame.height/375.0)
         //
-        iSelectedWeapon = 1
+        iSelectedWeapon = 2
         flmeteoriteSpeed = flmeteoriteSpeedInit
         imeteoriteSpawnTime = imeteoriteSpawnTimeInit
         blBombFired = false
@@ -151,6 +165,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         iTime10ms = 0
         iLaserShootingPause = 0
         iLaserSphereShootingPause = 0
+        iLaserConeShootingPause = 0
         iGameRestartCnt = 0
         iBombCount = 0
         flScreenWidth = view.frame.size.width
@@ -165,6 +180,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snBackground.position = CGPoint(x: 0, y: 0)
         addChild(snBackground)
         
+        snNebula = TLNebula(size: CGSizeMake(view.frame.width, view.frame.height))
+        snNebula.position = CGPoint(x: 0, y: 0)
+        addChild(snNebula)
+
         snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
         snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
         flShipPosX = snShip.position.x
@@ -187,13 +206,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + (216  * (self.frame.width/667.0)), y: 14 * (self.frame.height/375.0))
         lbGameScore.fontColor = UIColor.orangeColor()
         lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
-        lbGameScore.zPosition = 1.0
+        lbGameScore.zPosition = 2.0
         self.addChild(lbGameScore)
         // HUD sprites
         let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_003.png"), color: UIColor.clearColor(), size: CGSizeMake(470 * (self.frame.width/667.0), 60 * (self.frame.height/375.0)))
         snHud.anchorPoint = CGPointMake(0.5, 0)
         snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3 * (self.frame.height/375.0))
-        snHud.zPosition = 1.0
+        snHud.zPosition = 2.0
         snHud.alpha = 0.75
         addChild(snHud)
         // Game time
@@ -202,7 +221,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameTime.fontSize = 20 * (self.frame.width/667.0)
         lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 24 * (self.frame.height/375.0))
         lbGameTime.fontColor = UIColor(red: 102/255.0, green: 255/255.0, blue: 255/255.0, alpha: 1.0)
-        lbGameTime.zPosition = 1.0
+        lbGameTime.zPosition = 2.0
         self.addChild(lbGameTime)
         // Shields
         // Menu sprite size
@@ -214,28 +233,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite1Width, flShieldSprite1Height))
         snShieldBar1.anchorPoint = CGPointMake(0.0, 0.5)
         snShieldBar1.position = CGPoint(x: CGRectGetMidX(self.frame) - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-        snShieldBar1.zPosition = 1.0
+        snShieldBar1.zPosition = 2.0
         snShieldBar1.alpha = 1.0
         self.addChild(snShieldBar1)
         // Shield bar 2
         snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
         snShieldBar2.anchorPoint = CGPointMake(0.0, 0.5)
         snShieldBar2.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-        snShieldBar2.zPosition = 1.0
+        snShieldBar2.zPosition = 2.0
         snShieldBar2.alpha = 1.0
         self.addChild(snShieldBar2)
         // Shield bar 3
         snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
         snShieldBar3.anchorPoint = CGPointMake(0.0, 0.5)
         snShieldBar3.position = CGPoint(x: CGRectGetMidX(self.frame) - (136 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-        snShieldBar3.zPosition = 1.0
+        snShieldBar3.zPosition = 2.0
         snShieldBar3.alpha = 1.0
         self.addChild(snShieldBar3)
         // Shield bar 4
         snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
         snShieldBar4.anchorPoint = CGPointMake(0.0, 0.5)
         snShieldBar4.position = CGPoint(x: CGRectGetMidX(self.frame) - (92 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-        snShieldBar4.zPosition = 1.0
+        snShieldBar4.zPosition = 2.0
         snShieldBar4.alpha = 1.0
         self.addChild(snShieldBar4)
         fctUpdateShields()
@@ -246,21 +265,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snBomb1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
         snBomb1.anchorPoint = CGPointMake(0.5, 0.5)
         snBomb1.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
-        snBomb1.zPosition = 1.0
+        snBomb1.zPosition = 2.0
         snBomb1.alpha = 1.0
         self.addChild(snBomb1)
         // Bomb 2
         snBomb2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
         snBomb2.anchorPoint = CGPointMake(0.5, 0.5)
         snBomb2.position = CGPoint(x: CGRectGetMidX(self.frame) - (145 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
-        snBomb2.zPosition = 1.0
+        snBomb2.zPosition = 2.0
         snBomb2.alpha = 1.0
         self.addChild(snBomb2)
         // Bomb 3
         snBomb3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
         snBomb3.anchorPoint = CGPointMake(0.5, 0.5)
         snBomb3.position = CGPoint(x: CGRectGetMidX(self.frame) - (110 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
-        snBomb3.zPosition = 1.0
+        snBomb3.zPosition = 2.0
         snBomb3.alpha = 1.0
         self.addChild(snBomb3)
         // "Power up to inventory" frame sprite
@@ -269,7 +288,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snPowerUpInvFrame = SKSpriteNode(texture: SKTexture(imageNamed: "Media/checkbox_unchecked.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptCheckboxWidth, flOptCheckboxHeight))
         snPowerUpInvFrame.anchorPoint = CGPointMake(0.5, 0.5)
         snPowerUpInvFrame.position = CGPoint(x: self.frame.width - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0)), y: self.frame.height - (flOptCheckboxHeight/2) - (5 * (self.frame.height/375.0)))
-        snPowerUpInvFrame.zPosition = 1.0
+        snPowerUpInvFrame.zPosition = 2.0
         snPowerUpInvFrame.alpha = 0.0
         self.addChild(snPowerUpInvFrame)
         // "Power up to inventory" item sprite
@@ -278,7 +297,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snPowerUpInv = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flPowerUpWidth, flPowerUpHeight))
         snPowerUpInv.anchorPoint = CGPointMake(0.5, 0.5)
         snPowerUpInv.position = snPowerUpInvFrame.position
-        snPowerUpInv.zPosition = 1.0
+        snPowerUpInv.zPosition = 2.0
         snPowerUpInv.alpha = 0.0
         self.addChild(snPowerUpInv)
         // "Power up to inventory" text
@@ -290,7 +309,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbPowerUpInv.position = snPowerUpInvFrame.position
         lbPowerUpInv.position.x = lbPowerUpInv.position.x - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0))
         lbPowerUpInv.fontColor = UIColor.whiteColor()
-        lbPowerUpInv.zPosition = 1.0
+        lbPowerUpInv.zPosition = 2.0
         lbPowerUpInv.alpha = 0.0
         self.addChild(lbPowerUpInv)
         // Pause screen sprite
@@ -342,8 +361,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             if blLaserFired == false {
                                 blLaserFired = true
                                 iLaserShootingPause = 0
-                                snShip.fctPlayShootingSound()
-                                //print("right")
                                 self.fctShootLaser01()
                                 flTouchMoveDist = touch.locationInView(view).x
                             }
@@ -351,10 +368,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             if blLaserSphereFired == false {
                                 blLaserSphereFired = true
                                 iLaserSphereShootingPause = 0
-                                snShip.fctPlayShootingSound()
                                 self.fctShootLaserSphere()
                                 flTouchMoveDist = touch.locationInView(view).x
                                 print("Laser spheres: " + String(aSnLaserSphere.count)) // #debug
+                            }
+                        case 2:
+                            if blLaserConeFired == false {
+                                blLaserConeFired = true
+                                iLaserConeShootingPause = 0
+                                self.fctShootLaserCone()
+                                flTouchMoveDist = touch.locationInView(view).x
+                                print("Laser cones: " + String(aSnLaserCone.count)) // #debug
                             }
                         default:
                             ()
@@ -413,7 +437,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         if (blBombFired == false) && (iBombCount > 0) {
                             iBombCount = iBombCount - 1
                             fctUpdateBombs()
-                            snShip.fctPlayBombShootingSound()
                             fctShootBomb()
                         }
                     }
@@ -443,6 +466,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     if iLaserSphereShootingPause >= iLaserSphereShootInterval {
                         iLaserSphereShootingPause = 0
                         blLaserSphereFired = false
+                    }
+                }
+                if blLaserConeFired == true {
+                    iLaserConeShootingPause = iLaserConeShootingPause + 1
+                    if iLaserConeShootingPause >= iLaserConeShootInterval {
+                        iLaserConeShootingPause = 0
+                        blLaserConeFired = false
                     }
                 }
             }
@@ -528,6 +558,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 aSnLaser01[i].blActive = true
                 addChild(aSnLaser01[i])
                 aSnLaser01[i].fctMoveRight()
+                aSnLaser01[i].fctPlayShootingSound()
                 break allElements
             }
             if i == (aSnLaser01.count - 1) {
@@ -535,6 +566,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 aSnLaser01[i+1].blActive = true
                 addChild(aSnLaser01[i+1])
                 aSnLaser01[i+1].fctMoveRight()
+                aSnLaser01[i+1].fctPlayShootingSound()
                 break allElements
             }
         }
@@ -553,6 +585,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 aSnLaserSphere[i].blActive = true
                 addChild(aSnLaserSphere[i])
                 aSnLaserSphere[i].fctMoveRight()
+                aSnLaserSphere[i].fctPlayShootingSound()
                 break allElements
             }
             if i == (aSnLaserSphere.count - 1) {
@@ -560,7 +593,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 aSnLaserSphere[i+1].blActive = true
                 addChild(aSnLaserSphere[i+1])
                 aSnLaserSphere[i+1].fctMoveRight()
+                aSnLaserSphere[i+1].fctPlayShootingSound()
                 break allElements
+            }
+        }
+    }
+    
+    func fctShootLaserCone() {
+        for iAngle in 0 ..< 3 {
+            if aSnLaserCone.count == 0
+            {
+                aSnLaserCone.append(TLLaserCone(size: CGSizeMake(40 * (self.frame.width/667.0), 5 * (self.frame.height/375.0)), angle: iAngle))
+                aSnLaserCone[0].blActive = false
+            }
+            allElements: for i in 0 ..< aSnLaserCone.count {
+                if aSnLaserCone[i].blActive == false {
+                    aSnLaserCone[i] = TLLaserCone(size: CGSizeMake(40 * (self.frame.width/667.0), 5 * (self.frame.height/375.0)), angle: iAngle)
+                    aSnLaserCone[i].blActive = true
+                    addChild(aSnLaserCone[i])
+                    aSnLaserCone[i].fctMove(iAngle)
+                    aSnLaserCone[i].fctPlayShootingSound()
+                    break allElements
+                }
+                if i == (aSnLaserCone.count - 1) {
+                    aSnLaserCone.append(TLLaserCone(size: CGSizeMake(40 * (self.frame.width/667.0), 5 * (self.frame.height/375.0)), angle: iAngle))
+                    aSnLaserCone[i+1].blActive = true
+                    addChild(aSnLaserCone[i+1])
+                    aSnLaserCone[i+1].fctMove(iAngle)
+                    aSnLaserCone[i+1].fctPlayShootingSound()
+                    break allElements
+                }
             }
         }
     }
@@ -571,7 +633,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(snBombFired)
         print("Bomb fired") // #debug
         snBombFired.fctMoveRight()
-        
+        snBombFired.fctPlayShootingSound()
     }
     
     func didBeginContact(contact: SKPhysicsContact) {
@@ -633,7 +695,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                 if snShip.iHealth > 100 {
                                     fctFadeInOutSKSpriteNode(snShip.snShipShield, time: 0.5, alpha: 0.75, pause: 0.1)
                                 }
-                                snShip.iHealth = snShip.iHealth - aSnmeteorite[i].iHealth
+                                snShip.iHealth = snShip.iHealth - aSnmeteorite[i].iDamage
                                 aSnmeteorite[i].iHealth = 0
                                 aSnmeteorite[i].physicsBody?.categoryBitMask = 0
                                 aSnmeteorite[i].physicsBody?.contactTestBitMask = 0
@@ -668,6 +730,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             }
                         }
                     }
+                    fctUpdateShields()
                     //print("ship health: " + String(snShip.iHealth)) // #debug
                     //snShip.removeFromParent()
                     if snShip.iHealth <= 0 {
@@ -714,6 +777,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                 fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                             }
                             aSnPowerUp[i].fctExplode()
+                            fctUpdateShields()
                         }
                     }
                 }
@@ -825,6 +889,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             blGameOver = true
                             iGameRestartCnt = 0
                         }
+                        fctUpdateShields()
                     }
                 }
             // Laser sphere hits meteorite
@@ -864,13 +929,50 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         }
                     }
                 }
-//                for i in 0 ..< aSnLaser01.count {
-//                    if (secondNode == aSnLaser01[i] || firstNode == aSnLaser01[i]) && (aSnLaser01[i].blDestroyed == false)  {
-//                        aSnLaser01[i].physicsBody?.categoryBitMask = 0
-//                        aSnLaser01[i].physicsBody?.contactTestBitMask = 0
-//                        aSnLaser01[i].fctExplode()
-//                    }
-//                }
+            // Laser cone hits meteorite
+            case enBodyType.laserCone.rawValue | enBodyType.meteorite.rawValue:
+                let secondNode = contact.bodyB.node
+                let firstNode = contact.bodyA.node
+                for i in 0 ..< aSnmeteorite.count {
+                    if (secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i]) && (aSnmeteorite[i].blDestroyed == false) {
+                        aSnmeteorite[i].iHealth -= 80
+                        if aSnmeteorite[i].iHealth <= 0 {
+                            if aSnmeteorite[i].iPowerUp > 0 {
+                                if aSnPowerUp.count == 0 {
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp[0].blActive = false
+                                }
+                                allElements: for j in 0 ..< aSnPowerUp.count {
+                                    if aSnPowerUp[j].blActive == false {
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j].blActive = true
+                                        addChild(aSnPowerUp[j])
+                                        aSnPowerUp[j].fctMoveLeft()
+                                        break allElements
+                                    }
+                                    if j == (aSnPowerUp.count - 1) {
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp[j+1].blActive = true
+                                        addChild(aSnPowerUp[j+1])
+                                        aSnPowerUp[j+1].fctMoveLeft()
+                                        break allElements
+                                    }
+                                }
+                            }
+                            aSnmeteorite[i].fctExplode()
+                        } else {
+                            // ToDo
+                            aSnmeteorite[i].fctHit()
+                        }
+                    }
+                }
+                for i in 0 ..< aSnLaserCone.count {
+                    if (secondNode == aSnLaserCone[i] || firstNode == aSnLaserCone[i]) && (aSnLaserCone[i].blDestroyed == false)  {
+                        aSnLaserCone[i].physicsBody?.categoryBitMask = 0
+                        aSnLaserCone[i].physicsBody?.contactTestBitMask = 0
+                        aSnLaserCone[i].fctExplode()
+                    }
+                }
             default:
                 ()
             }
@@ -912,31 +1014,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             aSnmeteorite[i].removeFromParent()
         }
         aSnmeteorite.removeAll()
+        
         for i in 0 ..< aSnLaser01.count {
             aSnLaser01[i].physicsBody?.categoryBitMask = 0
             aSnLaser01[i].blActive = false
             aSnLaser01[i].removeFromParent()
         }
         aSnLaser01.removeAll()
+        
         for i in 0 ..< aSnPowerUp.count {
             aSnPowerUp[i].physicsBody?.categoryBitMask = 0
             aSnPowerUp[i].blActive = false
             aSnPowerUp[i].removeFromParent()
         }
         aSnPowerUp.removeAll()
-        
-        aSnLaserSphere.removeAll()
+
         for i in 0 ..< aSnLaserSphere.count {
             aSnLaserSphere[i].physicsBody?.categoryBitMask = 0
             aSnLaserSphere[i].blActive = false
             aSnLaserSphere[i].removeFromParent()
         }
         aSnLaserSphere.removeAll()
+        
+        for i in 0 ..< aSnLaserCone.count {
+            aSnLaserCone[i].physicsBody?.categoryBitMask = 0
+            aSnLaserCone[i].blActive = false
+            aSnLaserCone[i].removeFromParent()
+        }
+        aSnLaserCone.removeAll()
     }
     
     func fctNewGame() {
         blLaserFired = false
         blLaserSphereFired = false
+        blLaserConeFired = false
         iSelectedWeapon = 0
         blBombFired = false
         flTouchMoveDist = 1000
@@ -979,6 +1090,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else {
             snShieldBar4.alpha = 0.0
         }
+        print("Health: " + String(snShip.iHealth)) // #debug
     }
     
     func fctUpdateBombs() {
@@ -1001,8 +1113,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func applicationWillResignActive(notification: NSNotification) {
         //print("I'm out of focus!")
-        snPause.zPosition = 1.1
-        lbPause.zPosition = 1.1
+        snPause.zPosition = 2.1
+        lbPause.zPosition = 2.1
         self.speed = 0.0
         //self.view!.paused = true
         print("Paused!")

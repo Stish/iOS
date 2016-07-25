@@ -42,6 +42,7 @@ class TLPowerUp: SKSpriteNode {
         self.physicsBody?.collisionBitMask = 0
         
         self.fctRotate(4, iDirection: 1)
+        self.zPosition = 1.1
     }
     
     required init?(coder aDecoder: NSCoder) {

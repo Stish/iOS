@@ -14,9 +14,6 @@ class TLShip: SKSpriteNode {
     var aShipFlyFront = Array<SKTexture>()
     var aShipFlyLeft = Array<SKTexture>()
     var aShipFlyRight = Array<SKTexture>()
-    var apLaserShootingSound: AVAudioPlayer!
-    var apLaserSphereShootingSound: AVAudioPlayer!
-    var apBombShootingSound: AVAudioPlayer!
     var blActive = false
     var iHealth = 500
     var snShipShield: SKSpriteNode!
@@ -45,49 +42,14 @@ class TLShip: SKSpriteNode {
         self.physicsBody?.categoryBitMask = enBodyType.ship.rawValue
         self.physicsBody?.contactTestBitMask = enBodyType.meteorite.rawValue
         self.physicsBody?.collisionBitMask = 0
+        self.zPosition = 1.1
         // --- Shield ---
         snShipShield = SKSpriteNode(texture: SKTexture(imageNamed: "Media/ship.atlas/ship_shield_001.png"), color: UIColor.blueColor(), size: CGSizeMake(40 * (flScreenWidth/667.0), 80 * (flScreenHeight/375.0)))
         snShipShield.anchorPoint = CGPointMake(0.0, 0.5)
         snShipShield.position = CGPoint(x: self.position.x, y: self.position.y)
-        snShipShield.zPosition = 1.0
+        snShipShield.zPosition = 1.1
         snShipShield.alpha = 0.0
         self.addChild(snShipShield)
-        // --- Sounds: Shooting ---
-        if blSoundEffectsEnabled == true {
-            // Sounds for laser
-            var path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
-            var fileURL = NSURL(fileURLWithPath: path!)
-            do {
-                try apLaserShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-            } catch {
-                print("Could not create audio player: \(error)")
-                return
-            }
-            apLaserShootingSound.numberOfLoops = 0
-            apLaserShootingSound.volume = flSoundsVolume
-            // Sounds for bomb
-            path = NSBundle.mainBundle().pathForResource("Media/sounds/bomb_001", ofType:"wav")
-            fileURL = NSURL(fileURLWithPath: path!)
-            do {
-                try apBombShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-            } catch {
-                print("Could not create audio player: \(error)")
-                return
-            }
-            apBombShootingSound.numberOfLoops = 0
-            apBombShootingSound.volume = flSoundsVolume
-            // Sounds for laser sphere
-            path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_003", ofType:"wav")
-            fileURL = NSURL(fileURLWithPath: path!)
-            do {
-                try apLaserSphereShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-            } catch {
-                print("Could not create audio player: \(error)")
-                return
-            }
-            apLaserSphereShootingSound.numberOfLoops = 0
-            apLaserSphereShootingSound.volume = flSoundsVolume
-        }
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -127,34 +89,6 @@ class TLShip: SKSpriteNode {
         self.removeAllActions()
         let actFlyRight = SKAction.animateWithTextures(self.aShipFlyRight, timePerFrame: 0.15);
         self.runAction(SKAction.repeatActionForever(actFlyRight))
-    }
-    
-    func fctPlayShootingSound() {
-        if blSoundEffectsEnabled == true {
-            apLaserShootingSound.stop()
-            apLaserSphereShootingSound.stop()
-            switch(iSelectedWeapon) {
-            case 0:
-                apLaserShootingSound.volume = flSoundsVolume
-                apLaserShootingSound.prepareToPlay()
-                apLaserShootingSound.play()
-            case 1:
-                apLaserSphereShootingSound.volume = flSoundsVolume
-                apLaserSphereShootingSound.prepareToPlay()
-                apLaserSphereShootingSound.play()
-            default:
-                ()
-            }
-            
-        }
-    }
-    
-    func fctPlayBombShootingSound() {
-        if blSoundEffectsEnabled == true {
-            apBombShootingSound.volume = flSoundsVolume
-            apBombShootingSound.prepareToPlay()
-            apBombShootingSound.play()
-        }
     }
     
     func fctExplode() {

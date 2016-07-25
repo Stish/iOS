@@ -14,6 +14,7 @@ class TLLaserSphere: SKSpriteNode {
     var blExploded = false
     var blActive = false
     var aAnimation = Array<SKTexture>()
+    var apLaserSphereShootingSound: AVAudioPlayer!
     
     init(size: CGSize) {
         super.init(texture: SKTexture(imageNamed: "Media/effects/sphere_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
@@ -27,7 +28,7 @@ class TLLaserSphere: SKSpriteNode {
         self.physicsBody?.categoryBitMask = enBodyType.laserSphere.rawValue
         self.physicsBody?.contactTestBitMask = enBodyType.meteorite.rawValue
         self.physicsBody?.collisionBitMask = 0
-        
+        self.zPosition = 1.1
         aAnimation.removeAll()
         aAnimation.append(SKTexture(imageNamed: "Media/effects/sphere_001.png"))
         aAnimation.append(SKTexture(imageNamed: "Media/effects/sphere_002.png"))
@@ -37,8 +38,22 @@ class TLLaserSphere: SKSpriteNode {
         aAnimation.append(SKTexture(imageNamed: "Media/effects/sphere_006.png"))
         
         self.removeAllActions()
-        let actExplode = SKAction.animateWithTextures(aAnimation, timePerFrame: 0.1)
-        self.runAction(SKAction.repeatActionForever(actExplode))
+        let actMoving = SKAction.animateWithTextures(aAnimation, timePerFrame: 0.1)
+        self.runAction(SKAction.repeatActionForever(actMoving))
+        
+        if blSoundEffectsEnabled == true {
+            // Sounds for laser sphere
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_006", ofType:"wav")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                try apLaserSphereShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
+            apLaserSphereShootingSound.numberOfLoops = 0
+            apLaserSphereShootingSound.volume = flSoundsVolume
+        }
 
     }
     
@@ -54,7 +69,6 @@ class TLLaserSphere: SKSpriteNode {
     }
     
     func fctExplode() {
-        blBombFired = false
         self.blExploded = true
         self.blActive = false
         let actExplode = SKAction.animateWithTextures(aAnimation, timePerFrame: 0.05)
@@ -66,5 +80,13 @@ class TLLaserSphere: SKSpriteNode {
             self.removeAllActions()
             self.removeFromParent()
         })
+    }
+    
+    func fctPlayShootingSound() {
+        if blSoundEffectsEnabled == true {
+            apLaserSphereShootingSound.volume = flSoundsVolume
+            apLaserSphereShootingSound.prepareToPlay()
+            apLaserSphereShootingSound.play()
+        }
     }
 }

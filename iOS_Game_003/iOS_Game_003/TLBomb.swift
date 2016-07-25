@@ -18,6 +18,7 @@ class TLBomb: SKSpriteNode {
     var snExplosion: SKSpriteNode!
     var snExplosion2: SKSpriteNode!
     var snExplosion3: SKSpriteNode!
+    var apBombShootingSound: AVAudioPlayer!
     
     init(size: CGSize) {
         super.init(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
@@ -31,8 +32,9 @@ class TLBomb: SKSpriteNode {
         self.physicsBody?.categoryBitMask = enBodyType.bomb.rawValue
         self.physicsBody?.contactTestBitMask = enBodyType.meteorite.rawValue
         self.physicsBody?.collisionBitMask = 0
+        self.zPosition = 1.1
         // Explosion radius
-        snExplosion = SKSpriteNode(color: UIColor.clearColor(), size: CGSizeMake(300.0 * (flScreenWidth/667.0), 300.0 * (flScreenHeight/375.0)))
+        snExplosion = SKSpriteNode(color: UIColor.clearColor(), size: CGSizeMake(350.0 * (flScreenWidth/667.0), 350.0 * (flScreenHeight/375.0)))
         snExplosion.anchorPoint = CGPointMake(0.5, 0.5)
         snExplosion.physicsBody = SKPhysicsBody(circleOfRadius: snExplosion.size.width/2)
         snExplosion.physicsBody?.dynamic = false
@@ -43,7 +45,7 @@ class TLBomb: SKSpriteNode {
         snExplosion.physicsBody?.collisionBitMask = 0
         self.addChild(snExplosion)
         // Explosion help sprite for contact detection
-        snExplosion2 = SKSpriteNode(color: UIColor.clearColor(), size: CGSizeMake(300.0 * (flScreenWidth/667.0), 5.0 * (flScreenHeight/375.0)))
+        snExplosion2 = SKSpriteNode(color: UIColor.clearColor(), size: CGSizeMake(350.0 * (flScreenWidth/667.0), 5.0 * (flScreenHeight/375.0)))
         snExplosion2.anchorPoint = CGPointMake(0.5, 0.5)
         snExplosion2.physicsBody = SKPhysicsBody(rectangleOfSize: CGSizeMake(snExplosion2.frame.width, snExplosion2.frame.height))
         snExplosion2.physicsBody?.dynamic = false
@@ -54,7 +56,7 @@ class TLBomb: SKSpriteNode {
         snExplosion2.physicsBody?.collisionBitMask = 0
         self.addChild(snExplosion2)
         // Explosion help sprite for contact detection
-        snExplosion3 = SKSpriteNode(color: UIColor.clearColor(), size: CGSizeMake(5.0 * (flScreenWidth/667.0), 300.0 * (flScreenHeight/375.0)))
+        snExplosion3 = SKSpriteNode(color: UIColor.clearColor(), size: CGSizeMake(5.0 * (flScreenWidth/667.0), 350.0 * (flScreenHeight/375.0)))
         snExplosion3.anchorPoint = CGPointMake(0.5, 0.5)
         snExplosion3.physicsBody = SKPhysicsBody(rectangleOfSize: CGSizeMake(snExplosion3.frame.width, snExplosion3.frame.height))
         snExplosion3.physicsBody?.dynamic = false
@@ -74,6 +76,19 @@ class TLBomb: SKSpriteNode {
         aExplosion_02.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_02_006"))
         aExplosion_02.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_02_007"))
         aExplosion_02.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_02_008"))
+        if blSoundEffectsEnabled == true {
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/bomb_001", ofType:"wav")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                try apBombShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
+            apBombShootingSound.numberOfLoops = 0
+            apBombShootingSound.volume = flSoundsVolume
+        }
+
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -97,7 +112,7 @@ class TLBomb: SKSpriteNode {
         self.physicsBody?.contactTestBitMask = 0
         // --- load sounds ---
         if blSoundEffectsEnabled == true {
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_001", ofType:"mp3")
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_003", ofType:"wav")
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
                 apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
@@ -125,5 +140,13 @@ class TLBomb: SKSpriteNode {
         })
         self.snExplosion.physicsBody?.categoryBitMask = 0
         self.snExplosion.physicsBody?.contactTestBitMask = 0
+    }
+    
+    func fctPlayShootingSound() {
+        if blSoundEffectsEnabled == true {
+            apBombShootingSound.volume = flSoundsVolume
+            apBombShootingSound.prepareToPlay()
+            apBombShootingSound.play()
+        }
     }
 }

@@ -15,6 +15,7 @@ class TLMeteorite: SKSpriteNode {
     var blActive = false
     var iHealth = 100
     var iScore = 100
+    var iDamage = 100
     var apExplosionSound: AVAudioPlayer!
     var apHitSound: AVAudioPlayer!
     //var blHasPowerUp: Bool!
@@ -37,6 +38,7 @@ class TLMeteorite: SKSpriteNode {
         case 80...86:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_004.png")
             iHealth = 200
+            iDamage = 200
             iScore = 500
             //blHasPowerUp = true
             iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
@@ -45,6 +47,7 @@ class TLMeteorite: SKSpriteNode {
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_005.png")
             iHealth = 200
             iScore = 500
+            iDamage = 200
             //blHasPowerUp = true
             iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
             print("PowerUp Type: " + String(iPowerUp))
@@ -52,6 +55,7 @@ class TLMeteorite: SKSpriteNode {
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_006.png")
             iHealth = 200
             iScore = 500
+            iDamage = 200
             //blHasPowerUp = true
             iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
             print("PowerUp Type: " + String(iPowerUp))
@@ -71,6 +75,7 @@ class TLMeteorite: SKSpriteNode {
         self.physicsBody?.collisionBitMask = 0
         
         self.fctRotate(rotSpeed, iDirection: rotDirec)
+        self.zPosition = 1.1
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -104,11 +109,11 @@ class TLMeteorite: SKSpriteNode {
         self.physicsBody?.contactTestBitMask = 0
         // --- load sounds ---
         if blSoundEffectsEnabled == true {
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_004", ofType:"wav")
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
                 apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-                apExplosionSound.volume = flSoundsVolume
+                apExplosionSound.volume = flSoundsVolume * 3
                 apExplosionSound.numberOfLoops = 0
                 apExplosionSound.prepareToPlay()
                 apExplosionSound.play()

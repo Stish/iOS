@@ -1,7 +1,6 @@
 # iOS_Game_003
 
 ToDo
-- different weapons
 - ship inventory
 - enemies
 - high score list
@@ -9,8 +8,15 @@ ToDo
 - nebulas
 - random backgrounds
 
+ver 0.31
+- New weapon: Laser cone
+- Laser cone implemented
+- New sound effects added
+- Nebula added
+
 ver 0.30
 - Laser sphere implemented
+- Shooting sound added
 
 ver 0.29
 - New weapon: laser sphere

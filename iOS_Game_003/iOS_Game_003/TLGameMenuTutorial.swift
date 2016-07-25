@@ -274,7 +274,6 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
                 snFingerShoot.alpha = 1.0
             }
             if (iTime100msCount == 85) {
-                snShip.fctPlayShootingSound()
                 //print("right")
                 flShipPosX = snShip.position.x
                 flShipPosY = snShip.position.y
@@ -282,6 +281,7 @@ class TLGameMenuTutorial: SKScene, SKPhysicsContactDelegate {
                 snLaser.zPosition = 1.1
                 self.addChild(snLaser)
                 snLaser.fctMoveRight()
+                snLaser.fctPlayShootingSound()
             }
             if (iTime100msCount == 90) {
                 snFingerShoot.removeFromParent()

@@ -38,6 +38,7 @@ class TLBackground: SKSpriteNode {
 
         super.init(texture: nil,color: UIColor.blackColor(), size: CGSizeMake(size.height * ((flBackgroundRatio_001 * 2) + flBackgroundRatio_002), size.height))
         self.anchorPoint = CGPointMake(0.0, 0.0)
+        self.zPosition = 1.0
         // --- Part 001 ---
         let snBackground_001 = SKSpriteNode(texture: txBackground_001,color: UIColor.blackColor(), size: CGSizeMake(size.height * flBackgroundRatio_001, size.height))
         snBackground_001.anchorPoint = CGPointMake(0.0, 0.0)
