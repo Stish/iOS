@@ -106,6 +106,7 @@ class TLBomb: SKSpriteNode {
         blBombFired = false
         self.blExploded = true
         self.blActive = false
+        self.texture = SKTexture(imageNamed: "Media/transparent.png")
         let actExplode = SKAction.animateWithTextures(aExplosion_02, timePerFrame: 0.05)
         self.removeAllActions()
         self.physicsBody?.categoryBitMask = 0
@@ -116,7 +117,7 @@ class TLBomb: SKSpriteNode {
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
                 apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-                apExplosionSound.volume = flSoundsVolume * 1.5
+                apExplosionSound.volume = flSoundsVolume * 4
                 apExplosionSound.numberOfLoops = 0
                 apExplosionSound.prepareToPlay()
                 apExplosionSound.play()

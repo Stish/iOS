@@ -29,35 +29,35 @@ class TLMeteorite: SKSpriteNode {
         blInBombRadius = false
         iPowerUp = 0
         switch (arc4random_uniform(UInt32(100)) + 1) {
-        case 1...26:
+        case 1...30:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_001.png")
-        case 27...52:
+        case 31...60:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_002.png")
-        case 53...79:
+        case 61...90:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_003.png")
-        case 80...86:
+        case 91...93:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_004.png")
             iHealth = 200
             iDamage = 200
             iScore = 500
             //blHasPowerUp = true
-            iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
+            iPowerUp = Int(arc4random_uniform(UInt32(4)) + 1)
             print("PowerUp Type: " + String(iPowerUp))
-        case 87...93:
+        case 94...96:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_005.png")
             iHealth = 200
             iScore = 500
             iDamage = 200
             //blHasPowerUp = true
-            iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
+            iPowerUp = Int(arc4random_uniform(UInt32(4)) + 1)
             print("PowerUp Type: " + String(iPowerUp))
-        case 94...100:
+        case 97...100:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_006.png")
             iHealth = 200
             iScore = 500
             iDamage = 200
             //blHasPowerUp = true
-            iPowerUp = Int(arc4random_uniform(UInt32(2)) + 1)
+            iPowerUp = Int(arc4random_uniform(UInt32(4)) + 1)
             print("PowerUp Type: " + String(iPowerUp))
         default:
             ()
@@ -100,7 +100,7 @@ class TLMeteorite: SKSpriteNode {
     }
     
     func fctExplode() {
-        let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.07)
+        let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.10)
         self.blDestroyed = true
         iGameScore = iGameScore + iScore
         lbGameScore.text = String(iGameScore)

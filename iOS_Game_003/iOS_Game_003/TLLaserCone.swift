@@ -40,25 +40,25 @@ class TLLaserCone: SKSpriteNode {
         switch (angle) {
         case 0:
             self.zRotation = atan(((flScreenHeight / 2)) / (flScreenWidth - (self.position.x) + 50))
+            if blSoundEffectsEnabled == true {
+                // Sounds for laser cone
+                let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_004", ofType:"wav")
+                let fileURL = NSURL(fileURLWithPath: path!)
+                do {
+                    try apLaserConeShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                } catch {
+                    print("Could not create audio player: \(error)")
+                    return
+                }
+                apLaserConeShootingSound.numberOfLoops = 0
+                apLaserConeShootingSound.volume = flSoundsVolume * 0.4
+            }
         case 1:
             self.zRotation = 0
         case 2:
             self.zRotation =  -1 * atan(((flScreenHeight / 2)) / (flScreenWidth - (self.position.x) + 50))
         default:
             ()
-        }
-        if blSoundEffectsEnabled == true {
-            // Sounds for laser cone
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_004", ofType:"wav")
-            let fileURL = NSURL(fileURLWithPath: path!)
-            do {
-                try apLaserConeShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-            } catch {
-                print("Could not create audio player: \(error)")
-                return
-            }
-            apLaserConeShootingSound.numberOfLoops = 0
-            apLaserConeShootingSound.volume = flSoundsVolume * 0.6
         }
     }
     
@@ -103,7 +103,7 @@ class TLLaserCone: SKSpriteNode {
     }
     
     func fctPlayShootingSound() {
-        if blSoundEffectsEnabled == true {
+        if (blSoundEffectsEnabled == true) && (iAngle == 0) {
             apLaserConeShootingSound.volume = flSoundsVolume * 0.6
             apLaserConeShootingSound.prepareToPlay()
             apLaserConeShootingSound.play()

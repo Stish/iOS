@@ -27,13 +27,15 @@ var aSkHighscoresRows = 5
 var iGameScore = 0
 var blGameOver = false
 var blBombFired: Bool!
-var iSelectedWeapon: Int! // 0: Laser 1: Laser sphere 2: Tripple laser
+var iSelectedWeapon: Int! // 0: Laser 1: Laser sphere 2: Laser cone
+var blLaserSpherePickedUp = false
+var blLaserConePickedUp = false
 // --- game speed ---
-let flmeteoriteSpeedInit = Double(2.5)
-let imeteoriteSpawnTimeInit = 15
+let flmeteoriteSpeedInit = Double(3.0)
+let imeteoriteSpawnTimeInit = 20
 var flmeteoriteSpeed: Double!
 var imeteoriteSpawnTime: Int!
-let iSpeedUpateCycleTimeSec = 15
+let iSpeedUpateCycleTimeSec = 20
 let iLaserShootInterval = 4
 let iLaserConeShootInterval = 4
 let iLaserSphereShootInterval = 10
@@ -118,27 +120,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var flTouchMoveDist: CGFloat!
     var snBombFired: TLBomb!
     var snNebula: TLNebula!
+    var snInventory: TLInventory!
 
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
-        view.showsPhysics = true // #debug
+        view.showsPhysics = false // #debug
+        view.showsFPS = true
         // --- explosion sprites ---
         //let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
         aExplosion_01.removeAll()
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_001"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_002"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_003"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_004"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_005"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_006"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_007"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_008"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_009"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_010"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_011"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_01_012"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_001"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_002"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_003"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_004"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_005"))
+        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_006"))
         
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
@@ -154,7 +152,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         flShipSizeWidth = CGFloat(70) * (self.frame.width/667.0)
         flShipSizeHeight = CGFloat(62) * (self.frame.height/375.0)
         //
-        iSelectedWeapon = 2
+        iSelectedWeapon = 0
         flmeteoriteSpeed = flmeteoriteSpeedInit
         imeteoriteSpawnTime = imeteoriteSpawnTimeInit
         blBombFired = false
@@ -180,9 +178,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snBackground.position = CGPoint(x: 0, y: 0)
         addChild(snBackground)
         
-        snNebula = TLNebula(size: CGSizeMake(view.frame.width, view.frame.height))
-        snNebula.position = CGPoint(x: 0, y: 0)
-        addChild(snNebula)
+//        snNebula = TLNebula(size: CGSizeMake(view.frame.width, view.frame.height))
+//        snNebula.position = CGPoint(x: 0, y: 0)
+//        addChild(snNebula)
 
         snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
         snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
@@ -197,6 +195,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - (myLabel.frame.size.height/2))
         myLabel.fontColor = UIColor.whiteColor()
         self.addChild(myLabel)
+        myLabel.zPosition = 2.0
         
         // --- Interface ---
         // Game score
@@ -333,6 +332,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbPause.zPosition = -0.1
         lbPause.alpha = 1.0
         self.addChild(lbPause)
+        // Inventory
+        //snInventory = TLInventory(size: CGSize(width: self.frame.height, height: self.frame.height))
+        //snInventory.zPosition = -0.1
+        //self.addChild(snInventory)
+        // Home button settings
         NSNotificationCenter.defaultCenter().addObserver(
             self,
             selector: "applicationWillResignActive:",
@@ -356,20 +360,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         snShip.fctMoveShipByY(deltaY)
                         //print("left")
                     } else {
+                        flTouchMoveDist = touch.locationInView(view).x
                         switch (iSelectedWeapon) {
                         case 0:
                             if blLaserFired == false {
                                 blLaserFired = true
                                 iLaserShootingPause = 0
                                 self.fctShootLaser01()
-                                flTouchMoveDist = touch.locationInView(view).x
                             }
                         case 1:
                             if blLaserSphereFired == false {
                                 blLaserSphereFired = true
                                 iLaserSphereShootingPause = 0
                                 self.fctShootLaserSphere()
-                                flTouchMoveDist = touch.locationInView(view).x
                                 print("Laser spheres: " + String(aSnLaserSphere.count)) // #debug
                             }
                         case 2:
@@ -377,7 +380,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                 blLaserConeFired = true
                                 iLaserConeShootingPause = 0
                                 self.fctShootLaserCone()
-                                flTouchMoveDist = touch.locationInView(view).x
                                 print("Laser cones: " + String(aSnLaserCone.count)) // #debug
                             }
                         default:
@@ -403,6 +405,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.speed = 1.0
             snPause.zPosition = -0.1
             lbPause.zPosition = -0.1
+            //snInventory.zPosition = -0.1
         }
     }
     
@@ -519,7 +522,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         if flmeteoriteSpeed > 0.1 {
                             flmeteoriteSpeed = flmeteoriteSpeed - 0.1
                         }
-                        if imeteoriteSpawnTime > 1 {
+                        if imeteoriteSpawnTime > 4 {
                             imeteoriteSpawnTime = imeteoriteSpawnTime - 1
                         }
                     }
@@ -673,7 +676,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             aSnmeteorite[i].fctExplode()
                         } else {
                             // ToDo
-                            aSnmeteorite[i].fctHit()
+                            //aSnmeteorite[i].fctHit()
                         }
                     }
                 }
@@ -701,6 +704,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                 aSnmeteorite[i].physicsBody?.contactTestBitMask = 0
                                 fctUpdateShields()
                                 if aSnmeteorite[i].iPowerUp == 1 {
+                                    iGameScore = iGameScore + 300
                                     if iBombCount < 3 {
                                         self.iBombCount = iBombCount + 1
                                         fctUpdateBombs()
@@ -714,6 +718,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                     fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                 }
                                 if aSnmeteorite[i].iPowerUp == 2 {
+                                    iGameScore = iGameScore + 300
                                     if snShip.iHealth < 500 {
                                         snShip.iHealth = snShip.iHealth + 100
                                         fctUpdateShields()
@@ -722,6 +727,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                         lbPowerUpInv.text = "Shields at 100%"
                                     }
                                     snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_shield_001.png")
+                                    fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                }
+                                if aSnmeteorite[i].iPowerUp == 3 {
+                                    iGameScore = iGameScore + 1000
+                                    if blLaserSpherePickedUp == false {
+                                        blLaserSpherePickedUp = true
+                                        iSelectedWeapon = 1
+                                        lbPowerUpInv.text = "New weapon: Laser sphere"
+                                    } else {
+                                        lbPowerUpInv.text = "Laser sphere already euqipped"
+                                    }
+                                    snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_sphere.png")
+                                    fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                }
+                                if aSnmeteorite[i].iPowerUp == 4 {
+                                    iGameScore = iGameScore + 1000
+                                    if blLaserConePickedUp == false {
+                                        blLaserConePickedUp = true
+                                        iSelectedWeapon = 2
+                                        lbPowerUpInv.text = "New weapon: Laser cone"
+                                    } else {
+                                        lbPowerUpInv.text = "Laser cone already euqipped"
+                                    }
+                                    snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_cone.png")
                                     fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
                                     fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                     fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
@@ -772,6 +805,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                     lbPowerUpInv.text = "Shields at 100%"
                                 }
                                 snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_shield_001.png")
+                                fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                            }
+                            if aSnPowerUp[i].iPowerUp == 3 {
+                                if blLaserSpherePickedUp == false {
+                                    blLaserSpherePickedUp = true
+                                    iSelectedWeapon = 1
+                                    lbPowerUpInv.text = "New weapon: Laser sphere"
+                                } else {
+                                    lbPowerUpInv.text = "Laser sphere already euqipped"
+                                }
+                                snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_sphere.png")
+                                fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                            }
+                            if aSnPowerUp[i].iPowerUp == 4 {
+                                if blLaserConePickedUp == false {
+                                    blLaserConePickedUp = true
+                                    iSelectedWeapon = 2
+                                    lbPowerUpInv.text = "New weapon: Laser cone"
+                                } else {
+                                    lbPowerUpInv.text = "Laser cone already euqipped"
+                                }
+                                snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_cone.png")
                                 fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
                                 fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                 fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
@@ -827,7 +886,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             snBombFired.blExploded = true
                         } else {
                             // ToDo
-                            aSnmeteorite[i].fctHit()
+                            //aSnmeteorite[i].fctHit()
                         }
                     }
                 }
@@ -867,7 +926,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                 snBombFired.blExploded = true
                             } else {
                                 // ToDo
-                                aSnmeteorite[i].fctHit()
+                                //aSnmeteorite[i].fctHit()
                             }
                         }
                     }
@@ -925,7 +984,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             aSnmeteorite[i].fctExplode()
                         } else {
                             // ToDo
-                            aSnmeteorite[i].fctHit()
+                            //aSnmeteorite[i].fctHit()
                         }
                     }
                 }
@@ -962,7 +1021,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             aSnmeteorite[i].fctExplode()
                         } else {
                             // ToDo
-                            aSnmeteorite[i].fctHit()
+                            //aSnmeteorite[i].fctHit()
                         }
                     }
                 }
@@ -1006,6 +1065,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameOver.fontSize = 70 * (self.frame.width/667.0)
         lbGameOver.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame) - (lbGameOver.frame.size.height/2))
         lbGameOver.fontColor = UIColor.whiteColor()
+        lbGameOver.zPosition = 2.0
         self.addChild(lbGameOver)
         
         for i in 0 ..< aSnmeteorite.count {
@@ -1045,6 +1105,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctNewGame() {
+        blLaserSpherePickedUp = false
+        blLaserConePickedUp = false
         blLaserFired = false
         blLaserSphereFired = false
         blLaserConeFired = false
@@ -1115,6 +1177,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //print("I'm out of focus!")
         snPause.zPosition = 2.1
         lbPause.zPosition = 2.1
+        //snInventory.zPosition = 2.2
         self.speed = 0.0
         //self.view!.paused = true
         print("Paused!")

@@ -8,6 +8,13 @@ ToDo
 - nebulas
 - random backgrounds
 
+ver 0.32
+- Adjustment in spawning times
+- Bug fixes
+- Power ups added: Laser sphere and laser cone
+- Weapon can be picked up and will be equipped
+- Inventory class added
+
 ver 0.31
 - New weapon: Laser cone
 - Laser cone implemented

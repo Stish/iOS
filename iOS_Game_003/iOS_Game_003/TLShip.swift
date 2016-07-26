@@ -92,7 +92,7 @@ class TLShip: SKSpriteNode {
     }
     
     func fctExplode() {
-        let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.07)
+        let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.10)
         self.removeAllActions()
         // --- load sounds ---
         if blSoundEffectsEnabled == true {
