@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.31"
+var strVersion = "ver 0.33"
 var blGameTest = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
@@ -31,11 +31,11 @@ var iSelectedWeapon: Int! // 0: Laser 1: Laser sphere 2: Laser cone
 var blLaserSpherePickedUp = false
 var blLaserConePickedUp = false
 // --- game speed ---
-let flmeteoriteSpeedInit = Double(3.0)
-let imeteoriteSpawnTimeInit = 20
+let flmeteoriteSpeedInit = Double(2.9)
+let imeteoriteSpawnTimeInit = 18
 var flmeteoriteSpeed: Double!
 var imeteoriteSpawnTime: Int!
-let iSpeedUpateCycleTimeSec = 20
+let iSpeedUpateCycleTimeSec = 18
 let iLaserShootInterval = 4
 let iLaserConeShootInterval = 4
 let iLaserSphereShootInterval = 10
@@ -111,6 +111,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snBomb1: SKSpriteNode!
     var snBomb2: SKSpriteNode!
     var snBomb3: SKSpriteNode!
+    var snMenuPause: SKSpriteNode!
+    var snMenuWeapons: SKSpriteNode!
     var iBombCount: Int!
     var snPowerUpInvFrame: SKSpriteNode!
     var snPowerUpInv: SKSpriteNode!
@@ -121,6 +123,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snBombFired: TLBomb!
     var snNebula: TLNebula!
     var snInventory: TLInventory!
+    var iButtonPressed: Int!
+    var apClick: AVAudioPlayer!
+    var snMenuBack: SKSpriteNode!
+    var snMenuQuit: SKSpriteNode!
+    var lbMenuQuit: SKLabelNode!
 
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -168,6 +175,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         iBombCount = 0
         flScreenWidth = view.frame.size.width
         flScreenHeight = view.frame.size.height
+        iButtonPressed = 0
         
         self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
         self.anchorPoint = CGPointMake(0, 0)
@@ -281,6 +289,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         snBomb3.zPosition = 2.0
         snBomb3.alpha = 1.0
         self.addChild(snBomb3)
+        // Menus
+        let flMenuWidth = (SKTexture(imageNamed: "Media/hud_pause.png").size().width) * (self.frame.width/667.0) * 0.85
+        let flMenuHeight = (SKTexture(imageNamed: "Media/hud_pause.png").size().height) * (self.frame.height/375.0) * 0.85
+        // Pause menu
+        snMenuPause = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_pause.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuWidth, flMenuHeight))
+        snMenuPause.anchorPoint = CGPointMake(1.0, 1.0)
+        snMenuPause.position = CGPoint(x: CGRectGetMidX(self.frame) - (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
+        snMenuPause.zPosition = 2.0
+        snMenuPause.alpha = 0.75
+        snMenuPause.name = "MenuPause"
+        self.addChild(snMenuPause)
+        // Weapons menu
+        snMenuWeapons = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_weapons.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuWidth, flMenuHeight))
+        snMenuWeapons.anchorPoint = CGPointMake(0.0, 1.0)
+        snMenuWeapons.position = CGPoint(x: CGRectGetMidX(self.frame) + (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
+        snMenuWeapons.zPosition = 2.0
+        snMenuWeapons.alpha = 0.75
+        snMenuWeapons.name = "MenuWeapons"
+        self.addChild(snMenuWeapons)
         // "Power up to inventory" frame sprite
         let flOptCheckboxWidth = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().width) * (self.frame.width/667.0)
         let flOptCheckboxHeight = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().height) * (self.frame.height/375.0)
@@ -301,47 +328,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(snPowerUpInv)
         // "Power up to inventory" text
         lbPowerUpInv = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
-        lbPowerUpInv.text = "Bombs +1"
+        lbPowerUpInv.text = ""
         lbPowerUpInv.horizontalAlignmentMode = .Right
         lbPowerUpInv.verticalAlignmentMode = .Center
-        lbPowerUpInv.fontSize = 20 * (self.frame.width/667.0)
+        lbPowerUpInv.fontSize = 17 * (self.frame.width/667.0)
         lbPowerUpInv.position = snPowerUpInvFrame.position
         lbPowerUpInv.position.x = lbPowerUpInv.position.x - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0))
         lbPowerUpInv.fontColor = UIColor.whiteColor()
         lbPowerUpInv.zPosition = 2.0
         lbPowerUpInv.alpha = 0.0
         self.addChild(lbPowerUpInv)
-        // Pause screen sprite
-        snPause = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
-        snPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-        snPause.strokeColor = SKColor.blackColor()
-        snPause.glowWidth = 0.0
-        snPause.lineWidth = 0.0
-        snPause.fillColor = SKColor.blackColor()
-        snPause.zPosition = -0.1
-        snPause.alpha = 0.75
-        self.addChild(snPause)
-        // Pause screen text
-        lbPause = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbPause.text = "PAUSED"
-        lbPause.horizontalAlignmentMode = .Center
-        lbPause.verticalAlignmentMode = .Center
-        lbPause.fontSize = 40 * (self.frame.width/667.0)
-        lbPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-        lbPause.fontColor = UIColor.whiteColor()
-        lbPause.zPosition = -0.1
-        lbPause.alpha = 1.0
-        self.addChild(lbPause)
-        // Inventory
-        //snInventory = TLInventory(size: CGSize(width: self.frame.height, height: self.frame.height))
-        //snInventory.zPosition = -0.1
-        //self.addChild(snInventory)
+        
+        // --- Sounds: Click ---
+        let path = NSBundle.mainBundle().pathForResource("Media/sounds/click_001", ofType:"wav")
+        let fileURL = NSURL(fileURLWithPath: path!)
+        do {
+            try apClick = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+        } catch {
+            print("Could not create audio player: \(error)")
+            return
+        }
+        apClick.numberOfLoops = 0
         // Home button settings
         NSNotificationCenter.defaultCenter().addObserver(
             self,
             selector: "applicationWillResignActive:",
             name: UIApplicationWillResignActiveNotification,
             object: nil)
+        
+        fctNewGame()
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -354,39 +369,54 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 blGameOver = false
                 snBackground.fctMoveLeft()
             } else if blGameOver == false {
-                for touch:AnyObject in touches {
-                    if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
-                        let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
-                        snShip.fctMoveShipByY(deltaY)
-                        //print("left")
-                    } else {
-                        flTouchMoveDist = touch.locationInView(view).x
-                        switch (iSelectedWeapon) {
-                        case 0:
-                            if blLaserFired == false {
-                                blLaserFired = true
-                                iLaserShootingPause = 0
-                                self.fctShootLaser01()
+                
+                if let location = touches.first?.locationInNode(self) {
+                    let touchedNode = nodeAtPoint(location)
+                    
+                    switch (touchedNode.name) {
+                    case "MenuPause"?:
+                        iButtonPressed = 1
+                        fctPlayClickSound()
+                    case "MenuWeapons"?:
+                        iButtonPressed = 2
+                        fctPlayClickSound()
+                    default:
+                        for touch:AnyObject in touches {
+                            if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
+                                let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
+                                snShip.fctMoveShipByY(deltaY)
+                                //print("left")
+                            } else {
+                                flTouchMoveDist = touch.locationInView(view).x
+                                switch (iSelectedWeapon) {
+                                case 0:
+                                    if blLaserFired == false {
+                                        blLaserFired = true
+                                        iLaserShootingPause = 0
+                                        self.fctShootLaser01()
+                                    }
+                                case 1:
+                                    if blLaserSphereFired == false {
+                                        blLaserSphereFired = true
+                                        iLaserSphereShootingPause = 0
+                                        self.fctShootLaserSphere()
+                                        print("Laser spheres: " + String(aSnLaserSphere.count)) // #debug
+                                    }
+                                case 2:
+                                    if blLaserConeFired == false {
+                                        blLaserConeFired = true
+                                        iLaserConeShootingPause = 0
+                                        self.fctShootLaserCone()
+                                        print("Laser cones: " + String(aSnLaserCone.count)) // #debug
+                                    }
+                                default:
+                                    ()
+                                }
                             }
-                        case 1:
-                            if blLaserSphereFired == false {
-                                blLaserSphereFired = true
-                                iLaserSphereShootingPause = 0
-                                self.fctShootLaserSphere()
-                                print("Laser spheres: " + String(aSnLaserSphere.count)) // #debug
-                            }
-                        case 2:
-                            if blLaserConeFired == false {
-                                blLaserConeFired = true
-                                iLaserConeShootingPause = 0
-                                self.fctShootLaserCone()
-                                print("Laser cones: " + String(aSnLaserCone.count)) // #debug
-                            }
-                        default:
-                            ()
                         }
                     }
                 }
+                
             }
             if (blGameOver == true) && (iGameRestartCnt >= 7) {
                 snShip.removeFromParent()
@@ -402,10 +432,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 fctNewGame()
             }
         } else {
-            self.speed = 1.0
-            snPause.zPosition = -0.1
-            lbPause.zPosition = -0.1
-            //snInventory.zPosition = -0.1
+            if let location = touches.first?.locationInNode(self) {
+                let touchedNode = nodeAtPoint(location)
+                
+                switch (touchedNode.name) {
+                case "MenuBack"?:
+                    iButtonPressed = 3
+                    fctPlayClickSound()
+                case "MenuQuit"?:
+                    iButtonPressed = 4
+                    fctPlayClickSound()
+                case "MenuWpnLaserCone"?:
+                    if blLaserConePickedUp == true {
+                        iButtonPressed = 5
+                        fctPlayClickSound()
+                    }
+                case "MenuWpnLaser"?:
+                    iButtonPressed = 6
+                    fctPlayClickSound()
+                case "MenuWpnLaserSphere"?:
+                    if blLaserSpherePickedUp == true {
+                        iButtonPressed = 7
+                        fctPlayClickSound()
+                    }
+                default:
+                    ()
+                }
+            }
         }
     }
     
@@ -433,6 +486,139 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             snShip.fctStartFlyAnimationFront()
         }
         if (blGameOver == false)  && (blGameStarted == true) {
+            if let location = touches.first?.locationInNode(self) {
+                let touchedNode = nodeAtPoint(location)
+                
+                switch (touchedNode.name) {
+                case "MenuPause"?:
+                    if (iButtonPressed == 1) && (self.speed > 0.0) {
+                        //snInventory.zPosition = 2.2
+                        self.speed = 0.0
+                        //self.view!.paused = true
+                        print("Paused!")
+                        // Pause screen sprite
+                        snPause = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
+                        snPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+                        snPause.strokeColor = SKColor.blackColor()
+                        snPause.glowWidth = 0.0
+                        snPause.lineWidth = 0.0
+                        snPause.fillColor = SKColor.blackColor()
+                        snPause.zPosition = 2.1
+                        snPause.alpha = 0.8
+                        self.addChild(snPause)
+                        // Pause screen text
+                        lbPause = SKLabelNode(fontNamed: fnGameFont?.fontName)
+                        lbPause.text = "PAUSED"
+                        lbPause.horizontalAlignmentMode = .Center
+                        lbPause.verticalAlignmentMode = .Center
+                        lbPause.fontSize = 60 * (self.frame.width/667.0)
+                        lbPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+                        lbPause.fontColor = UIColor.whiteColor()
+                        lbPause.zPosition = 2.1
+                        lbPause.alpha = 1.0
+                        self.addChild(lbPause)
+                        // Menu "Back" Sprite
+                        let flMenuBackSpriteWidth = (SKTexture(imageNamed: "Media/menu_back.png").size().width) * (self.frame.width/667.0)
+                        let flMenuBackSpriteHeight = (SKTexture(imageNamed: "Media/menu_back.png").size().height) * (self.frame.height/375.0)
+                        snMenuBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
+                        snMenuBack.anchorPoint = CGPointMake(0.0, 0.5)
+                        snMenuBack.position = CGPoint(x: 1*(self.frame.width / 16), y: 10*(self.frame.height / 12))
+                        snMenuBack.zPosition = 2.2
+                        snMenuBack.alpha = 1.0
+                        snMenuBack.name = "MenuBack"
+                        self.addChild(snMenuBack)
+                        // Menu "About" Sprite
+                        let flMenuSpriteWidth = (SKTexture(imageNamed: "Media/menu_top.png").size().width) * (self.frame.width/667.0)
+                        let flMenuSpriteHeight = (SKTexture(imageNamed: "Media/menu_top.png").size().height) * (self.frame.height/375.0)
+                        snMenuQuit = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_bottom.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
+                        snMenuQuit.anchorPoint = CGPointMake(0.5, 0.5)
+                        snMenuQuit.position = CGPoint(x: CGRectGetMidX(self.frame), y: 2*(self.frame.height / 12))
+                        snMenuQuit.zPosition = 2.2
+                        snMenuQuit.alpha = 1.0
+                        snMenuQuit.name = "MenuQuit"
+                        addChild(snMenuQuit)
+                        // Menu "About" Text
+                        lbMenuQuit = SKLabelNode(fontNamed: fnGameFont?.fontName)
+                        lbMenuQuit.horizontalAlignmentMode = .Center;
+                        lbMenuQuit.verticalAlignmentMode = .Center
+                        lbMenuQuit.text = "QUIT"
+                        lbMenuQuit.fontSize = 30 * (self.frame.width/667.0)
+                        lbMenuQuit.position = CGPoint(x: CGRectGetMidX(self.frame), y: 2*(self.frame.height / 12))
+                        lbMenuQuit.fontColor = UIColor.whiteColor()
+                        lbMenuQuit.zPosition = 2.2
+                        lbMenuQuit.name = "MenuQuit"
+                        self.addChild(lbMenuQuit)
+                    }
+                case "MenuWeapons"?:
+                    if (iButtonPressed == 2) && (self.speed > 0.0) {
+                        //snInventory.zPosition = 2.2
+                        self.speed = 0.0
+                        //self.view!.paused = true
+                        print("Paused!")
+                        // Inventory
+                        snInventory = TLInventory(size: CGSize(width: self.frame.width, height: self.frame.height))
+                        snInventory.zPosition = 2.2
+                        self.addChild(snInventory)
+                    }
+                case "MenuBack"?:
+                    if (iButtonPressed == 3) && (self.speed == 0.0) {
+                        self.speed = 1.0
+                        if snPause != nil {
+                            snPause.removeFromParent()
+                        }
+                        if lbPause != nil {
+                            lbPause.removeFromParent()
+                        }
+                        if snMenuBack != nil {
+                            snMenuBack.removeFromParent()
+                        }
+                        if snMenuQuit != nil {
+                            snMenuQuit.removeFromParent()
+                        }
+                        if lbMenuQuit != nil {
+                            lbMenuQuit.removeFromParent()
+                        }
+                        if snInventory != nil {
+                            snInventory.removeFromParent()
+                        }
+                    }
+                case "MenuQuit"?:
+                    if (iButtonPressed == 4) && (self.speed == 0.0) {
+                        fctGameOver()
+                        let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
+                        let nextScene = TLGameMenu(size: scene!.size)
+                        nextScene.scaleMode = .AspectFill
+                        scene?.view?.presentScene(nextScene, transition: transition)
+                        snMenuQuit.removeFromParent()
+                        lbMenuQuit.removeFromParent()
+                        self.removeFromParent()
+                    }
+                case "MenuWpnLaserCone"?:
+                    if (iButtonPressed == 5) && (self.speed == 0.0) {
+                        if blLaserConePickedUp == true {
+                            iSelectedWeapon = 2
+                            snInventory.fctUpdateWpns()
+                        }
+                    }
+                case "MenuWpnLaser"?:
+                    if (iButtonPressed == 6) && (self.speed == 0.0) {
+                        iSelectedWeapon = 0
+                        snInventory.fctUpdateWpns()
+                    }
+                case "MenuWpnLaserSphere"?:
+                    if (iButtonPressed == 7) && (self.speed == 0.0) {
+                        if blLaserSpherePickedUp == true {
+                            iSelectedWeapon = 1
+                            snInventory.fctUpdateWpns()
+                        }
+                    }
+                default:
+                    ()
+                }
+            }
+            
+            iButtonPressed = 0
+            
             for touch in touches {
                 if touch.locationInView(view).x >= (200.0 * (self.frame.height/375.0)) {
                     if touch.locationInView(view).x - flTouchMoveDist >= 100 {
@@ -735,10 +921,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                     iGameScore = iGameScore + 1000
                                     if blLaserSpherePickedUp == false {
                                         blLaserSpherePickedUp = true
-                                        iSelectedWeapon = 1
-                                        lbPowerUpInv.text = "New weapon: Laser sphere"
+                                        //iSelectedWeapon = 1
+                                        lbPowerUpInv.text = "Weapon: Laser sphere"
                                     } else {
-                                        lbPowerUpInv.text = "Laser sphere already euqipped"
+                                        lbPowerUpInv.text = "Weapon is already known"
                                     }
                                     snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_sphere.png")
                                     fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
@@ -749,10 +935,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                     iGameScore = iGameScore + 1000
                                     if blLaserConePickedUp == false {
                                         blLaserConePickedUp = true
-                                        iSelectedWeapon = 2
-                                        lbPowerUpInv.text = "New weapon: Laser cone"
+                                        //iSelectedWeapon = 2
+                                        lbPowerUpInv.text = "Weapon: Laser cone"
                                     } else {
-                                        lbPowerUpInv.text = "Laser cone already euqipped"
+                                        lbPowerUpInv.text = "Weapon is already known"
                                     }
                                     snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_cone.png")
                                     fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
@@ -812,10 +998,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             if aSnPowerUp[i].iPowerUp == 3 {
                                 if blLaserSpherePickedUp == false {
                                     blLaserSpherePickedUp = true
-                                    iSelectedWeapon = 1
-                                    lbPowerUpInv.text = "New weapon: Laser sphere"
+                                    //iSelectedWeapon = 1
+                                    lbPowerUpInv.text = "Weapon: Laser sphere"
                                 } else {
-                                    lbPowerUpInv.text = "Laser sphere already euqipped"
+                                    lbPowerUpInv.text = "Weapon is already known"
                                 }
                                 snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_sphere.png")
                                 fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
@@ -825,10 +1011,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             if aSnPowerUp[i].iPowerUp == 4 {
                                 if blLaserConePickedUp == false {
                                     blLaserConePickedUp = true
-                                    iSelectedWeapon = 2
-                                    lbPowerUpInv.text = "New weapon: Laser cone"
+                                    //iSelectedWeapon = 2
+                                    lbPowerUpInv.text = "Weapon: Laser cone"
                                 } else {
-                                    lbPowerUpInv.text = "Laser cone already euqipped"
+                                    lbPowerUpInv.text = "Weapon is already known"
                                 }
                                 snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_cone.png")
                                 fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
@@ -1059,6 +1245,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 //    }
     
     func fctGameOver() {
+        blGameStarted = false
         iGameRestartCnt = 0
         lbGameOver = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameOver.text = "GAME OVER"
@@ -1105,6 +1292,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctNewGame() {
+        iButtonPressed = 0
         blLaserSpherePickedUp = false
         blLaserConePickedUp = false
         blLaserFired = false
@@ -1116,9 +1304,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         flmeteoriteSpeed = flmeteoriteSpeedInit
         imeteoriteSpawnTime = imeteoriteSpawnTimeInit
         iGameTimeSec = 0
-        lbGameTime.text = "0s"
+        lbGameTime.text = "0"
         blGameOver = false
-        lbGameOver.removeFromParent()
+        if lbGameOver != nil {
+            lbGameOver.removeFromParent()
+        }
         snBackground.removeAllActions()
         snBackground.fctResetPos()
         //sleep(2)
@@ -1170,6 +1360,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             snBomb3.texture = SKTexture(imageNamed: "Media/pu_bomb_001.png")
         } else {
             snBomb3.texture = SKTexture(imageNamed: "Media/pu_bomb_001_empty.png")
+        }
+    }
+    
+    func fctPlayClickSound() {
+        if blSoundEffectsEnabled == true {
+            apClick.volume = flSoundsVolume
+            apClick.prepareToPlay()
+            apClick.play()
         }
     }
     

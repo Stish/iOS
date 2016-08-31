@@ -4,9 +4,13 @@ ToDo
 - ship inventory
 - enemies
 - high score list
-- game pause
 - nebulas
 - random backgrounds
+
+ver 0.33
+- game pause added
+- HUD has now icons for game pause and weapons
+- Game can be quitted
 
 ver 0.32
 - Adjustment in spawning times
