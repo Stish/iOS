@@ -40,7 +40,7 @@ class TLLaserCone: SKSpriteNode {
         switch (angle) {
         case 0:
             self.zRotation = atan(((flScreenHeight / 2)) / (flScreenWidth - (self.position.x) + 50))
-            if blSoundEffectsEnabled == true {
+            if GameData.blSoundEffectsEnabled == true {
                 // Sounds for laser cone
                 let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_004", ofType:"wav")
                 let fileURL = NSURL(fileURLWithPath: path!)
@@ -51,7 +51,7 @@ class TLLaserCone: SKSpriteNode {
                     return
                 }
                 apLaserConeShootingSound.numberOfLoops = 0
-                apLaserConeShootingSound.volume = flSoundsVolume * 0.4
+                apLaserConeShootingSound.volume = GameData.flSoundsVolume * 0.4
             }
         case 1:
             self.zRotation = 0
@@ -103,8 +103,8 @@ class TLLaserCone: SKSpriteNode {
     }
     
     func fctPlayShootingSound() {
-        if (blSoundEffectsEnabled == true) && (iAngle == 0) {
-            apLaserConeShootingSound.volume = flSoundsVolume * 0.6
+        if (GameData.blSoundEffectsEnabled == true) && (iAngle == 0) {
+            apLaserConeShootingSound.volume = GameData.flSoundsVolume * 0.6
             apLaserConeShootingSound.prepareToPlay()
             apLaserConeShootingSound.play()
         }

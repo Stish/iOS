@@ -10,18 +10,20 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.33"
+var strVersion = "ver 0.34"
 var blGameTest = false
+var blResetGameData = false
 // --- Game positions ---
 var flScreenWidth: CGFloat!
 var flScreenHeight: CGFloat!
 var flShipPosX: CGFloat!
 var flShipPosY: CGFloat!
 // --- game attributes ---
-var strPlayerName = "Player"
+var SDGameData: TLSaveData!
+var GameData: TLGameData!
 var blScoreSwitchChecked = true
-var aHighscoresScore = Array<TLHighscoreMember>()
-var aHighscoresTime = Array<TLHighscoreMember>()
+//let strHighscoreDummy = "0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"
+let strHighscoreDummy = "1"+"\t"+"11"+"\t"+"111"+"\t"+"2"+"\t"+"22"+"\t"+"222"+"\t"+"3"+"\t"+"33"+"\t"+"333"+"\t"+"4"+"\t"+"44"+"\t"+"444"+"\t"+"5"+"\t"+"55"+"\t"+"555"
 var aSkHighscoresColumns = 4
 var aSkHighscoresRows = 5
 var iGameScore = 0
@@ -45,11 +47,6 @@ var flmeteoriteSizeMax = CGFloat(120)
 var flmeteoriteSizeMin = CGFloat(50)
 var flShipSizeWidth = CGFloat(70)
 var flShipSizeHeight = CGFloat(62)
-// --- game sounds ---
-var blSoundEffectsEnabled = true
-var blMusicEnabled = true
-var flSoundsVolume = Float(0.5)
-var flMusicVolume = Float(0.5)
 
 var myLabel: SKLabelNode!
 var lbGameScore: SKLabelNode!
@@ -130,7 +127,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var lbMenuQuit: SKLabelNode!
 
     override func didMoveToView(view: SKView) {
-        /* Setup your scene here */
         // --- collision setup ---
         physicsWorld.contactDelegate = self
         view.showsPhysics = false // #debug
@@ -718,7 +714,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctPlayBackgroundMusic() {
-        if blMusicEnabled == true {
+        if GameData.blMusicEnabled == true {
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/music_001", ofType:"mp3")
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
@@ -728,7 +724,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 return
             }
             apBackgroundMusic.numberOfLoops = -1
-            apBackgroundMusic.volume = flMusicVolume
+            apBackgroundMusic.volume = GameData.flMusicVolume
             apBackgroundMusic.prepareToPlay()
             apBackgroundMusic.play()
         }
@@ -1364,10 +1360,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctPlayClickSound() {
-        if blSoundEffectsEnabled == true {
-            apClick.volume = flSoundsVolume
+        if GameData.blSoundEffectsEnabled == true {
+            apClick.volume = GameData.flSoundsVolume
             apClick.prepareToPlay()
             apClick.play()
+        }
+    }
+    
+    func fctSaveGameData () {
+        // Save Data
+        SDGameData.strPlayerName = GameData.strPlayerName
+        SDGameData.blSoundEffectsEnabled = GameData.blSoundEffectsEnabled
+        SDGameData.blMusicEnabled = GameData.blMusicEnabled
+        SDGameData.flSoundsVolume = GameData.flSoundsVolume
+        SDGameData.flMusicVolume = GameData.flMusicVolume
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
+        if !isSuccessfulSave {
+            print("Failed to save meals...")
+        } else {
+            print("Player name successfully saved")
         }
     }
     

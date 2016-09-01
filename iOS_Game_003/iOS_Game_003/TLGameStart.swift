@@ -13,6 +13,8 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
+        // --- Loading Game Data ---
+        fctLoadGameData()
         // --- collision setup ---
         physicsWorld.contactDelegate = self
         view.showsPhysics = false // #debug
@@ -32,14 +34,7 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
         snlogo.zPosition = 1.0
         snlogo.alpha = 1.0
         addChild(snlogo)
-        // Highscore by score array
-        aHighscoresScore.removeAll()
-        aHighscoresTime.removeAll()
-        for row in 0...aSkHighscoresRows - 1 {
-            aHighscoresScore.append(TLHighscoreMember())
-            aHighscoresTime.append(TLHighscoreMember())
-            aHighscoresTime[row].strName = "N.A."
-        }
+        
         let time = dispatch_time(dispatch_time_t(DISPATCH_TIME_NOW), 2 * Int64(NSEC_PER_SEC))
         dispatch_after(time, dispatch_get_main_queue()) {
             let transition = SKTransition.fadeWithColor(.blackColor(), duration: 2)
@@ -67,6 +62,54 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         
+    }
+    
+    func fctLoadGameData() {
+        GameData = TLGameData()
+        GameData.aHighscoresScore.removeAll()
+        GameData.aHighscoresTime.removeAll()
+        for row in 0...aSkHighscoresRows - 1 {
+            GameData.aHighscoresScore.append(TLHighscoreMember())
+            GameData.aHighscoresTime.append(TLHighscoreMember())
+        }
+        if blResetGameData == false {
+            do {
+                try SDGameData = NSKeyedUnarchiver.unarchiveObjectWithFile(TLSaveData.ArchiveURL.path!) as? TLSaveData
+                //print("Path: " + TLSaveData.ArchiveURL.path!) // #debug
+                if (SDGameData != nil) {
+                    GameData.strPlayerName = SDGameData.strPlayerName
+                    GameData.blSoundEffectsEnabled = SDGameData.blSoundEffectsEnabled
+                    GameData.blMusicEnabled = SDGameData.blMusicEnabled
+                    GameData.flSoundsVolume = SDGameData.flSoundsVolume
+                    GameData.flMusicVolume = SDGameData.flMusicVolume
+                    let aStrHighscoreTime = SDGameData.strHighscoreTime.componentsSeparatedByString("\t")
+                    for row in 0...(aStrHighscoreTime.count / 3) - 1 {
+                        GameData.aHighscoresTime[row].iScore = Int(aStrHighscoreTime[(row*3) + 0])
+                        GameData.aHighscoresTime[row].iTime = Int(aStrHighscoreTime[(row*3) + 1])
+                        GameData.aHighscoresTime[row].strName = aStrHighscoreTime[(row*3) + 2]
+                    }
+                    let aStrHighscoreScore = SDGameData.strHighscoreScore.componentsSeparatedByString("\t")
+                    for row in 0...(aStrHighscoreTime.count / 3) - 1 {
+                        GameData.aHighscoresScore[row].iScore = Int(aStrHighscoreScore[(row*3) + 0])
+                        GameData.aHighscoresScore[row].iTime = Int(aStrHighscoreScore[(row*3) + 1])
+                        GameData.aHighscoresScore[row].strName = aStrHighscoreScore[(row*3) + 2]
+                    }
+                } else {
+                    SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy)
+                }
+            } catch {
+                SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy)
+            }
+        } else {
+            SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy)
+        }
+        let testString = "Stish" + "\t" + "1234" + "\t" + "5678"
+        let testStringArr = testString.componentsSeparatedByString("\t")
+        print("Name: " + testStringArr[0])
+        print("Time: " + testStringArr[1])
+        print("Score: " + testStringArr[2])
+        
+        // Highscore by score array
     }
     
 }

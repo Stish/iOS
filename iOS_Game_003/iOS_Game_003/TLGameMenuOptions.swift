@@ -85,7 +85,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
         tfPlayerName.tintColor = SKColor.whiteColor()
         tfPlayerName.autocorrectionType = UITextAutocorrectionType.No
         tfPlayerName.font = UIFont(name: fnGameTextFont!.fontName, size: 30 * (self.frame.width/667.0))
-        tfPlayerName.text = strPlayerName
+        tfPlayerName.text = GameData.strPlayerName
         tfPlayerName.textAlignment = .Center
         tfPlayerName.contentVerticalAlignment = .Center
         tfPlayerName.clearButtonMode = UITextFieldViewMode.WhileEditing
@@ -147,7 +147,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
         snOptMusicCheckbox.alpha = 1.0
         snOptMusicCheckbox.name = "OptMusicCheckbox"
         self.addChild(snOptMusicCheckbox)
-        if blMusicEnabled == true {
+        if GameData.blMusicEnabled == true {
             snOptMusicCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_checked.png")
         } else {
             snOptMusicCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_unchecked.png")
@@ -168,7 +168,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
         snOptMusicSliderKnob.alpha = 1.0
         snOptMusicSliderKnob.name = "OptMusicSliderKnob"
         self.addChild(snOptMusicSliderKnob)
-        let flOptMusicSliderKnobPos = (((snOptMusicSliderBody.frame.size.width - snOptMusicSliderKnob.frame.size.width) / 100.0) * CGFloat(flMusicVolume * 100.0)) + (snOptMusicSliderKnob.frame.size.width / 2)
+        let flOptMusicSliderKnobPos = (((snOptMusicSliderBody.frame.size.width - snOptMusicSliderKnob.frame.size.width) / 100.0) * CGFloat(GameData.flMusicVolume * 100.0)) + (snOptMusicSliderKnob.frame.size.width / 2)
         snOptMusicSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16) - snOptMusicSliderBody.frame.size.width + flOptMusicSliderKnobPos), y: (4 * (self.frame.height / 12)))
         // +------------+
         // |   Sounds   |
@@ -192,7 +192,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
         snOptSoundsCheckbox.alpha = 1.0
         snOptSoundsCheckbox.name = "OptSoundsCheckbox"
         self.addChild(snOptSoundsCheckbox)
-        if blSoundEffectsEnabled == true {
+        if GameData.blSoundEffectsEnabled == true {
             snOptSoundsCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_checked.png")
         } else {
             snOptSoundsCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_unchecked.png")
@@ -213,7 +213,7 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
         snOptSoundsSliderKnob.alpha = 1.0
         snOptSoundsSliderKnob.name = "OptSoundsSliderKnob"
         self.addChild(snOptSoundsSliderKnob)
-        let flOptSoundsSliderKnobPos = (((snOptSoundsSliderBody.frame.size.width - snOptSoundsSliderKnob.frame.size.width) / 100.0) * CGFloat(flSoundsVolume * 100.0))
+        let flOptSoundsSliderKnobPos = (((snOptSoundsSliderBody.frame.size.width - snOptSoundsSliderKnob.frame.size.width) / 100.0) * CGFloat(GameData.flSoundsVolume * 100.0))
         snOptSoundsSliderKnob.position = CGPoint(x: (15*(self.frame.width / 16) - snOptSoundsSliderBody.frame.size.width + flOptSoundsSliderKnobPos + (snOptSoundsSliderKnob.frame.size.width / 2)), y: (2*(self.frame.height / 12)))
     }
     
@@ -252,20 +252,20 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
                 
                 if (touch.locationInView(view).x >= flOptMusicSliderKnobMin) && (touch.locationInView(view).x <= flOptMusicSliderKnobMax) {
                     snOptMusicSliderKnob.position = CGPoint(x: touch.locationInView(view).x, y: snOptMusicSliderKnob.position.y)
-                    flMusicVolume = Float(snOptMusicSliderKnob.position.x - (snOptMusicSliderBody.position.x - snOptMusicSliderBody.frame.size.width))
-                    flMusicVolume = flMusicVolume - Float(snOptMusicSliderKnob.frame.size.width / 2.0)
-                    flMusicVolume = flMusicVolume / Float(snOptMusicSliderBody.frame.size.width - snOptMusicSliderKnob.frame.size.width)
-                    //print(flMusicVolume) // #debug
+                    GameData.flMusicVolume = Float(snOptMusicSliderKnob.position.x - (snOptMusicSliderBody.position.x - snOptMusicSliderBody.frame.size.width))
+                    GameData.flMusicVolume = GameData.flMusicVolume - Float(snOptMusicSliderKnob.frame.size.width / 2.0)
+                    GameData.flMusicVolume = GameData.flMusicVolume / Float(snOptMusicSliderBody.frame.size.width - snOptMusicSliderKnob.frame.size.width)
+                    //print(GameData.flMusicVolume) // #debug
                 }
                 if touch.locationInView(view).x < flOptMusicSliderKnobMin {
                     snOptMusicSliderKnob.position = CGPoint(x: flOptMusicSliderKnobMin, y: snOptMusicSliderKnob.position.y)
-                    flMusicVolume = 0.0
-                    //print(flMusicVolume) // #debug
+                    GameData.flMusicVolume = 0.0
+                    //print(GameData.flMusicVolume) // #debug
                 }
                 if touch.locationInView(view).x > flOptMusicSliderKnobMax {
                     snOptMusicSliderKnob.position = CGPoint(x: flOptMusicSliderKnobMax, y: snOptMusicSliderKnob.position.y)
-                    flMusicVolume = 1.0
-                    //print(flMusicVolume) // #debug
+                    GameData.flMusicVolume = 1.0
+                    //print(GameData.flMusicVolume) // #debug
                 }
             }
         }
@@ -276,20 +276,20 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
                 
                 if (touch.locationInView(view).x >= flOptSoundsSliderKnobMin) && (touch.locationInView(view).x <= flOptSoundsSliderKnobMax) {
                     snOptSoundsSliderKnob.position = CGPoint(x: touch.locationInView(view).x, y: snOptSoundsSliderKnob.position.y)
-                    flSoundsVolume = Float(snOptSoundsSliderKnob.position.x - (snOptSoundsSliderBody.position.x - snOptSoundsSliderBody.frame.size.width))
-                    flSoundsVolume = flSoundsVolume - Float(snOptSoundsSliderKnob.frame.size.width / 2.0)
-                    flSoundsVolume = flSoundsVolume / Float(snOptSoundsSliderBody.frame.size.width - snOptSoundsSliderKnob.frame.size.width)
-                    //print(flSoundsVolume)  // #debug
+                    GameData.flSoundsVolume = Float(snOptSoundsSliderKnob.position.x - (snOptSoundsSliderBody.position.x - snOptSoundsSliderBody.frame.size.width))
+                    GameData.flSoundsVolume = GameData.flSoundsVolume - Float(snOptSoundsSliderKnob.frame.size.width / 2.0)
+                    GameData.flSoundsVolume = GameData.flSoundsVolume / Float(snOptSoundsSliderBody.frame.size.width - snOptSoundsSliderKnob.frame.size.width)
+                    //print(GameData.flSoundsVolume)  // #debug
                 }
                 if touch.locationInView(view).x < flOptSoundsSliderKnobMin {
                     snOptSoundsSliderKnob.position = CGPoint(x: flOptSoundsSliderKnobMin, y: snOptSoundsSliderKnob.position.y)
-                    flSoundsVolume = 0.0
-                    //print(flSoundsVolume) // #debug
+                    GameData.flSoundsVolume = 0.0
+                    //print(GameData.flSoundsVolume) // #debug
                 }
                 if touch.locationInView(view).x > flOptSoundsSliderKnobMax {
                     snOptSoundsSliderKnob.position = CGPoint(x: flOptSoundsSliderKnobMax, y: snOptSoundsSliderKnob.position.y)
-                    flSoundsVolume = 1.0
-                    //print(flSoundsVolume) // #debug
+                    GameData.flSoundsVolume = 1.0
+                    //print(GameData.flSoundsVolume) // #debug
                 }
             }
         }
@@ -304,7 +304,8 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
             switch (touchedNode.name) {
             case "MenuBack"?:
                 if iButtonPressed == 1 {
-                    strPlayerName = tfPlayerName.text!
+                    GameData.strPlayerName = tfPlayerName.text!
+                    fctSaveGameData()
                     tfPlayerName.removeFromSuperview()
                     let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
                     let nextScene = TLGameMenu(size: scene!.size)
@@ -314,21 +315,21 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
                 }
             case "OptMusicCheckbox"?:
                 if iButtonPressed == 2 {
-                    if blMusicEnabled == true {
-                        blMusicEnabled = false
+                    if GameData.blMusicEnabled == true {
+                        GameData.blMusicEnabled = false
                         snOptMusicCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_unchecked.png")
                     } else {
-                        blMusicEnabled = true
+                        GameData.blMusicEnabled = true
                         snOptMusicCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_checked.png")
                     }
                 }
             case "OptSoundsCheckbox"?:
                 if iButtonPressed == 3 {
-                    if blSoundEffectsEnabled == true {
-                        blSoundEffectsEnabled = false
+                    if GameData.blSoundEffectsEnabled == true {
+                        GameData.blSoundEffectsEnabled = false
                         snOptSoundsCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_unchecked.png")
                     } else {
-                        blSoundEffectsEnabled = true
+                        GameData.blSoundEffectsEnabled = true
                         snOptSoundsCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_checked.png")
                     }
                 }
@@ -346,8 +347,8 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
     }
     
     func fctPlayClickSound() {
-        if blSoundEffectsEnabled == true {
-            apClick.volume = flSoundsVolume
+        if GameData.blSoundEffectsEnabled == true {
+            apClick.volume = GameData.flSoundsVolume
             apClick.prepareToPlay()
             apClick.play()
         }
@@ -364,9 +365,24 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
-        strPlayerName = tfPlayerName.text!
+        GameData.strPlayerName = tfPlayerName.text!
         tfPlayerName.resignFirstResponder()
         return true
+    }
+    
+    func fctSaveGameData () {
+        // Save Data
+        SDGameData.strPlayerName = GameData.strPlayerName
+        SDGameData.blSoundEffectsEnabled = GameData.blSoundEffectsEnabled
+        SDGameData.blMusicEnabled = GameData.blMusicEnabled
+        SDGameData.flSoundsVolume = GameData.flSoundsVolume
+        SDGameData.flMusicVolume = GameData.flMusicVolume
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
+        if !isSuccessfulSave {
+            print("Failed to save meals...")
+        } else {
+            print("Player name successfully saved")
+        }
     }
 }
 

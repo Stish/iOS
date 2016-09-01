@@ -32,6 +32,8 @@
 		FAE3E3451C2096E1004F5D3A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FAE3E3431C2096E1004F5D3A /* LaunchScreen.storyboard */; };
 		FAE3E3511C209C40004F5D3A /* TLBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE3E3501C209C40004F5D3A /* TLBackground.swift */; };
 		FAE3E3531C20A751004F5D3A /* TLShip.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE3E3521C20A751004F5D3A /* TLShip.swift */; };
+		FAEBD1491D78280C000A9212 /* TLSaveData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEBD1481D78280C000A9212 /* TLSaveData.swift */; };
+		FAEBD14B1D78458E000A9212 /* TLGameData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEBD14A1D78458E000A9212 /* TLGameData.swift */; };
 		FAF15CDF1C22F9A600CB5827 /* TLMeteorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF15CDE1C22F9A600CB5827 /* TLMeteorite.swift */; };
 		FAF15CE31C2305CB00CB5827 /* TLLaser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF15CE21C2305CB00CB5827 /* TLLaser.swift */; };
 /* End PBXBuildFile section */
@@ -64,6 +66,8 @@
 		FAE3E3461C2096E1004F5D3A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FAE3E3501C209C40004F5D3A /* TLBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLBackground.swift; sourceTree = "<group>"; };
 		FAE3E3521C20A751004F5D3A /* TLShip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLShip.swift; sourceTree = "<group>"; };
+		FAEBD1481D78280C000A9212 /* TLSaveData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLSaveData.swift; sourceTree = "<group>"; };
+		FAEBD14A1D78458E000A9212 /* TLGameData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameData.swift; sourceTree = "<group>"; };
 		FAF15CDE1C22F9A600CB5827 /* TLMeteorite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLMeteorite.swift; sourceTree = "<group>"; };
 		FAF15CE21C2305CB00CB5827 /* TLLaser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLLaser.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -126,6 +130,8 @@
 				FA19BBE01D2DA5E900157105 /* TLHighscoreManager.swift */,
 				FAADFBA81D464E3900AFADE2 /* TLNebula.swift */,
 				FAADFBAA1D47A72800AFADE2 /* TLInventory.swift */,
+				FAEBD1481D78280C000A9212 /* TLSaveData.swift */,
+				FAEBD14A1D78458E000A9212 /* TLGameData.swift */,
 			);
 			path = iOS_Game_003;
 			sourceTree = "<group>";
@@ -211,6 +217,7 @@
 				FA19BBDF1D2DA59100157105 /* TLHighscore.swift in Sources */,
 				FAE3E3531C20A751004F5D3A /* TLShip.swift in Sources */,
 				FA19BBE31D2EAA0B00157105 /* TLGameMenuOptions.swift in Sources */,
+				FAEBD14B1D78458E000A9212 /* TLGameData.swift in Sources */,
 				FAD12A071D3796A600338919 /* TLGameMenuTutorial.swift in Sources */,
 				FAADFBA51D40FCB200AFADE2 /* TLLaserSphere.swift in Sources */,
 				FAF15CE31C2305CB00CB5827 /* TLLaser.swift in Sources */,
@@ -220,6 +227,7 @@
 				FAADFBA91D464E3900AFADE2 /* TLNebula.swift in Sources */,
 				FA19BBE51D3001CD00157105 /* TLGameMenuAbout.swift in Sources */,
 				FAD12A051D36804900338919 /* TLHighscoreMember.swift in Sources */,
+				FAEBD1491D78280C000A9212 /* TLSaveData.swift in Sources */,
 				FAE3E33D1C2096E1004F5D3A /* GameViewController.swift in Sources */,
 				FA13A5151D3E607C0076EC79 /* TLBomb.swift in Sources */,
 				FAD12A031D36636500338919 /* TLGameMenuHighscore.swift in Sources */,

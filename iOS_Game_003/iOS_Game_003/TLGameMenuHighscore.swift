@@ -58,15 +58,15 @@ class TLGameMenuHighscore: SKScene, SKPhysicsContactDelegate {
                     aSkHighscores[column][row].position = CGPoint(x: 3*(self.frame.width / 30), y: CGFloat(5-row)*(self.frame.height / 12))
                 }
                 if column == 1 {
-                    aSkHighscores[column][row].text = String(aHighscoresScore[row].iScore)
+                    aSkHighscores[column][row].text = String(GameData.aHighscoresScore[row].iScore)
                     aSkHighscores[column][row].position = CGPoint(x: 8.5*(self.frame.width / 30), y: CGFloat(5-row)*(self.frame.height / 12))
                 }
                 if column == 2 {
-                    aSkHighscores[column][row].text = String(aHighscoresScore[row].iTime)
+                    aSkHighscores[column][row].text = String(GameData.aHighscoresScore[row].iTime)
                     aSkHighscores[column][row].position = CGPoint(x: 15*(self.frame.width / 30), y: CGFloat(5-row)*(self.frame.height / 12))
                 }
                 if column == 3 {
-                    aSkHighscores[column][row].text = aHighscoresScore[row].strName
+                    aSkHighscores[column][row].text = GameData.aHighscoresScore[row].strName
                     aSkHighscores[column][row].position = CGPoint(x: 23*(self.frame.width / 30), y: CGFloat(5-row)*(self.frame.height / 12))
                 }
             }
@@ -288,8 +288,8 @@ class TLGameMenuHighscore: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctPlayClickSound() {
-        if blSoundEffectsEnabled == true {
-            apClick.volume = flSoundsVolume
+        if GameData.blSoundEffectsEnabled == true {
+            apClick.volume = GameData.flSoundsVolume
             apClick.prepareToPlay()
             apClick.play()
         }
@@ -300,23 +300,23 @@ class TLGameMenuHighscore: SKScene, SKPhysicsContactDelegate {
             for row in 0...aSkHighscoresRows - 1 {
                 if column == 1 {
                     if blScoreSwitchChecked == true {
-                        aSkHighscores[column][row].text = String(aHighscoresScore[row].iScore)
+                        aSkHighscores[column][row].text = String(GameData.aHighscoresScore[row].iScore)
                     } else {
-                        aSkHighscores[column][row].text = String(aHighscoresTime[row].iScore)
+                        aSkHighscores[column][row].text = String(GameData.aHighscoresTime[row].iScore)
                     }
                 }
                 if column == 2 {
                     if blScoreSwitchChecked == true {
-                        aSkHighscores[column][row].text = String(aHighscoresScore[row].iTime)
+                        aSkHighscores[column][row].text = String(GameData.aHighscoresScore[row].iTime)
                     } else {
-                        aSkHighscores[column][row].text = String(aHighscoresTime[row].iTime)
+                        aSkHighscores[column][row].text = String(GameData.aHighscoresTime[row].iTime)
                     }
                 }
                 if column == 3 {
                     if blScoreSwitchChecked == true {
-                        aSkHighscores[column][row].text = aHighscoresScore[row].strName
+                        aSkHighscores[column][row].text = GameData.aHighscoresScore[row].strName
                     } else {
-                        aSkHighscores[column][row].text = aHighscoresTime[row].strName
+                        aSkHighscores[column][row].text = GameData.aHighscoresTime[row].strName
                     }
                 }
             }

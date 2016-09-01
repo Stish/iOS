@@ -41,7 +41,7 @@ class TLLaserSphere: SKSpriteNode {
         let actMoving = SKAction.animateWithTextures(aAnimation, timePerFrame: 0.1)
         self.runAction(SKAction.repeatActionForever(actMoving))
         
-        if blSoundEffectsEnabled == true {
+        if GameData.blSoundEffectsEnabled == true {
             // Sounds for laser sphere
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_006", ofType:"wav")
             let fileURL = NSURL(fileURLWithPath: path!)
@@ -52,7 +52,7 @@ class TLLaserSphere: SKSpriteNode {
                 return
             }
             apLaserSphereShootingSound.numberOfLoops = 0
-            apLaserSphereShootingSound.volume = flSoundsVolume
+            apLaserSphereShootingSound.volume = GameData.flSoundsVolume
         }
 
     }
@@ -83,8 +83,8 @@ class TLLaserSphere: SKSpriteNode {
     }
     
     func fctPlayShootingSound() {
-        if blSoundEffectsEnabled == true {
-            apLaserSphereShootingSound.volume = flSoundsVolume
+        if GameData.blSoundEffectsEnabled == true {
+            apLaserSphereShootingSound.volume = GameData.flSoundsVolume
             apLaserSphereShootingSound.prepareToPlay()
             apLaserSphereShootingSound.play()
         }

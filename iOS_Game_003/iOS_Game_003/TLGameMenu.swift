@@ -268,8 +268,8 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
     }
     
     func fctPlayClickSound() {
-        if blSoundEffectsEnabled == true {
-            apClick.volume = flSoundsVolume
+        if GameData.blSoundEffectsEnabled == true {
+            apClick.volume = GameData.flSoundsVolume
             apClick.prepareToPlay()
             apClick.play()
         }

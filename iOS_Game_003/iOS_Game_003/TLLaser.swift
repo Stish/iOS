@@ -28,7 +28,7 @@ class TLLaser: SKSpriteNode {
         self.physicsBody?.contactTestBitMask = enBodyType.meteorite.rawValue
         self.physicsBody?.collisionBitMask = 0
         self.zPosition = 1.1
-        if blSoundEffectsEnabled == true {
+        if GameData.blSoundEffectsEnabled == true {
             // Sounds for laser
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
             let fileURL = NSURL(fileURLWithPath: path!)
@@ -39,7 +39,7 @@ class TLLaser: SKSpriteNode {
                 return
             }
             apLaserShootingSound.numberOfLoops = 0
-            apLaserShootingSound.volume = flSoundsVolume
+            apLaserShootingSound.volume = GameData.flSoundsVolume
         }
 
     }
@@ -63,8 +63,8 @@ class TLLaser: SKSpriteNode {
     }
     
     func fctPlayShootingSound() {
-        if blSoundEffectsEnabled == true {
-            apLaserShootingSound.volume = flSoundsVolume
+        if GameData.blSoundEffectsEnabled == true {
+            apLaserShootingSound.volume = GameData.flSoundsVolume
             apLaserShootingSound.prepareToPlay()
             apLaserShootingSound.play()
         }

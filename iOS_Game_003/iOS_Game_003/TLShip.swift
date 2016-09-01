@@ -95,12 +95,12 @@ class TLShip: SKSpriteNode {
         let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.10)
         self.removeAllActions()
         // --- load sounds ---
-        if blSoundEffectsEnabled == true {
+        if GameData.blSoundEffectsEnabled == true {
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_002", ofType:"wav")
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
                 let apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-                apExplosionSound.volume = flSoundsVolume
+                apExplosionSound.volume = GameData.flSoundsVolume
                 apExplosionSound.numberOfLoops = 0
                 apExplosionSound.prepareToPlay()
                 apExplosionSound.play()

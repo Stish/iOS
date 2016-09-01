@@ -1,16 +1,20 @@
 # iOS_Game_003
 
 ToDo
-- ship inventory
 - enemies
 - high score list
 - nebulas
 - random backgrounds
 
+ver 0.34
+- Game settings are saved to and loaded from file
+
 ver 0.33
-- game pause added
+- Game pause added
 - HUD has now icons for game pause and weapons
 - Game can be quitted
+- Ship inventory added
+- Player can switch between weapons
 
 ver 0.32
 - Adjustment in spawning times

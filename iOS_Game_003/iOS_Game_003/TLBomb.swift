@@ -76,7 +76,7 @@ class TLBomb: SKSpriteNode {
         aExplosion_02.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_02_006"))
         aExplosion_02.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_02_007"))
         aExplosion_02.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_02_008"))
-        if blSoundEffectsEnabled == true {
+        if GameData.blSoundEffectsEnabled == true {
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/bomb_001", ofType:"wav")
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
@@ -86,7 +86,7 @@ class TLBomb: SKSpriteNode {
                 return
             }
             apBombShootingSound.numberOfLoops = 0
-            apBombShootingSound.volume = flSoundsVolume
+            apBombShootingSound.volume = GameData.flSoundsVolume
         }
 
     }
@@ -112,12 +112,12 @@ class TLBomb: SKSpriteNode {
         self.physicsBody?.categoryBitMask = 0
         self.physicsBody?.contactTestBitMask = 0
         // --- load sounds ---
-        if blSoundEffectsEnabled == true {
+        if GameData.blSoundEffectsEnabled == true {
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_003", ofType:"wav")
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
                 apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-                apExplosionSound.volume = flSoundsVolume * 4
+                apExplosionSound.volume = GameData.flSoundsVolume * 4
                 apExplosionSound.numberOfLoops = 0
                 apExplosionSound.prepareToPlay()
                 apExplosionSound.play()
@@ -144,8 +144,8 @@ class TLBomb: SKSpriteNode {
     }
     
     func fctPlayShootingSound() {
-        if blSoundEffectsEnabled == true {
-            apBombShootingSound.volume = flSoundsVolume
+        if GameData.blSoundEffectsEnabled == true {
+            apBombShootingSound.volume = GameData.flSoundsVolume
             apBombShootingSound.prepareToPlay()
             apBombShootingSound.play()
         }

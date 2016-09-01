@@ -108,12 +108,12 @@ class TLMeteorite: SKSpriteNode {
         self.physicsBody?.categoryBitMask = 0
         self.physicsBody?.contactTestBitMask = 0
         // --- load sounds ---
-        if blSoundEffectsEnabled == true {
+        if GameData.blSoundEffectsEnabled == true {
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_004", ofType:"wav")
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
                 apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-                apExplosionSound.volume = flSoundsVolume * 3
+                apExplosionSound.volume = GameData.flSoundsVolume * 3
                 apExplosionSound.numberOfLoops = 0
                 apExplosionSound.prepareToPlay()
                 apExplosionSound.play()
@@ -143,13 +143,13 @@ class TLMeteorite: SKSpriteNode {
     
     func fctHit() {
         // --- load sounds ---
-        if blSoundEffectsEnabled == true {
+        if GameData.blSoundEffectsEnabled == true {
             let path = NSBundle.mainBundle().pathForResource("Media/sounds/hit_001", ofType:"mp3")
             let fileURL = NSURL(fileURLWithPath: path!)
             do {
                 apHitSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
                 apHitSound.numberOfLoops = 0
-                apHitSound.volume = flSoundsVolume
+                apHitSound.volume = GameData.flSoundsVolume
                 apHitSound.prepareToPlay()
                 apHitSound.play()
             } catch {
