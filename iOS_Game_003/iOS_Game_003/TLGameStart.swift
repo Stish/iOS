@@ -96,12 +96,15 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
                     }
                 } else {
                     SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy)
+                    NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
                 }
             } catch {
                 SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy)
+                NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
             }
         } else {
             SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy)
+            NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
         }
         let testString = "Stish" + "\t" + "1234" + "\t" + "5678"
         let testStringArr = testString.componentsSeparatedByString("\t")

@@ -22,8 +22,8 @@ var flShipPosY: CGFloat!
 var SDGameData: TLSaveData!
 var GameData: TLGameData!
 var blScoreSwitchChecked = true
-//let strHighscoreDummy = "0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"
-let strHighscoreDummy = "1"+"\t"+"11"+"\t"+"111"+"\t"+"2"+"\t"+"22"+"\t"+"222"+"\t"+"3"+"\t"+"33"+"\t"+"333"+"\t"+"4"+"\t"+"44"+"\t"+"444"+"\t"+"5"+"\t"+"55"+"\t"+"555"
+let strHighscoreDummy = "0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"
+//let strHighscoreDummy = "1"+"\t"+"11"+"\t"+"111"+"\t"+"2"+"\t"+"22"+"\t"+"222"+"\t"+"3"+"\t"+"33"+"\t"+"333"+"\t"+"4"+"\t"+"44"+"\t"+"444"+"\t"+"5"+"\t"+"55"+"\t"+"555"
 var aSkHighscoresColumns = 4
 var aSkHighscoresRows = 5
 var iGameScore = 0
@@ -125,6 +125,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var snMenuBack: SKSpriteNode!
     var snMenuQuit: SKSpriteNode!
     var lbMenuQuit: SKLabelNode!
+    var lbHighscoreTextLine1: SKLabelNode!
+    var lbHighscoreTextLine2: SKLabelNode!
 
     override func didMoveToView(view: SKView) {
         // --- collision setup ---
@@ -334,6 +336,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbPowerUpInv.zPosition = 2.0
         lbPowerUpInv.alpha = 0.0
         self.addChild(lbPowerUpInv)
+        // Highscore text line 1
+        lbHighscoreTextLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lbHighscoreTextLine1.text = ""
+        lbHighscoreTextLine1.horizontalAlignmentMode = .Center
+        lbHighscoreTextLine1.verticalAlignmentMode = .Center
+        lbHighscoreTextLine1.fontSize = 20 * (self.frame.width/667.0)
+        lbHighscoreTextLine1.position = CGPoint(x: CGRectGetMidX(self.frame), y: 9*(self.frame.height / 12))
+        lbHighscoreTextLine1.fontColor = UIColor.whiteColor()
+        lbHighscoreTextLine1.zPosition = 2.2
+        lbHighscoreTextLine1.alpha = 0.0
+        self.addChild(lbHighscoreTextLine1)
+        // Highscore text line 2
+        lbHighscoreTextLine2 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lbHighscoreTextLine2.text = ""
+        lbHighscoreTextLine2.horizontalAlignmentMode = .Center
+        lbHighscoreTextLine2.verticalAlignmentMode = .Center
+        lbHighscoreTextLine2.fontSize = 20 * (self.frame.width/667.0)
+        lbHighscoreTextLine2.position = CGPoint(x: CGRectGetMidX(self.frame), y: 8*(self.frame.height / 12))
+        lbHighscoreTextLine2.fontColor = UIColor.whiteColor()
+        lbHighscoreTextLine2.zPosition = 2.2
+        lbHighscoreTextLine2.alpha = 0.0
+        self.addChild(lbHighscoreTextLine2)
         
         // --- Sounds: Click ---
         let path = NSBundle.mainBundle().pathForResource("Media/sounds/click_001", ofType:"wav")
@@ -950,6 +974,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     //snShip.removeFromParent()
                     if snShip.iHealth <= 0 {
                         self.fctGameOver()
+                        self.fctCheckForNewHighscore()
+                        self.fctSaveHighscoreData()
                         snShip.physicsBody?.categoryBitMask = 0
                         snShip.fctExplode()
                         blGameOver = true
@@ -1125,6 +1151,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         snShip.iHealth = snShip.iHealth - 100
                         if snShip.iHealth <= 0 {
                             self.fctGameOver()
+                            self.fctCheckForNewHighscore()
+                            self.fctSaveHighscoreData()
                             snShip.physicsBody?.categoryBitMask = 0
                             snShip.fctExplode()
                             blGameOver = true
@@ -1367,19 +1395,85 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func fctSaveGameData () {
-        // Save Data
-        SDGameData.strPlayerName = GameData.strPlayerName
-        SDGameData.blSoundEffectsEnabled = GameData.blSoundEffectsEnabled
-        SDGameData.blMusicEnabled = GameData.blMusicEnabled
-        SDGameData.flSoundsVolume = GameData.flSoundsVolume
-        SDGameData.flMusicVolume = GameData.flMusicVolume
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
-        if !isSuccessfulSave {
-            print("Failed to save meals...")
-        } else {
-            print("Player name successfully saved")
+    func fctCheckForNewHighscore () {
+        var blNewHighscoreScore = false
+        var blNewHighscoreTime = false
+        // Check for new highscores based on score
+        for row in 0...aSkHighscoresRows - 1 {
+            if GameData.aHighscoresScore[row].iScore < iGameScore {
+                print("New Highscore: " + String(iGameScore) + " Score @ Rank: " + String(row + 1))
+                if row < (aSkHighscoresRows - 1) {
+                    for backrow in ((row + 1)...(aSkHighscoresRows - 1)).reverse() {
+                        GameData.aHighscoresScore[backrow].iScore = GameData.aHighscoresScore[backrow - 1].iScore
+                        GameData.aHighscoresScore[backrow].iTime = GameData.aHighscoresScore[backrow - 1].iTime
+                        GameData.aHighscoresScore[backrow].strName = GameData.aHighscoresScore[backrow - 1].strName
+                    }
+                }
+                GameData.aHighscoresScore[row].iScore = iGameScore
+                GameData.aHighscoresScore[row].iTime = iGameTimeSec
+                GameData.aHighscoresScore[row].strName = GameData.strPlayerName
+                blNewHighscoreScore = true
+                lbHighscoreTextLine1.text = "New Highscore: " + String(iGameScore) + " Score @ Rank: " + String(row + 1)
+                break
+            }
         }
+        // Check for new highscores based on time
+        for row in 0...aSkHighscoresRows - 1 {
+            if GameData.aHighscoresTime[row].iTime < iGameTimeSec {
+                print("New Highscore: " + String(iGameTimeSec) + " Time @ Rank: " + String(row + 1))
+                if row < (aSkHighscoresRows - 1) {
+                    for backrow in ((row + 1)...(aSkHighscoresRows - 1)).reverse() {
+                        GameData.aHighscoresTime[backrow].iScore = GameData.aHighscoresTime[backrow - 1].iScore
+                        GameData.aHighscoresTime[backrow].iTime = GameData.aHighscoresTime[backrow - 1].iTime
+                        GameData.aHighscoresTime[backrow].strName = GameData.aHighscoresTime[backrow - 1].strName
+                    }
+                }
+                GameData.aHighscoresTime[row].iScore = iGameScore
+                GameData.aHighscoresTime[row].iTime = iGameTimeSec
+                GameData.aHighscoresTime[row].strName = GameData.strPlayerName
+                blNewHighscoreTime = true
+                lbHighscoreTextLine2.text = "New Highscore: " + String(iGameTimeSec) + " Time @ Rank: " + String(row + 1)
+                break
+            }
+        }
+        if (blNewHighscoreScore == true) && (blNewHighscoreTime == true) {
+            fctFadeInOutSKLabelNode(lbHighscoreTextLine1, time: 1, alpha: 1.0, pause: 7)
+            fctFadeInOutSKLabelNode(lbHighscoreTextLine2, time: 1, alpha: 1.0, pause: 7)
+        }
+        if (blNewHighscoreScore == true) && (blNewHighscoreTime == false) {
+            fctFadeInOutSKLabelNode(lbHighscoreTextLine1, time: 1, alpha: 1.0, pause: 7)
+        }
+        if (blNewHighscoreScore == false) && (blNewHighscoreTime == true) {
+            lbHighscoreTextLine1.text = lbHighscoreTextLine2.text
+            fctFadeInOutSKLabelNode(lbHighscoreTextLine1, time: 1, alpha: 1.0, pause: 7)
+        }
+    }
+    
+    func fctSaveHighscoreData () {
+        // Build strHighscoreTime string out of highscores
+        var strBuffer = ""
+        for row in 0...aSkHighscoresRows - 1 {
+            strBuffer = strBuffer + String(GameData.aHighscoresTime[row].iScore) + "\t"
+            strBuffer = strBuffer + String(GameData.aHighscoresTime[row].iTime) + "\t"
+            strBuffer = strBuffer + GameData.aHighscoresTime[row].strName
+            if row != aSkHighscoresRows - 1 {
+                strBuffer = strBuffer + "\t"
+            }
+        }
+        SDGameData.strHighscoreTime = strBuffer
+        // Build strHighscoreScore string out of highscores
+        strBuffer = ""
+        for row in 0...aSkHighscoresRows - 1 {
+            strBuffer = strBuffer + String(GameData.aHighscoresScore[row].iScore) + "\t"
+            strBuffer = strBuffer + String(GameData.aHighscoresScore[row].iTime) + "\t"
+            strBuffer = strBuffer + GameData.aHighscoresScore[row].strName
+            if row != aSkHighscoresRows - 1 {
+                strBuffer = strBuffer + "\t"
+            }
+        }
+        SDGameData.strHighscoreScore = strBuffer
+        // Save data
+        NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
     }
     
     func applicationWillResignActive(notification: NSNotification) {

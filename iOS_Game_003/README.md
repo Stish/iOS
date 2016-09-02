@@ -2,9 +2,16 @@
 
 ToDo
 - enemies
-- high score list
 - nebulas
 - random backgrounds
+- Improve controls
+- Add new game features to tutorial
+- Improve sprites
+
+ver 0.35
+- High score list added
+- High score are persistently saved
+- Small bug fixes
 
 ver 0.34
 - Game settings are saved to and loaded from file
