@@ -98,7 +98,7 @@ class TLInventory: SKSpriteNode {
             if blLaserSpherePickedUp == true {
                 snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_sphere_unchecked.png")
             } else {
-                snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_Sphere_unequipped.png")
+                snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_sphere_unequipped.png")
             }
         default:
             ()

@@ -10,7 +10,7 @@ import SpriteKit
 import AVFoundation
 
 // Debugging
-var strVersion = "ver 0.34"
+var strVersion = "ver 0.36"
 var blGameTest = false
 var blResetGameData = false
 // --- Game positions ---
@@ -495,6 +495,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         snShip.position.y = snShip.position.y + deltaY
                     } else if (deltaY < (3 * (self.frame.height/375.0)) && deltaY > (-3 * (self.frame.height/375.0))) {
                         //snShip.fctStartFlyAnimationFront()
+                    } else {
+                        snShip.fctMoveShipByY(deltaY)
                     }
                 }
             }
@@ -506,6 +508,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             snShip.fctStartFlyAnimationFront()
         }
         if (blGameOver == false)  && (blGameStarted == true) {
+            for touch in touches {
+                if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
+                    let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
+                    snShip.fctMoveShipByY(deltaY)
+                }
+            }
             if let location = touches.first?.locationInNode(self) {
                 let touchedNode = nodeAtPoint(location)
                 
@@ -720,6 +728,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         }
                     }
                 }
+                
                 // --- every 1s
                 if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
                     iGameTimeSec = iGameTimeSec + 1

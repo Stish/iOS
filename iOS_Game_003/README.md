@@ -4,9 +4,11 @@ ToDo
 - enemies
 - nebulas
 - random backgrounds
-- Improve controls
 - Add new game features to tutorial
 - Improve sprites
+
+ver 0.36
+- Controls improved
 
 ver 0.35
 - High score list added
