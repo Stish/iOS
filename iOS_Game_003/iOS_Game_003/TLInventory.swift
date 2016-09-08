@@ -13,6 +13,7 @@ class TLInventory: SKSpriteNode {
     var snMenuWpnLaserCone: SKSpriteNode!
     var snMenuWpnLaserSphere: SKSpriteNode!
     var snMenuWpnLaser: SKSpriteNode!
+    var snMenuBack: SKSpriteNode!
     
     init(size: CGSize) {
         //let txBackground_001 = SKTexture(imageNamed: "Media/reactor_001.png")
@@ -29,7 +30,7 @@ class TLInventory: SKSpriteNode {
         // Menu "Back" Sprite
         let flMenuBackSpriteWidth = (SKTexture(imageNamed: "Media/menu_back.png").size().width) * (self.frame.width/667.0)
         let flMenuBackSpriteHeight = (SKTexture(imageNamed: "Media/menu_back.png").size().height) * (self.frame.height/375.0)
-        let snMenuBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
+        snMenuBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
         snMenuBack.anchorPoint = CGPointMake(0.0, 0.5)
         snMenuBack.position = CGPoint(x: 1*(flScreenWidth / 16), y: 10*(flScreenHeight / 12))
         snMenuBack.zPosition = 2.2

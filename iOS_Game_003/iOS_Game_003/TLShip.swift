@@ -17,6 +17,7 @@ class TLShip: SKSpriteNode {
     var blActive = false
     var iHealth = 500
     var snShipShield: SKSpriteNode!
+    //var apThrust: AVAudioPlayer!
     
     init(size: CGSize) {
         //let taShip = SKTextureAtlas(named:"ship.atlas")
@@ -50,6 +51,16 @@ class TLShip: SKSpriteNode {
         snShipShield.zPosition = 1.1
         snShipShield.alpha = 0.0
         self.addChild(snShipShield)
+        // --- Sounds: Thrust ---
+//        let path = NSBundle.mainBundle().pathForResource("Media/sounds/thrust_002", ofType:"wav")
+//        let fileURL = NSURL(fileURLWithPath: path!)
+//        do {
+//            try apThrust = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+//        } catch {
+//            print("Could not create audio player: \(error)")
+//            return
+//        }
+//        apThrust.numberOfLoops = -1
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -60,13 +71,13 @@ class TLShip: SKSpriteNode {
         let cnt = delatY / 10
         if cnt >= 1 {
             self.fctStartFlyAnimationLeft()
-            let actMoveShipVertByY = SKAction.moveBy(CGVector.init(dx: 0, dy: 10), duration: 0.02)
+            let actMoveShipVertByY = SKAction.moveBy(CGVector.init(dx: 0, dy: 10), duration: 0.01)
             self.runAction(SKAction.repeatAction(actMoveShipVertByY, count: Int(cnt)), completion: {() in
                 self.fctStartFlyAnimationFront()
             })
         } else if cnt <= -1 {
             self.fctStartFlyAnimationRight()
-            let actMoveShipVertByY = SKAction.moveBy(CGVector.init(dx: 0, dy: -10), duration: 0.02)
+            let actMoveShipVertByY = SKAction.moveBy(CGVector.init(dx: 0, dy: -10), duration: 0.01)
             self.runAction(SKAction.repeatAction(actMoveShipVertByY, count: Int(cnt * (-1))), completion: {() in
                 self.fctStartFlyAnimationFront()
             })
@@ -81,12 +92,16 @@ class TLShip: SKSpriteNode {
     
     func fctStartFlyAnimationLeft() {
         self.removeAllActions()
+        //apThrust.prepareToPlay()
+        //apThrust.play()
         let actFlyLeft = SKAction.animateWithTextures(self.aShipFlyLeft, timePerFrame: 0.15);
         self.runAction(SKAction.repeatActionForever(actFlyLeft))
     }
     
     func fctStartFlyAnimationRight() {
         self.removeAllActions()
+        //apThrust.prepareToPlay()
+        //apThrust.play()
         let actFlyRight = SKAction.animateWithTextures(self.aShipFlyRight, timePerFrame: 0.15);
         self.runAction(SKAction.repeatActionForever(actFlyRight))
     }

@@ -8,6 +8,7 @@
 
 import SpriteKit
 import AVFoundation
+import Social
 
 // Debugging
 var strVersion = "ver 0.36"
@@ -83,7 +84,7 @@ enum enBodyType: UInt32 {
 // Debug
 var debug_LaserCnt = 0
 
-class GameScene: SKScene, SKPhysicsContactDelegate {
+class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var apBackgroundMusic: AVAudioPlayer!
     var snInterfaceLeft: SKSpriteNode!
     var snInterfaceRight: SKSpriteNode!
@@ -127,6 +128,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var lbMenuQuit: SKLabelNode!
     var lbHighscoreTextLine1: SKLabelNode!
     var lbHighscoreTextLine2: SKLabelNode!
+    var lbShareLine1: SKLabelNode!
+    var snShareTwitter: SKSpriteNode!
+    var snShareFacebook: SKSpriteNode!
+    var snGameOverBack: SKSpriteNode!
 
     override func didMoveToView(view: SKView) {
         // --- collision setup ---
@@ -358,7 +363,37 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbHighscoreTextLine2.zPosition = 2.2
         lbHighscoreTextLine2.alpha = 0.0
         self.addChild(lbHighscoreTextLine2)
-        
+        // Share line 1
+        lbShareLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lbShareLine1.text = "Share your score: "
+        lbShareLine1.horizontalAlignmentMode = .Right
+        lbShareLine1.verticalAlignmentMode = .Center
+        lbShareLine1.fontSize = 20 * (self.frame.width/667.0)
+        lbShareLine1.position = CGPoint(x: CGRectGetMidX(self.frame) - 10, y: 3.5*(self.frame.height / 12))
+        lbShareLine1.fontColor = UIColor.whiteColor()
+        lbShareLine1.zPosition = 2.2
+        lbShareLine1.alpha = 0.0
+        self.addChild(lbShareLine1)
+        // Share "Twitter" Sprite
+        let flShareTwitterWidth = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().width) * (self.frame.width/667.0) / 2.5
+        let flShareTwitterHeight = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().height) * (self.frame.height/375.0) / 2.5
+        snShareTwitter = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_twitter.png"), color: UIColor.clearColor(), size: CGSizeMake(flShareTwitterWidth, flShareTwitterHeight))
+        snShareTwitter.anchorPoint = CGPointMake(0.0, 0.5)
+        snShareTwitter.position = CGPoint(x: CGRectGetMidX(self.frame) + 10, y: 3.5*(self.frame.height / 12))
+        snShareTwitter.zPosition = 2.2
+        snShareTwitter.alpha = 0.0
+        snShareTwitter.name = "ShareTwitter"
+        self.addChild(snShareTwitter)
+        // Share "Facebook" Sprite
+        let flShareFacebookWidth = (SKTexture(imageNamed: "Media/about_icon_facebook.png").size().width) * (self.frame.width/667.0) / 2.5
+        let flShareFacebookHeight = (SKTexture(imageNamed: "Media/about_icon_facebook.png").size().height) * (self.frame.height/375.0) / 2.5
+        snShareFacebook = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_facebook.png"), color: UIColor.clearColor(), size: CGSizeMake(flShareFacebookWidth, flShareFacebookHeight))
+        snShareFacebook.anchorPoint = CGPointMake(0.0, 0.5)
+        snShareFacebook.position = CGPoint(x: CGRectGetMidX(self.frame) + 70, y: 3.5*(self.frame.height / 12))
+        snShareFacebook.zPosition = 2.2
+        snShareFacebook.alpha = 0.0
+        snShareFacebook.name = "ShareFacebook"
+        self.addChild(snShareFacebook)
         // --- Sounds: Click ---
         let path = NSBundle.mainBundle().pathForResource("Media/sounds/click_001", ofType:"wav")
         let fileURL = NSURL(fileURLWithPath: path!)
@@ -438,18 +473,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
                 
             }
-            if (blGameOver == true) && (iGameRestartCnt >= 7) {
-                snShip.removeFromParent()
-                //fctNewGame()
-                let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.3)
-                
-                let nextScene = TLGameMenu(size: self.scene!.size)
-                nextScene.scaleMode = .AspectFill
-                
-                self.scene?.view?.presentScene(nextScene, transition: transition)
-                //fctNewGame()
-                //self.delete(self)
-                fctNewGame()
+            if (blGameOver == true) {
+                if let location = touches.first?.locationInNode(self) {
+                    let touchedNode = nodeAtPoint(location)
+                    
+                    switch (touchedNode.name) {
+                    case "ShareTwitter"?:
+                        iButtonPressed = 8
+                        fctPlayClickSound()
+                    case "ShareFacebook"?:
+                        iButtonPressed = 9
+                        fctPlayClickSound()
+                    case "GameOverBack"?:
+                        iButtonPressed = 10
+                        snGameOverBack.texture = SKTexture(imageNamed: "Media/menu_back_pressed.png")
+                        fctPlayClickSound()
+                    default:
+                        ()
+                    }
+                }
             }
         } else {
             if let location = touches.first?.locationInNode(self) {
@@ -458,9 +500,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 switch (touchedNode.name) {
                 case "MenuBack"?:
                     iButtonPressed = 3
+                    if snMenuBack != nil {
+                        snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back_pressed.png")
+                    }
+                    if snInventory != nil {
+                        snInventory.snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back_pressed.png")
+                    }
                     fctPlayClickSound()
                 case "MenuQuit"?:
                     iButtonPressed = 4
+                    snMenuQuit.texture = SKTexture(imageNamed: "Media/menu_bottom_pressed.png")
+                    lbMenuQuit.fontColor = UIColor.blackColor()
                     fctPlayClickSound()
                 case "MenuWpnLaserCone"?:
                     if blLaserConePickedUp == true {
@@ -483,7 +533,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if (blGameOver == false) && (blGameStarted == true) {
+        if (blGameOver == false) && (blGameStarted == true) && (self.speed > 0.0) {
             for touch in touches {
                 if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
                     let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
@@ -504,14 +554,65 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        // Reset pressed sprites
+        if snMenuBack != nil {
+            snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back.png")
+        }
+        if snMenuQuit != nil {
+            snMenuQuit.texture = SKTexture(imageNamed: "Media/menu_bottom.png")
+        }
+        if lbMenuQuit != nil {
+            lbMenuQuit.fontColor = UIColor.whiteColor()
+        }
+        if snGameOverBack != nil {
+            snGameOverBack.texture = SKTexture(imageNamed: "Media/menu_back.png")
+        }
+        if snInventory != nil {
+            snInventory.snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back.png")
+        }
+        // Screen elements
         if (blGameOver == false)  && (blGameStarted == true) {
             snShip.fctStartFlyAnimationFront()
         }
+        if (blGameOver == true) {
+            if let location = touches.first?.locationInNode(self) {
+                let touchedNode = nodeAtPoint(location)
+                
+                switch (touchedNode.name) {
+                case "ShareTwitter"?:
+                    if (iButtonPressed == 8) {
+                        shareToTwitter()
+                    }
+                case "ShareFacebook"?:
+                    if (iButtonPressed == 9) {
+                        shareToFacebook()
+                    }
+                case "GameOverBack"?:
+                    if (iButtonPressed == 10) {
+                        snShip.removeFromParent()
+                        //fctNewGame()
+                        let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.3)
+                        
+                        let nextScene = TLGameMenu(size: self.scene!.size)
+                        nextScene.scaleMode = .AspectFill
+                        
+                        self.scene?.view?.presentScene(nextScene, transition: transition)
+                        //fctNewGame()
+                        //self.delete(self)
+                        fctNewGame()
+                    }
+                default:
+                    ()
+                }
+            }
+        }
         if (blGameOver == false)  && (blGameStarted == true) {
-            for touch in touches {
-                if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
-                    let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
-                    snShip.fctMoveShipByY(deltaY)
+            if self.speed > 0.0 {
+                for touch in touches {
+                    if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
+                        let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
+                        snShip.fctMoveShipByY(deltaY)
+                    }
                 }
             }
             if let location = touches.first?.locationInNode(self) {
@@ -868,19 +969,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
@@ -1078,19 +1179,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
@@ -1118,19 +1219,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             if aSnmeteorite[i].iHealth <= 0 {
                                 if aSnmeteorite[i].iPowerUp > 0 {
                                     if aSnPowerUp.count == 0 {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[0].blActive = false
                                     }
                                     allElements: for j in 0 ..< aSnPowerUp.count {
                                         if aSnPowerUp[j].blActive == false {
-                                            aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                            aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                             aSnPowerUp[j].blActive = true
                                             addChild(aSnPowerUp[j])
                                             aSnPowerUp[j].fctMoveLeft()
                                             break allElements
                                         }
                                         if j == (aSnPowerUp.count - 1) {
-                                            aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                            aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                             aSnPowerUp[j+1].blActive = true
                                             addChild(aSnPowerUp[j+1])
                                             aSnPowerUp[j+1].fctMoveLeft()
@@ -1180,19 +1281,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
@@ -1217,19 +1318,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
@@ -1285,8 +1386,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         lbGameOver.fontSize = 70 * (self.frame.width/667.0)
         lbGameOver.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame) - (lbGameOver.frame.size.height/2))
         lbGameOver.fontColor = UIColor.whiteColor()
-        lbGameOver.zPosition = 2.0
+        lbGameOver.zPosition = 2.2
         self.addChild(lbGameOver)
+        // Pause screen sprite
+        snPause = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
+        snPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+        snPause.strokeColor = SKColor.blackColor()
+        snPause.glowWidth = 0.0
+        snPause.lineWidth = 0.0
+        snPause.fillColor = SKColor.blackColor()
+        snPause.zPosition = 2.1
+        snPause.alpha = 0.7
+        self.addChild(snPause)
+        // Menu "Back" Sprite
+        let flMenuBackSpriteWidth = (SKTexture(imageNamed: "Media/menu_back.png").size().width) * (self.frame.width/667.0)
+        let flMenuBackSpriteHeight = (SKTexture(imageNamed: "Media/menu_back.png").size().height) * (self.frame.height/375.0)
+        snGameOverBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
+        snGameOverBack.anchorPoint = CGPointMake(0.0, 0.5)
+        snGameOverBack.position = CGPoint(x: 1*(self.frame.width / 16), y: 10*(self.frame.height / 12))
+        snGameOverBack.zPosition = 2.2
+        snGameOverBack.alpha = 1.0
+        snGameOverBack.name = "GameOverBack"
+        self.addChild(snGameOverBack)
         
         for i in 0 ..< aSnmeteorite.count {
             aSnmeteorite[i].physicsBody?.categoryBitMask = 0
@@ -1407,6 +1528,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func fctCheckForNewHighscore () {
         var blNewHighscoreScore = false
         var blNewHighscoreTime = false
+        
+        lbShareLine1.alpha = 1.0
+        snShareTwitter.alpha = 1.0
+        snShareFacebook.alpha = 1.0
         // Check for new highscores based on score
         for row in 0...aSkHighscoresRows - 1 {
             if GameData.aHighscoresScore[row].iScore < iGameScore {
@@ -1458,7 +1583,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func fctSaveHighscoreData () {
+    func fctSaveHighscoreData() {
         // Build strHighscoreTime string out of highscores
         var strBuffer = ""
         for row in 0...aSkHighscoresRows - 1 {
@@ -1485,10 +1610,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
     }
     
+    func fctTweetScore() {
+        if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) {
+            // 2
+            var tweetSheet = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
+            // 3
+            tweetSheet.setInitialText("Test Tweet")
+            self.view?.window?.rootViewController?.presentViewController(tweetSheet, animated: true, completion: nil)
+        } else {
+            // 5
+            print("error")
+        }
+    }
+    
     func applicationWillResignActive(notification: NSNotification) {
         //print("I'm out of focus!")
-        snPause.zPosition = 2.1
-        lbPause.zPosition = 2.1
+        if snPause != nil {
+            snPause.zPosition = 2.1
+        }
+        if lbPause != nil {
+            lbPause.zPosition = 2.1
+        }
         //snInventory.zPosition = 2.2
         self.speed = 0.0
         //self.view!.paused = true

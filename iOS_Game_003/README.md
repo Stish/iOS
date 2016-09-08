@@ -7,6 +7,12 @@ ToDo
 - Add new game features to tutorial
 - Improve sprites
 
+ver 0.37
+- Score can be tweeted on Twitter
+- Score can be tweeted on Facebook
+- New sprites for power ups
+- Back button texture problem
+
 ver 0.36
 - Controls improved
 

@@ -200,7 +200,13 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         super.touchesBegan(touches, withEvent: event)
-        
+        // Reset pressed sprites
+        snMenuPlay.texture = SKTexture(imageNamed: "Media/menu_top.png")
+        snMenuTutorial.texture = SKTexture(imageNamed: "Media/menu_middle.png")
+        snMenuOptions.texture = SKTexture(imageNamed: "Media/menu_middle.png")
+        snMenuHighScore.texture = SKTexture(imageNamed: "Media/menu_middle.png")
+        snMenuAbout.texture = SKTexture(imageNamed: "Media/menu_bottom.png")
+        // Screen elements
         if let location = touches.first?.locationInNode(self) {
             let touchedNode = nodeAtPoint(location)
             
