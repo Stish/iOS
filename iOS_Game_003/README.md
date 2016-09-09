@@ -3,15 +3,22 @@
 ToDo
 - enemies
 - nebulas
-- random backgrounds
 - Add new game features to tutorial
 - Improve sprites
+- Different ship sprites?
+- Achievements?
+
+ver 0.38
+- New ship sprites
+- Options can be changed from "Pause" menu
+- Pause layout and functions moved to TLPause
+- New app icon based on new ship design
 
 ver 0.37
 - Score can be tweeted on Twitter
 - Score can be tweeted on Facebook
 - New sprites for power ups
-- Back button texture problem
+- Back button texture problem solved
 
 ver 0.36
 - Controls improved

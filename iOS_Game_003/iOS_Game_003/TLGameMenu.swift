@@ -214,9 +214,9 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
             case "MenuPlay"?:
                 if iButtonPressed == 1 {
                     let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.4)
-                    let nextScene = GameScene(size: scene!.size)
-                    nextScene.scaleMode = .AspectFill
-                    scene?.view?.presentScene(nextScene, transition: transition)
+                    gzGame = GameScene(size: scene!.size)
+                    gzGame.scaleMode = .AspectFill
+                    scene?.view?.presentScene(gzGame, transition: transition)
                     self.removeFromParent()
                 }
             case "MenuTutorial"?:

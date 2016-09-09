@@ -267,6 +267,11 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
                     GameData.flMusicVolume = 1.0
                     //print(GameData.flMusicVolume) // #debug
                 }
+                if blGameStarted == true {
+                    if gzGame.apBackgroundMusic != nil {
+                     gzGame.apBackgroundMusic.volume = GameData.flMusicVolume
+                    }
+                }
             }
         }
         if iButtonPressed == 5 {
@@ -310,10 +315,18 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
                     fctSaveGameData()
                     tfPlayerName.removeFromSuperview()
                     let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
-                    let nextScene = TLGameMenu(size: scene!.size)
-                    nextScene.scaleMode = .AspectFill
-                    scene?.view?.presentScene(nextScene, transition: transition)
-                    self.removeFromParent()
+                    
+                    if blGameStarted == false {
+                        let nextScene = TLGameMenu(size: scene!.size)
+                        nextScene.scaleMode = .AspectFill
+                        scene?.view?.presentScene(nextScene, transition: transition)
+                    } else {
+                        let nextScene = gzGame
+                        nextScene.scaleMode = .AspectFill
+                        scene?.view?.presentScene(nextScene, transition: transition)
+                    }
+                    
+                    //self.view?.presentScene(nil)
                 }
             case "OptMusicCheckbox"?:
                 if iButtonPressed == 2 {
@@ -323,6 +336,9 @@ class TLGameMenuOptions: SKScene, SKPhysicsContactDelegate, UITextFieldDelegate 
                     } else {
                         GameData.blMusicEnabled = true
                         snOptMusicCheckbox.texture = SKTexture(imageNamed: "Media/checkbox_checked.png")
+                    }
+                    if blGameStarted == true {
+                        gzGame.fctPlayBackgroundMusic()
                     }
                 }
             case "OptSoundsCheckbox"?:

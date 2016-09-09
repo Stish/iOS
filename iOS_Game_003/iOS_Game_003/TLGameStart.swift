@@ -9,6 +9,8 @@
 import SpriteKit
 import AVFoundation
 
+var gzGame: GameScene!
+
 class TLGameStart: SKScene, SKPhysicsContactDelegate {
     
     override func didMoveToView(view: SKView) {

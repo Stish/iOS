@@ -107,6 +107,7 @@ extension TLSocial where Self: SKScene {
         
         let text = TextString.shareSheetText //
         facebookSheet.setInitialText(text) // share sheet text for twitter will not work anymore if app is installed
+        facebookSheet.addURL(NSURL(string: text))
         self.view?.window?.rootViewController?.presentViewController(facebookSheet, animated: true, completion: nil)
     }
     

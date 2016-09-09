@@ -11,7 +11,7 @@ import AVFoundation
 import Social
 
 // Debugging
-var strVersion = "ver 0.36"
+var strVersion = "ver 0.38"
 var blGameTest = false
 var blResetGameData = false
 // --- Game positions ---
@@ -115,303 +115,301 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var snPowerUpInvFrame: SKSpriteNode!
     var snPowerUpInv: SKSpriteNode!
     var lbPowerUpInv: SKLabelNode!
-    var snPause: SKShapeNode!
-    var lbPause: SKLabelNode!
     var flTouchMoveDist: CGFloat!
     var snBombFired: TLBomb!
     var snNebula: TLNebula!
     var snInventory: TLInventory!
     var iButtonPressed: Int!
     var apClick: AVAudioPlayer!
-    var snMenuBack: SKSpriteNode!
-    var snMenuQuit: SKSpriteNode!
-    var lbMenuQuit: SKLabelNode!
     var lbHighscoreTextLine1: SKLabelNode!
     var lbHighscoreTextLine2: SKLabelNode!
     var lbShareLine1: SKLabelNode!
     var snShareTwitter: SKSpriteNode!
     var snShareFacebook: SKSpriteNode!
     var snGameOverBack: SKSpriteNode!
+    var snPause: TLPause!
 
     override func didMoveToView(view: SKView) {
-        // --- collision setup ---
-        physicsWorld.contactDelegate = self
-        view.showsPhysics = false // #debug
-        view.showsFPS = true
-        // --- explosion sprites ---
-        //let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
-        aExplosion_01.removeAll()
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_001"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_002"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_003"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_004"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_005"))
-        aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_006"))
-        
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
-        }
+        if blGameStarted == false {
+            // --- collision setup ---
+            physicsWorld.contactDelegate = self
+            view.showsPhysics = false // #debug
+            view.showsFPS = true
+            // --- explosion sprites ---
+            //let taExplosion_01 = SKTextureAtlas(named:"explosion.atlas")
+            aExplosion_01.removeAll()
+            aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_001"))
+            aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_002"))
+            aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_003"))
+            aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_004"))
+            aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_005"))
+            aExplosion_01.append(SKTexture(imageNamed: "Media/explosion.atlas/explosion_03_006"))
+            
+            do {
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
 
-        // Game settings
-        flmeteoriteSizeMax = CGFloat(120) * (self.frame.height/375.0)
-        flmeteoriteSizeMin = CGFloat(50) * (self.frame.height/375.0)
-        flShipSizeWidth = CGFloat(70) * (self.frame.width/667.0)
-        flShipSizeHeight = CGFloat(62) * (self.frame.height/375.0)
-        //
-        iSelectedWeapon = 0
-        flmeteoriteSpeed = flmeteoriteSpeedInit
-        imeteoriteSpawnTime = imeteoriteSpawnTimeInit
-        blBombFired = false
-        flTouchMoveDist = 1000
-        iGameTimeSec = 0
-        iTimeSec = 0
-        iTime100ms = 0
-        iTime10ms = 0
-        iLaserShootingPause = 0
-        iLaserSphereShootingPause = 0
-        iLaserConeShootingPause = 0
-        iGameRestartCnt = 0
-        iBombCount = 0
-        flScreenWidth = view.frame.size.width
-        flScreenHeight = view.frame.size.height
-        iButtonPressed = 0
-        
-        self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
-        self.anchorPoint = CGPointMake(0, 0)
-        
-        snBackground = TLBackground(size: CGSizeMake(view.frame.width, view.frame.height))
-        self.anchorPoint = CGPointMake(0.0, 0.0)
-        //snGameMap.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-        snBackground.position = CGPoint(x: 0, y: 0)
-        addChild(snBackground)
-        
-//        snNebula = TLNebula(size: CGSizeMake(view.frame.width, view.frame.height))
-//        snNebula.position = CGPoint(x: 0, y: 0)
-//        addChild(snNebula)
+            // Game settings
+            flmeteoriteSizeMax = CGFloat(120) * (self.frame.height/375.0)
+            flmeteoriteSizeMin = CGFloat(50) * (self.frame.height/375.0)
+            flShipSizeWidth = CGFloat(70) * (self.frame.width/667.0)
+            flShipSizeHeight = CGFloat(62) * (self.frame.height/375.0)
+            //
+            iSelectedWeapon = 0
+            flmeteoriteSpeed = flmeteoriteSpeedInit
+            imeteoriteSpawnTime = imeteoriteSpawnTimeInit
+            blBombFired = false
+            flTouchMoveDist = 1000
+            iGameTimeSec = 0
+            iTimeSec = 0
+            iTime100ms = 0
+            iTime10ms = 0
+            iLaserShootingPause = 0
+            iLaserSphereShootingPause = 0
+            iLaserConeShootingPause = 0
+            iGameRestartCnt = 0
+            iBombCount = 0
+            flScreenWidth = view.frame.size.width
+            flScreenHeight = view.frame.size.height
+            iButtonPressed = 0
+            
+            self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
+            self.anchorPoint = CGPointMake(0, 0)
+            
+            snBackground = TLBackground(size: CGSizeMake(view.frame.width, view.frame.height))
+            self.anchorPoint = CGPointMake(0.0, 0.0)
+            //snGameMap.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+            snBackground.position = CGPoint(x: 0, y: 0)
+            addChild(snBackground)
+            
+    //        snNebula = TLNebula(size: CGSizeMake(view.frame.width, view.frame.height))
+    //        snNebula.position = CGPoint(x: 0, y: 0)
+    //        addChild(snNebula)
 
-        snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
-        snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
-        flShipPosX = snShip.position.x
-        flShipPosY = snShip.position.y
-        snShip.iHealth = 500
-        addChild(snShip)
+            snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
+            snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
+            flShipPosX = snShip.position.x
+            flShipPosY = snShip.position.y
+            snShip.iHealth = 500
+            addChild(snShip)
 
-        myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        myLabel.text = "TOUCH TO START"
-        myLabel.fontSize = 40 * (self.frame.width/667.0)
-        myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - (myLabel.frame.size.height/2))
-        myLabel.fontColor = UIColor.whiteColor()
-        self.addChild(myLabel)
-        myLabel.zPosition = 2.0
-        
-        // --- Interface ---
-        // Game score
-        lbGameScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbGameScore.text = "0"
-        lbGameScore.fontSize = 22 * (self.frame.width/667.0)
-        lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + (216  * (self.frame.width/667.0)), y: 14 * (self.frame.height/375.0))
-        lbGameScore.fontColor = UIColor.orangeColor()
-        lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
-        lbGameScore.zPosition = 2.0
-        self.addChild(lbGameScore)
-        // HUD sprites
-        let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_003.png"), color: UIColor.clearColor(), size: CGSizeMake(470 * (self.frame.width/667.0), 60 * (self.frame.height/375.0)))
-        snHud.anchorPoint = CGPointMake(0.5, 0)
-        snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3 * (self.frame.height/375.0))
-        snHud.zPosition = 2.0
-        snHud.alpha = 0.75
-        addChild(snHud)
-        // Game time
-        lbGameTime = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbGameTime.text = "0"
-        lbGameTime.fontSize = 20 * (self.frame.width/667.0)
-        lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 24 * (self.frame.height/375.0))
-        lbGameTime.fontColor = UIColor(red: 102/255.0, green: 255/255.0, blue: 255/255.0, alpha: 1.0)
-        lbGameTime.zPosition = 2.0
-        self.addChild(lbGameTime)
-        // Shields
-        // Menu sprite size
-        let flShieldSprite1Width = (SKTexture(imageNamed: "Media/shield_point_001.png").size().width) * (self.frame.width/667.0)
-        let flShieldSprite1Height = (SKTexture(imageNamed: "Media/shield_point_001.png").size().height) * (self.frame.height/375.0)
-        let flShieldSprite2Width = (SKTexture(imageNamed: "Media/shield_point_002.png").size().width) * (self.frame.width/667.0)
-        let flShieldSprite2Height = (SKTexture(imageNamed: "Media/shield_point_002.png").size().height) * (self.frame.height/375.0)
-        // Shield bar 1
-        snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite1Width, flShieldSprite1Height))
-        snShieldBar1.anchorPoint = CGPointMake(0.0, 0.5)
-        snShieldBar1.position = CGPoint(x: CGRectGetMidX(self.frame) - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-        snShieldBar1.zPosition = 2.0
-        snShieldBar1.alpha = 1.0
-        self.addChild(snShieldBar1)
-        // Shield bar 2
-        snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
-        snShieldBar2.anchorPoint = CGPointMake(0.0, 0.5)
-        snShieldBar2.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-        snShieldBar2.zPosition = 2.0
-        snShieldBar2.alpha = 1.0
-        self.addChild(snShieldBar2)
-        // Shield bar 3
-        snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
-        snShieldBar3.anchorPoint = CGPointMake(0.0, 0.5)
-        snShieldBar3.position = CGPoint(x: CGRectGetMidX(self.frame) - (136 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-        snShieldBar3.zPosition = 2.0
-        snShieldBar3.alpha = 1.0
-        self.addChild(snShieldBar3)
-        // Shield bar 4
-        snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
-        snShieldBar4.anchorPoint = CGPointMake(0.0, 0.5)
-        snShieldBar4.position = CGPoint(x: CGRectGetMidX(self.frame) - (92 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-        snShieldBar4.zPosition = 2.0
-        snShieldBar4.alpha = 1.0
-        self.addChild(snShieldBar4)
-        fctUpdateShields()
-        // Bombs
-        let flBombWidth = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().width) * (self.frame.width/667.0)
-        let flBombHeight = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().height) * (self.frame.height/375.0)
-        // Bomb 1
-        snBomb1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
-        snBomb1.anchorPoint = CGPointMake(0.5, 0.5)
-        snBomb1.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
-        snBomb1.zPosition = 2.0
-        snBomb1.alpha = 1.0
-        self.addChild(snBomb1)
-        // Bomb 2
-        snBomb2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
-        snBomb2.anchorPoint = CGPointMake(0.5, 0.5)
-        snBomb2.position = CGPoint(x: CGRectGetMidX(self.frame) - (145 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
-        snBomb2.zPosition = 2.0
-        snBomb2.alpha = 1.0
-        self.addChild(snBomb2)
-        // Bomb 3
-        snBomb3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
-        snBomb3.anchorPoint = CGPointMake(0.5, 0.5)
-        snBomb3.position = CGPoint(x: CGRectGetMidX(self.frame) - (110 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
-        snBomb3.zPosition = 2.0
-        snBomb3.alpha = 1.0
-        self.addChild(snBomb3)
-        // Menus
-        let flMenuWidth = (SKTexture(imageNamed: "Media/hud_pause.png").size().width) * (self.frame.width/667.0) * 0.85
-        let flMenuHeight = (SKTexture(imageNamed: "Media/hud_pause.png").size().height) * (self.frame.height/375.0) * 0.85
-        // Pause menu
-        snMenuPause = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_pause.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuWidth, flMenuHeight))
-        snMenuPause.anchorPoint = CGPointMake(1.0, 1.0)
-        snMenuPause.position = CGPoint(x: CGRectGetMidX(self.frame) - (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
-        snMenuPause.zPosition = 2.0
-        snMenuPause.alpha = 0.75
-        snMenuPause.name = "MenuPause"
-        self.addChild(snMenuPause)
-        // Weapons menu
-        snMenuWeapons = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_weapons.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuWidth, flMenuHeight))
-        snMenuWeapons.anchorPoint = CGPointMake(0.0, 1.0)
-        snMenuWeapons.position = CGPoint(x: CGRectGetMidX(self.frame) + (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
-        snMenuWeapons.zPosition = 2.0
-        snMenuWeapons.alpha = 0.75
-        snMenuWeapons.name = "MenuWeapons"
-        self.addChild(snMenuWeapons)
-        // "Power up to inventory" frame sprite
-        let flOptCheckboxWidth = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().width) * (self.frame.width/667.0)
-        let flOptCheckboxHeight = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().height) * (self.frame.height/375.0)
-        snPowerUpInvFrame = SKSpriteNode(texture: SKTexture(imageNamed: "Media/checkbox_unchecked.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptCheckboxWidth, flOptCheckboxHeight))
-        snPowerUpInvFrame.anchorPoint = CGPointMake(0.5, 0.5)
-        snPowerUpInvFrame.position = CGPoint(x: self.frame.width - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0)), y: self.frame.height - (flOptCheckboxHeight/2) - (5 * (self.frame.height/375.0)))
-        snPowerUpInvFrame.zPosition = 2.0
-        snPowerUpInvFrame.alpha = 0.0
-        self.addChild(snPowerUpInvFrame)
-        // "Power up to inventory" item sprite
-        let flPowerUpWidth = (SKTexture(imageNamed: "Media/pu_bomb_001.png").size().width) * (self.frame.width/667.0)
-        let flPowerUpHeight = (SKTexture(imageNamed: "Media/pu_bomb_001.png").size().height) * (self.frame.height/375.0)
-        snPowerUpInv = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flPowerUpWidth, flPowerUpHeight))
-        snPowerUpInv.anchorPoint = CGPointMake(0.5, 0.5)
-        snPowerUpInv.position = snPowerUpInvFrame.position
-        snPowerUpInv.zPosition = 2.0
-        snPowerUpInv.alpha = 0.0
-        self.addChild(snPowerUpInv)
-        // "Power up to inventory" text
-        lbPowerUpInv = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
-        lbPowerUpInv.text = ""
-        lbPowerUpInv.horizontalAlignmentMode = .Right
-        lbPowerUpInv.verticalAlignmentMode = .Center
-        lbPowerUpInv.fontSize = 17 * (self.frame.width/667.0)
-        lbPowerUpInv.position = snPowerUpInvFrame.position
-        lbPowerUpInv.position.x = lbPowerUpInv.position.x - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0))
-        lbPowerUpInv.fontColor = UIColor.whiteColor()
-        lbPowerUpInv.zPosition = 2.0
-        lbPowerUpInv.alpha = 0.0
-        self.addChild(lbPowerUpInv)
-        // Highscore text line 1
-        lbHighscoreTextLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
-        lbHighscoreTextLine1.text = ""
-        lbHighscoreTextLine1.horizontalAlignmentMode = .Center
-        lbHighscoreTextLine1.verticalAlignmentMode = .Center
-        lbHighscoreTextLine1.fontSize = 20 * (self.frame.width/667.0)
-        lbHighscoreTextLine1.position = CGPoint(x: CGRectGetMidX(self.frame), y: 9*(self.frame.height / 12))
-        lbHighscoreTextLine1.fontColor = UIColor.whiteColor()
-        lbHighscoreTextLine1.zPosition = 2.2
-        lbHighscoreTextLine1.alpha = 0.0
-        self.addChild(lbHighscoreTextLine1)
-        // Highscore text line 2
-        lbHighscoreTextLine2 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
-        lbHighscoreTextLine2.text = ""
-        lbHighscoreTextLine2.horizontalAlignmentMode = .Center
-        lbHighscoreTextLine2.verticalAlignmentMode = .Center
-        lbHighscoreTextLine2.fontSize = 20 * (self.frame.width/667.0)
-        lbHighscoreTextLine2.position = CGPoint(x: CGRectGetMidX(self.frame), y: 8*(self.frame.height / 12))
-        lbHighscoreTextLine2.fontColor = UIColor.whiteColor()
-        lbHighscoreTextLine2.zPosition = 2.2
-        lbHighscoreTextLine2.alpha = 0.0
-        self.addChild(lbHighscoreTextLine2)
-        // Share line 1
-        lbShareLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
-        lbShareLine1.text = "Share your score: "
-        lbShareLine1.horizontalAlignmentMode = .Right
-        lbShareLine1.verticalAlignmentMode = .Center
-        lbShareLine1.fontSize = 20 * (self.frame.width/667.0)
-        lbShareLine1.position = CGPoint(x: CGRectGetMidX(self.frame) - 10, y: 3.5*(self.frame.height / 12))
-        lbShareLine1.fontColor = UIColor.whiteColor()
-        lbShareLine1.zPosition = 2.2
-        lbShareLine1.alpha = 0.0
-        self.addChild(lbShareLine1)
-        // Share "Twitter" Sprite
-        let flShareTwitterWidth = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().width) * (self.frame.width/667.0) / 2.5
-        let flShareTwitterHeight = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().height) * (self.frame.height/375.0) / 2.5
-        snShareTwitter = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_twitter.png"), color: UIColor.clearColor(), size: CGSizeMake(flShareTwitterWidth, flShareTwitterHeight))
-        snShareTwitter.anchorPoint = CGPointMake(0.0, 0.5)
-        snShareTwitter.position = CGPoint(x: CGRectGetMidX(self.frame) + 10, y: 3.5*(self.frame.height / 12))
-        snShareTwitter.zPosition = 2.2
-        snShareTwitter.alpha = 0.0
-        snShareTwitter.name = "ShareTwitter"
-        self.addChild(snShareTwitter)
-        // Share "Facebook" Sprite
-        let flShareFacebookWidth = (SKTexture(imageNamed: "Media/about_icon_facebook.png").size().width) * (self.frame.width/667.0) / 2.5
-        let flShareFacebookHeight = (SKTexture(imageNamed: "Media/about_icon_facebook.png").size().height) * (self.frame.height/375.0) / 2.5
-        snShareFacebook = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_facebook.png"), color: UIColor.clearColor(), size: CGSizeMake(flShareFacebookWidth, flShareFacebookHeight))
-        snShareFacebook.anchorPoint = CGPointMake(0.0, 0.5)
-        snShareFacebook.position = CGPoint(x: CGRectGetMidX(self.frame) + 70, y: 3.5*(self.frame.height / 12))
-        snShareFacebook.zPosition = 2.2
-        snShareFacebook.alpha = 0.0
-        snShareFacebook.name = "ShareFacebook"
-        self.addChild(snShareFacebook)
-        // --- Sounds: Click ---
-        let path = NSBundle.mainBundle().pathForResource("Media/sounds/click_001", ofType:"wav")
-        let fileURL = NSURL(fileURLWithPath: path!)
-        do {
-            try apClick = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
-        } catch {
-            print("Could not create audio player: \(error)")
-            return
-        }
-        apClick.numberOfLoops = 0
-        // Home button settings
-        NSNotificationCenter.defaultCenter().addObserver(
-            self,
-            selector: "applicationWillResignActive:",
-            name: UIApplicationWillResignActiveNotification,
-            object: nil)
-        
-        fctNewGame()
+            myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
+            myLabel.text = "TOUCH TO START"
+            myLabel.fontSize = 40 * (self.frame.width/667.0)
+            myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - (myLabel.frame.size.height/2))
+            myLabel.fontColor = UIColor.whiteColor()
+            self.addChild(myLabel)
+            myLabel.zPosition = 2.0
+            
+            // --- Interface ---
+            // Game score
+            lbGameScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
+            lbGameScore.text = "0"
+            lbGameScore.fontSize = 22 * (self.frame.width/667.0)
+            lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + (216  * (self.frame.width/667.0)), y: 14 * (self.frame.height/375.0))
+            lbGameScore.fontColor = UIColor.orangeColor()
+            lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
+            lbGameScore.zPosition = 2.0
+            self.addChild(lbGameScore)
+            // HUD sprites
+            let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_003.png"), color: UIColor.clearColor(), size: CGSizeMake(470 * (self.frame.width/667.0), 60 * (self.frame.height/375.0)))
+            snHud.anchorPoint = CGPointMake(0.5, 0)
+            snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3 * (self.frame.height/375.0))
+            snHud.zPosition = 2.0
+            snHud.alpha = 0.75
+            addChild(snHud)
+            // Game time
+            lbGameTime = SKLabelNode(fontNamed: fnGameFont?.fontName)
+            lbGameTime.text = "0"
+            lbGameTime.fontSize = 20 * (self.frame.width/667.0)
+            lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 24 * (self.frame.height/375.0))
+            lbGameTime.fontColor = UIColor(red: 102/255.0, green: 255/255.0, blue: 255/255.0, alpha: 1.0)
+            lbGameTime.zPosition = 2.0
+            self.addChild(lbGameTime)
+            // Shields
+            // Menu sprite size
+            let flShieldSprite1Width = (SKTexture(imageNamed: "Media/shield_point_001.png").size().width) * (self.frame.width/667.0)
+            let flShieldSprite1Height = (SKTexture(imageNamed: "Media/shield_point_001.png").size().height) * (self.frame.height/375.0)
+            let flShieldSprite2Width = (SKTexture(imageNamed: "Media/shield_point_002.png").size().width) * (self.frame.width/667.0)
+            let flShieldSprite2Height = (SKTexture(imageNamed: "Media/shield_point_002.png").size().height) * (self.frame.height/375.0)
+            // Shield bar 1
+            snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite1Width, flShieldSprite1Height))
+            snShieldBar1.anchorPoint = CGPointMake(0.0, 0.5)
+            snShieldBar1.position = CGPoint(x: CGRectGetMidX(self.frame) - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+            snShieldBar1.zPosition = 2.0
+            snShieldBar1.alpha = 1.0
+            self.addChild(snShieldBar1)
+            // Shield bar 2
+            snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
+            snShieldBar2.anchorPoint = CGPointMake(0.0, 0.5)
+            snShieldBar2.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+            snShieldBar2.zPosition = 2.0
+            snShieldBar2.alpha = 1.0
+            self.addChild(snShieldBar2)
+            // Shield bar 3
+            snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
+            snShieldBar3.anchorPoint = CGPointMake(0.0, 0.5)
+            snShieldBar3.position = CGPoint(x: CGRectGetMidX(self.frame) - (136 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+            snShieldBar3.zPosition = 2.0
+            snShieldBar3.alpha = 1.0
+            self.addChild(snShieldBar3)
+            // Shield bar 4
+            snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
+            snShieldBar4.anchorPoint = CGPointMake(0.0, 0.5)
+            snShieldBar4.position = CGPoint(x: CGRectGetMidX(self.frame) - (92 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+            snShieldBar4.zPosition = 2.0
+            snShieldBar4.alpha = 1.0
+            self.addChild(snShieldBar4)
+            fctUpdateShields()
+            // Bombs
+            let flBombWidth = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().width) * (self.frame.width/667.0)
+            let flBombHeight = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().height) * (self.frame.height/375.0)
+            // Bomb 1
+            snBomb1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+            snBomb1.anchorPoint = CGPointMake(0.5, 0.5)
+            snBomb1.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+            snBomb1.zPosition = 2.0
+            snBomb1.alpha = 1.0
+            self.addChild(snBomb1)
+            // Bomb 2
+            snBomb2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+            snBomb2.anchorPoint = CGPointMake(0.5, 0.5)
+            snBomb2.position = CGPoint(x: CGRectGetMidX(self.frame) - (145 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+            snBomb2.zPosition = 2.0
+            snBomb2.alpha = 1.0
+            self.addChild(snBomb2)
+            // Bomb 3
+            snBomb3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
+            snBomb3.anchorPoint = CGPointMake(0.5, 0.5)
+            snBomb3.position = CGPoint(x: CGRectGetMidX(self.frame) - (110 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+            snBomb3.zPosition = 2.0
+            snBomb3.alpha = 1.0
+            self.addChild(snBomb3)
+            // Menus
+            let flMenuWidth = (SKTexture(imageNamed: "Media/hud_pause.png").size().width) * (self.frame.width/667.0) * 0.85
+            let flMenuHeight = (SKTexture(imageNamed: "Media/hud_pause.png").size().height) * (self.frame.height/375.0) * 0.85
+            // Pause menu
+            snMenuPause = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_pause.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuWidth, flMenuHeight))
+            snMenuPause.anchorPoint = CGPointMake(1.0, 1.0)
+            snMenuPause.position = CGPoint(x: CGRectGetMidX(self.frame) - (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
+            snMenuPause.zPosition = 2.0
+            snMenuPause.alpha = 0.75
+            snMenuPause.name = "MenuPause"
+            self.addChild(snMenuPause)
+            // Weapons menu
+            snMenuWeapons = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_weapons.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuWidth, flMenuHeight))
+            snMenuWeapons.anchorPoint = CGPointMake(0.0, 1.0)
+            snMenuWeapons.position = CGPoint(x: CGRectGetMidX(self.frame) + (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
+            snMenuWeapons.zPosition = 2.0
+            snMenuWeapons.alpha = 0.75
+            snMenuWeapons.name = "MenuWeapons"
+            self.addChild(snMenuWeapons)
+            // "Power up to inventory" frame sprite
+            let flOptCheckboxWidth = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().width) * (self.frame.width/667.0)
+            let flOptCheckboxHeight = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().height) * (self.frame.height/375.0)
+            snPowerUpInvFrame = SKSpriteNode(texture: SKTexture(imageNamed: "Media/checkbox_unchecked.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptCheckboxWidth, flOptCheckboxHeight))
+            snPowerUpInvFrame.anchorPoint = CGPointMake(0.5, 0.5)
+            snPowerUpInvFrame.position = CGPoint(x: self.frame.width - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0)), y: self.frame.height - (flOptCheckboxHeight/2) - (5 * (self.frame.height/375.0)))
+            snPowerUpInvFrame.zPosition = 2.0
+            snPowerUpInvFrame.alpha = 0.0
+            self.addChild(snPowerUpInvFrame)
+            // "Power up to inventory" item sprite
+            let flPowerUpWidth = (SKTexture(imageNamed: "Media/pu_bomb_001.png").size().width) * (self.frame.width/667.0)
+            let flPowerUpHeight = (SKTexture(imageNamed: "Media/pu_bomb_001.png").size().height) * (self.frame.height/375.0)
+            snPowerUpInv = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flPowerUpWidth, flPowerUpHeight))
+            snPowerUpInv.anchorPoint = CGPointMake(0.5, 0.5)
+            snPowerUpInv.position = snPowerUpInvFrame.position
+            snPowerUpInv.zPosition = 2.0
+            snPowerUpInv.alpha = 0.0
+            self.addChild(snPowerUpInv)
+            // "Power up to inventory" text
+            lbPowerUpInv = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+            lbPowerUpInv.text = ""
+            lbPowerUpInv.horizontalAlignmentMode = .Right
+            lbPowerUpInv.verticalAlignmentMode = .Center
+            lbPowerUpInv.fontSize = 17 * (self.frame.width/667.0)
+            lbPowerUpInv.position = snPowerUpInvFrame.position
+            lbPowerUpInv.position.x = lbPowerUpInv.position.x - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0))
+            lbPowerUpInv.fontColor = UIColor.whiteColor()
+            lbPowerUpInv.zPosition = 2.0
+            lbPowerUpInv.alpha = 0.0
+            self.addChild(lbPowerUpInv)
+            // Highscore text line 1
+            lbHighscoreTextLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+            lbHighscoreTextLine1.text = ""
+            lbHighscoreTextLine1.horizontalAlignmentMode = .Center
+            lbHighscoreTextLine1.verticalAlignmentMode = .Center
+            lbHighscoreTextLine1.fontSize = 20 * (self.frame.width/667.0)
+            lbHighscoreTextLine1.position = CGPoint(x: CGRectGetMidX(self.frame), y: 9*(self.frame.height / 12))
+            lbHighscoreTextLine1.fontColor = UIColor.whiteColor()
+            lbHighscoreTextLine1.zPosition = 2.2
+            lbHighscoreTextLine1.alpha = 0.0
+            self.addChild(lbHighscoreTextLine1)
+            // Highscore text line 2
+            lbHighscoreTextLine2 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+            lbHighscoreTextLine2.text = ""
+            lbHighscoreTextLine2.horizontalAlignmentMode = .Center
+            lbHighscoreTextLine2.verticalAlignmentMode = .Center
+            lbHighscoreTextLine2.fontSize = 20 * (self.frame.width/667.0)
+            lbHighscoreTextLine2.position = CGPoint(x: CGRectGetMidX(self.frame), y: 8*(self.frame.height / 12))
+            lbHighscoreTextLine2.fontColor = UIColor.whiteColor()
+            lbHighscoreTextLine2.zPosition = 2.2
+            lbHighscoreTextLine2.alpha = 0.0
+            self.addChild(lbHighscoreTextLine2)
+            // Share line 1
+            lbShareLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+            lbShareLine1.text = "Share your score: "
+            lbShareLine1.horizontalAlignmentMode = .Right
+            lbShareLine1.verticalAlignmentMode = .Center
+            lbShareLine1.fontSize = 20 * (self.frame.width/667.0)
+            lbShareLine1.position = CGPoint(x: CGRectGetMidX(self.frame) - 10, y: 3.5*(self.frame.height / 12))
+            lbShareLine1.fontColor = UIColor.whiteColor()
+            lbShareLine1.zPosition = 2.2
+            lbShareLine1.alpha = 0.0
+            self.addChild(lbShareLine1)
+            // Share "Twitter" Sprite
+            let flShareTwitterWidth = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().width) * (self.frame.width/667.0) / 2.5
+            let flShareTwitterHeight = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().height) * (self.frame.height/375.0) / 2.5
+            snShareTwitter = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_twitter.png"), color: UIColor.clearColor(), size: CGSizeMake(flShareTwitterWidth, flShareTwitterHeight))
+            snShareTwitter.anchorPoint = CGPointMake(0.0, 0.5)
+            snShareTwitter.position = CGPoint(x: CGRectGetMidX(self.frame) + 10, y: 3.5*(self.frame.height / 12))
+            snShareTwitter.zPosition = 2.2
+            snShareTwitter.alpha = 0.0
+            snShareTwitter.name = "ShareTwitter"
+            self.addChild(snShareTwitter)
+            // Share "Facebook" Sprite
+            let flShareFacebookWidth = (SKTexture(imageNamed: "Media/about_icon_facebook.png").size().width) * (self.frame.width/667.0) / 2.5
+            let flShareFacebookHeight = (SKTexture(imageNamed: "Media/about_icon_facebook.png").size().height) * (self.frame.height/375.0) / 2.5
+            snShareFacebook = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_facebook.png"), color: UIColor.clearColor(), size: CGSizeMake(flShareFacebookWidth, flShareFacebookHeight))
+            snShareFacebook.anchorPoint = CGPointMake(0.0, 0.5)
+            snShareFacebook.position = CGPoint(x: CGRectGetMidX(self.frame) + 70, y: 3.5*(self.frame.height / 12))
+            snShareFacebook.zPosition = 2.2
+            snShareFacebook.alpha = 0.0
+            snShareFacebook.name = "ShareFacebook"
+            self.addChild(snShareFacebook)
+            // --- Sounds: Click ---
+            let path = NSBundle.mainBundle().pathForResource("Media/sounds/click_001", ofType:"wav")
+            let fileURL = NSURL(fileURLWithPath: path!)
+            do {
+                try apClick = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
+            apClick.numberOfLoops = 0
+            // Home button settings
+            NSNotificationCenter.defaultCenter().addObserver(
+                self,
+                selector: "applicationWillResignActive:",
+                name: UIApplicationWillResignActiveNotification,
+                object: nil)
+            
+            fctNewGame()
+        } 
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -500,8 +498,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 switch (touchedNode.name) {
                 case "MenuBack"?:
                     iButtonPressed = 3
-                    if snMenuBack != nil {
-                        snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back_pressed.png")
+                    if snPause != nil {
+                        snPause.snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back_pressed.png")
                     }
                     if snInventory != nil {
                         snInventory.snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back_pressed.png")
@@ -509,8 +507,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                     fctPlayClickSound()
                 case "MenuQuit"?:
                     iButtonPressed = 4
-                    snMenuQuit.texture = SKTexture(imageNamed: "Media/menu_bottom_pressed.png")
-                    lbMenuQuit.fontColor = UIColor.blackColor()
+                    snPause.snMenuQuit.texture = SKTexture(imageNamed: "Media/menu_bottom_pressed.png")
+                    snPause.lbMenuQuit.fontColor = UIColor.blackColor()
                     fctPlayClickSound()
                 case "MenuWpnLaserCone"?:
                     if blLaserConePickedUp == true {
@@ -525,6 +523,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         iButtonPressed = 7
                         fctPlayClickSound()
                     }
+                case "MenuOptions"?:
+                    iButtonPressed = 11
+                    snPause.snMenuOptions.texture = SKTexture(imageNamed: "Media/menu_top_pressed.png")
+                    snPause.lbMenuOptions.fontColor = UIColor.blackColor()
+                    fctPlayClickSound()
                 default:
                     ()
                 }
@@ -555,14 +558,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // Reset pressed sprites
-        if snMenuBack != nil {
-            snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back.png")
-        }
-        if snMenuQuit != nil {
-            snMenuQuit.texture = SKTexture(imageNamed: "Media/menu_bottom.png")
-        }
-        if lbMenuQuit != nil {
-            lbMenuQuit.fontColor = UIColor.whiteColor()
+        if snPause != nil {
+            snPause.snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back.png")
+            snPause.snMenuQuit.texture = SKTexture(imageNamed: "Media/menu_bottom.png")
+            snPause.lbMenuQuit.fontColor = UIColor.whiteColor()
+            snPause.snMenuOptions.texture = SKTexture(imageNamed: "Media/menu_top.png")
+            snPause.lbMenuOptions.fontColor = UIColor.whiteColor()
         }
         if snGameOverBack != nil {
             snGameOverBack.texture = SKTexture(imageNamed: "Media/menu_back.png")
@@ -600,6 +601,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         //fctNewGame()
                         //self.delete(self)
                         fctNewGame()
+                        if apBackgroundMusic != nil {
+                            apBackgroundMusic.stop()
+                        }
                     }
                 default:
                     ()
@@ -621,62 +625,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 switch (touchedNode.name) {
                 case "MenuPause"?:
                     if (iButtonPressed == 1) && (self.speed > 0.0) {
-                        //snInventory.zPosition = 2.2
                         self.speed = 0.0
-                        //self.view!.paused = true
-                        print("Paused!")
-                        // Pause screen sprite
-                        snPause = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
-                        snPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-                        snPause.strokeColor = SKColor.blackColor()
-                        snPause.glowWidth = 0.0
-                        snPause.lineWidth = 0.0
-                        snPause.fillColor = SKColor.blackColor()
-                        snPause.zPosition = 2.1
-                        snPause.alpha = 0.8
+                        snPause = TLPause(size: CGSize(width: self.frame.width, height: self.frame.height))
+                        snPause.zPosition = 2.2
                         self.addChild(snPause)
-                        // Pause screen text
-                        lbPause = SKLabelNode(fontNamed: fnGameFont?.fontName)
-                        lbPause.text = "PAUSED"
-                        lbPause.horizontalAlignmentMode = .Center
-                        lbPause.verticalAlignmentMode = .Center
-                        lbPause.fontSize = 60 * (self.frame.width/667.0)
-                        lbPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-                        lbPause.fontColor = UIColor.whiteColor()
-                        lbPause.zPosition = 2.1
-                        lbPause.alpha = 1.0
-                        self.addChild(lbPause)
-                        // Menu "Back" Sprite
-                        let flMenuBackSpriteWidth = (SKTexture(imageNamed: "Media/menu_back.png").size().width) * (self.frame.width/667.0)
-                        let flMenuBackSpriteHeight = (SKTexture(imageNamed: "Media/menu_back.png").size().height) * (self.frame.height/375.0)
-                        snMenuBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
-                        snMenuBack.anchorPoint = CGPointMake(0.0, 0.5)
-                        snMenuBack.position = CGPoint(x: 1*(self.frame.width / 16), y: 10*(self.frame.height / 12))
-                        snMenuBack.zPosition = 2.2
-                        snMenuBack.alpha = 1.0
-                        snMenuBack.name = "MenuBack"
-                        self.addChild(snMenuBack)
-                        // Menu "About" Sprite
-                        let flMenuSpriteWidth = (SKTexture(imageNamed: "Media/menu_top.png").size().width) * (self.frame.width/667.0)
-                        let flMenuSpriteHeight = (SKTexture(imageNamed: "Media/menu_top.png").size().height) * (self.frame.height/375.0)
-                        snMenuQuit = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_bottom.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
-                        snMenuQuit.anchorPoint = CGPointMake(0.5, 0.5)
-                        snMenuQuit.position = CGPoint(x: CGRectGetMidX(self.frame), y: 2*(self.frame.height / 12))
-                        snMenuQuit.zPosition = 2.2
-                        snMenuQuit.alpha = 1.0
-                        snMenuQuit.name = "MenuQuit"
-                        addChild(snMenuQuit)
-                        // Menu "About" Text
-                        lbMenuQuit = SKLabelNode(fontNamed: fnGameFont?.fontName)
-                        lbMenuQuit.horizontalAlignmentMode = .Center;
-                        lbMenuQuit.verticalAlignmentMode = .Center
-                        lbMenuQuit.text = "QUIT"
-                        lbMenuQuit.fontSize = 30 * (self.frame.width/667.0)
-                        lbMenuQuit.position = CGPoint(x: CGRectGetMidX(self.frame), y: 2*(self.frame.height / 12))
-                        lbMenuQuit.fontColor = UIColor.whiteColor()
-                        lbMenuQuit.zPosition = 2.2
-                        lbMenuQuit.name = "MenuQuit"
-                        self.addChild(lbMenuQuit)
                     }
                 case "MenuWeapons"?:
                     if (iButtonPressed == 2) && (self.speed > 0.0) {
@@ -695,21 +647,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         if snPause != nil {
                             snPause.removeFromParent()
                         }
-                        if lbPause != nil {
-                            lbPause.removeFromParent()
-                        }
-                        if snMenuBack != nil {
-                            snMenuBack.removeFromParent()
-                        }
-                        if snMenuQuit != nil {
-                            snMenuQuit.removeFromParent()
-                        }
-                        if lbMenuQuit != nil {
-                            lbMenuQuit.removeFromParent()
+                        if snPause != nil {
+                            snPause.removeFromParent()
                         }
                         if snInventory != nil {
                             snInventory.removeFromParent()
                         }
+                        fctPlayBackgroundMusic()
                     }
                 case "MenuQuit"?:
                     if (iButtonPressed == 4) && (self.speed == 0.0) {
@@ -718,9 +662,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         let nextScene = TLGameMenu(size: scene!.size)
                         nextScene.scaleMode = .AspectFill
                         scene?.view?.presentScene(nextScene, transition: transition)
-                        snMenuQuit.removeFromParent()
-                        lbMenuQuit.removeFromParent()
+                        if snPause != nil {
+                            snPause.removeFromParent()
+                        }
                         self.removeFromParent()
+                        if apBackgroundMusic != nil {
+                            apBackgroundMusic.stop()
+                        }
                     }
                 case "MenuWpnLaserCone"?:
                     if (iButtonPressed == 5) && (self.speed == 0.0) {
@@ -740,6 +688,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                             iSelectedWeapon = 1
                             snInventory.fctUpdateWpns()
                         }
+                    }
+                case "MenuOptions"?:
+                    if (iButtonPressed == 11) && (self.speed == 0.0) {
+                        let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
+                        let nextScene = TLGameMenuOptions(size: scene!.size)
+                        nextScene.scaleMode = .AspectFill
+                        scene?.view?.presentScene(nextScene, transition: transition)
                     }
                 default:
                     ()
@@ -861,6 +816,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             apBackgroundMusic.volume = GameData.flMusicVolume
             apBackgroundMusic.prepareToPlay()
             apBackgroundMusic.play()
+        } else {
+            if apBackgroundMusic != nil {
+                apBackgroundMusic.stop()
+            }
         }
     }
     
@@ -1388,16 +1347,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         lbGameOver.fontColor = UIColor.whiteColor()
         lbGameOver.zPosition = 2.2
         self.addChild(lbGameOver)
-        // Pause screen sprite
-        snPause = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
-        snPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-        snPause.strokeColor = SKColor.blackColor()
-        snPause.glowWidth = 0.0
-        snPause.lineWidth = 0.0
-        snPause.fillColor = SKColor.blackColor()
-        snPause.zPosition = 2.1
-        snPause.alpha = 0.7
-        self.addChild(snPause)
+//        // Pause screen sprite
+        let snBackground = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
+        snBackground.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
+        snBackground.strokeColor = SKColor.blackColor()
+        snBackground.glowWidth = 0.0
+        snBackground.lineWidth = 0.0
+        snBackground.fillColor = SKColor.blackColor()
+        snBackground.zPosition = 2.1
+        snBackground.alpha = 0.7
+        self.addChild(snBackground)
         // Menu "Back" Sprite
         let flMenuBackSpriteWidth = (SKTexture(imageNamed: "Media/menu_back.png").size().width) * (self.frame.width/667.0)
         let flMenuBackSpriteHeight = (SKTexture(imageNamed: "Media/menu_back.png").size().height) * (self.frame.height/375.0)
@@ -1625,17 +1584,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     
     func applicationWillResignActive(notification: NSNotification) {
         //print("I'm out of focus!")
-        if snPause != nil {
-            snPause.zPosition = 2.1
+        if self.speed > 0.0 && blGameStarted == true {
+            snPause = TLPause(size: CGSize(width: self.frame.width, height: self.frame.height))
+            snPause.zPosition = 2.2
+            self.addChild(snPause)
+            //snInventory.zPosition = 2.2
+            self.speed = 0.0
+            //self.view!.paused = true
+            print("Paused!")
         }
-        if lbPause != nil {
-            lbPause.zPosition = 2.1
-        }
-        //snInventory.zPosition = 2.2
-        self.speed = 0.0
-        //self.view!.paused = true
-        print("Paused!")
-        
     }
     
     deinit {
