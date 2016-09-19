@@ -10,21 +10,21 @@ import Foundation
 
 class HighScore: NSObject, NSCoding {
     let score:Int;
-    let dateOfScore:NSDate;
+    let dateOfScore:Date;
     
-    init(score:Int, dateOfScore:NSDate) {
+    init(score:Int, dateOfScore:Date) {
         self.score = score;
         self.dateOfScore = dateOfScore;
     }
     
     required init(coder: NSCoder) {
-        self.score = coder.decodeObjectForKey("score")! as! Int;
-        self.dateOfScore = coder.decodeObjectForKey("dateOfScore")! as! NSDate;
+        self.score = coder.decodeObject(forKey: "score")! as! Int;
+        self.dateOfScore = coder.decodeObject(forKey: "dateOfScore")! as! Date;
         super.init()
     }
     
-    func encodeWithCoder(coder: NSCoder) {
-        coder.encodeObject(self.score, forKey: "score")
-        coder.encodeObject(self.dateOfScore, forKey: "dateOfScore")
+    func encode(with coder: NSCoder) {
+        coder.encode(self.score, forKey: "score")
+        coder.encode(self.dateOfScore, forKey: "dateOfScore")
     }
 }

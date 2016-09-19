@@ -23,7 +23,7 @@ class TLMeteorite: SKSpriteNode {
     var blInBombRadius: Bool!
     
     init(size: CGSize, rotSpeed: CGFloat, rotDirec: Int) {
-        super.init(texture: SKTexture(imageNamed: "Media/objects/meteorite_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
+        super.init(texture: SKTexture(imageNamed: "Media/objects/meteorite_001.png"), color: UIColor.clear, size: CGSize(width: size.width, height: size.height))
         // Different textures
         //blHasPowerUp = false
         blInBombRadius = false
@@ -63,11 +63,11 @@ class TLMeteorite: SKSpriteNode {
             ()
         }
         
-        self.anchorPoint = CGPointMake(0.5, 0.5)
+        self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.position = CGPoint(x: flScreenWidth + 88/2, y: CGFloat(arc4random_uniform(UInt32(flScreenHeight)) + 1))
         // --- physics body ---
         self.physicsBody = SKPhysicsBody(circleOfRadius: self.size.width/2)
-        self.physicsBody?.dynamic = true
+        self.physicsBody?.isDynamic = true
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = true
         self.physicsBody?.categoryBitMask = enBodyType.meteorite.rawValue
@@ -82,16 +82,16 @@ class TLMeteorite: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func fctRotate (flRotationSpeed: CGFloat, iDirection: Int) {
-        let actRotate = SKAction.rotateByAngle(CGFloat(Double(iDirection)*M_PI*2.0), duration: 10.0)
+    func fctRotate (_ flRotationSpeed: CGFloat, iDirection: Int) {
+        let actRotate = SKAction.rotate(byAngle: CGFloat(Double(iDirection)*M_PI*2.0), duration: 10.0)
         
-        runAction(SKAction.repeatActionForever(actRotate))
+        run(SKAction.repeatForever(actRotate))
     }
 
     func fctMoveLeft() {
-        let actMoveLeft = SKAction.moveByX(-(flScreenWidth + 100), y: 0, duration: flmeteoriteSpeed)
+        let actMoveLeft = SKAction.moveBy(x: -(flScreenWidth + 100), y: 0, duration: flmeteoriteSpeed)
 
-        runAction(actMoveLeft, completion: {() in
+        run(actMoveLeft, completion: {() in
             self.physicsBody?.categoryBitMask = 0
             self.physicsBody?.contactTestBitMask = 0
             self.removeFromParent()
@@ -100,7 +100,7 @@ class TLMeteorite: SKSpriteNode {
     }
     
     func fctExplode() {
-        let actExplode = SKAction.animateWithTextures(aExplosion_01, timePerFrame: 0.10)
+        let actExplode = SKAction.animate(with: aExplosion_01, timePerFrame: 0.10)
         self.blDestroyed = true
         iGameScore = iGameScore + iScore
         lbGameScore.text = String(iGameScore)
@@ -109,10 +109,10 @@ class TLMeteorite: SKSpriteNode {
         self.physicsBody?.contactTestBitMask = 0
         // --- load sounds ---
         if GameData.blSoundEffectsEnabled == true {
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/explosion_004", ofType:"wav")
-            let fileURL = NSURL(fileURLWithPath: path!)
+            let path = Bundle.main.path(forResource: "Media/sounds/explosion_004", ofType:"wav")
+            let fileURL = URL(fileURLWithPath: path!)
             do {
-                apExplosionSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                apExplosionSound = try AVAudioPlayer(contentsOf: fileURL, fileTypeHint: nil)
                 apExplosionSound.volume = GameData.flSoundsVolume * 3
                 apExplosionSound.numberOfLoops = 0
                 apExplosionSound.prepareToPlay()
@@ -127,12 +127,12 @@ class TLMeteorite: SKSpriteNode {
         lbScore.text = "+" + String(iScore)
         lbScore.fontSize = 30 * (flScreenWidth/667.0)
         lbScore.position = CGPoint(x: 0, y: 0 - (lbScore.frame.size.height / 2))
-        lbScore.fontColor = UIColor.orangeColor()
-        self.runAction(SKAction.rotateToAngle(0, duration: 0), completion: {() in
+        lbScore.fontColor = UIColor.orange
+        self.run(SKAction.rotate(toAngle: 0, duration: 0), completion: {() in
             self.addChild(lbScore)
         })
         
-        self.runAction(actExplode, completion: {() in
+        self.run(actExplode, completion: {() in
             lbScore.removeFromParent()
             self.blActive = false
             self.removeAllActions()
@@ -144,10 +144,10 @@ class TLMeteorite: SKSpriteNode {
     func fctHit() {
         // --- load sounds ---
         if GameData.blSoundEffectsEnabled == true {
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/hit_001", ofType:"mp3")
-            let fileURL = NSURL(fileURLWithPath: path!)
+            let path = Bundle.main.path(forResource: "Media/sounds/hit_001", ofType:"mp3")
+            let fileURL = URL(fileURLWithPath: path!)
             do {
-                apHitSound = try AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                apHitSound = try AVAudioPlayer(contentsOf: fileURL, fileTypeHint: nil)
                 apHitSound.numberOfLoops = 0
                 apHitSound.volume = GameData.flSoundsVolume
                 apHitSound.prepareToPlay()

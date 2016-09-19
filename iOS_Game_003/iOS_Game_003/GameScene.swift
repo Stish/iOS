@@ -11,7 +11,7 @@ import AVFoundation
 import Social
 
 // Debugging
-var strVersion = "ver 0.38"
+var strVersion = "ver 0.39"
 var blGameTest = false
 var blResetGameData = false
 // --- Game positions ---
@@ -24,6 +24,7 @@ var SDGameData: TLSaveData!
 var GameData: TLGameData!
 var blScoreSwitchChecked = true
 let strHighscoreDummy = "0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"
+let iAchieveCnt = Int(10)
 //let strHighscoreDummy = "1"+"\t"+"11"+"\t"+"111"+"\t"+"2"+"\t"+"22"+"\t"+"222"+"\t"+"3"+"\t"+"33"+"\t"+"333"+"\t"+"4"+"\t"+"44"+"\t"+"444"+"\t"+"5"+"\t"+"55"+"\t"+"555"
 var aSkHighscoresColumns = 4
 var aSkHighscoresRows = 5
@@ -121,6 +122,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var snInventory: TLInventory!
     var iButtonPressed: Int!
     var apClick: AVAudioPlayer!
+    var apShield: AVAudioPlayer!
     var lbHighscoreTextLine1: SKLabelNode!
     var lbHighscoreTextLine2: SKLabelNode!
     var lbShareLine1: SKLabelNode!
@@ -129,7 +131,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var snGameOverBack: SKSpriteNode!
     var snPause: TLPause!
 
-    override func didMoveToView(view: SKView) {
+    override func didMove(to view: SKView) {
         if blGameStarted == false {
             // --- collision setup ---
             physicsWorld.contactDelegate = self
@@ -178,10 +180,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             iButtonPressed = 0
             
             self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
-            self.anchorPoint = CGPointMake(0, 0)
+            self.anchorPoint = CGPoint(x: 0, y: 0)
             
-            snBackground = TLBackground(size: CGSizeMake(view.frame.width, view.frame.height))
-            self.anchorPoint = CGPointMake(0.0, 0.0)
+            snBackground = TLBackground(size: CGSize(width: view.frame.width, height: view.frame.height))
+            self.anchorPoint = CGPoint(x: 0.0, y: 0.0)
             //snGameMap.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
             snBackground.position = CGPoint(x: 0, y: 0)
             addChild(snBackground)
@@ -190,7 +192,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     //        snNebula.position = CGPoint(x: 0, y: 0)
     //        addChild(snNebula)
 
-            snShip = TLShip(size: CGSizeMake(flShipSizeWidth, flShipSizeHeight))
+            snShip = TLShip(size: CGSize(width: flShipSizeWidth, height: flShipSizeHeight))
             snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
             flShipPosX = snShip.position.x
             flShipPosY = snShip.position.y
@@ -200,8 +202,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
             myLabel.text = "TOUCH TO START"
             myLabel.fontSize = 40 * (self.frame.width/667.0)
-            myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - (myLabel.frame.size.height/2))
-            myLabel.fontColor = UIColor.whiteColor()
+            myLabel.position = CGPoint(x:self.frame.midX, y:self.frame.midY - (myLabel.frame.size.height/2))
+            myLabel.fontColor = UIColor.white
             self.addChild(myLabel)
             myLabel.zPosition = 2.0
             
@@ -210,15 +212,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             lbGameScore = SKLabelNode(fontNamed: fnGameFont?.fontName)
             lbGameScore.text = "0"
             lbGameScore.fontSize = 22 * (self.frame.width/667.0)
-            lbGameScore.position = CGPoint(x: CGRectGetMidX(self.frame) + (216  * (self.frame.width/667.0)), y: 14 * (self.frame.height/375.0))
-            lbGameScore.fontColor = UIColor.orangeColor()
-            lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
+            lbGameScore.position = CGPoint(x: self.frame.midX + (216  * (self.frame.width/667.0)), y: 14 * (self.frame.height/375.0))
+            lbGameScore.fontColor = UIColor.orange
+            lbGameScore.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.right
             lbGameScore.zPosition = 2.0
             self.addChild(lbGameScore)
             // HUD sprites
-            let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_003.png"), color: UIColor.clearColor(), size: CGSizeMake(470 * (self.frame.width/667.0), 60 * (self.frame.height/375.0)))
-            snHud.anchorPoint = CGPointMake(0.5, 0)
-            snHud.position = CGPoint(x: CGRectGetMidX(self.frame), y: 3 * (self.frame.height/375.0))
+            let snHud = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_003.png"), color: UIColor.clear, size: CGSize(width: 470 * (self.frame.width/667.0), height: 60 * (self.frame.height/375.0)))
+            snHud.anchorPoint = CGPoint(x: 0.5, y: 0)
+            snHud.position = CGPoint(x: self.frame.midX, y: 3 * (self.frame.height/375.0))
             snHud.zPosition = 2.0
             snHud.alpha = 0.75
             addChild(snHud)
@@ -226,7 +228,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             lbGameTime = SKLabelNode(fontNamed: fnGameFont?.fontName)
             lbGameTime.text = "0"
             lbGameTime.fontSize = 20 * (self.frame.width/667.0)
-            lbGameTime.position = CGPoint(x: CGRectGetMidX(self.frame), y: 24 * (self.frame.height/375.0))
+            lbGameTime.position = CGPoint(x: self.frame.midX, y: 24 * (self.frame.height/375.0))
             lbGameTime.fontColor = UIColor(red: 102/255.0, green: 255/255.0, blue: 255/255.0, alpha: 1.0)
             lbGameTime.zPosition = 2.0
             self.addChild(lbGameTime)
@@ -237,30 +239,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             let flShieldSprite2Width = (SKTexture(imageNamed: "Media/shield_point_002.png").size().width) * (self.frame.width/667.0)
             let flShieldSprite2Height = (SKTexture(imageNamed: "Media/shield_point_002.png").size().height) * (self.frame.height/375.0)
             // Shield bar 1
-            snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite1Width, flShieldSprite1Height))
-            snShieldBar1.anchorPoint = CGPointMake(0.0, 0.5)
-            snShieldBar1.position = CGPoint(x: CGRectGetMidX(self.frame) - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+            snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite1Width, height: flShieldSprite1Height))
+            snShieldBar1.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+            snShieldBar1.position = CGPoint(x: self.frame.midX - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
             snShieldBar1.zPosition = 2.0
             snShieldBar1.alpha = 1.0
             self.addChild(snShieldBar1)
             // Shield bar 2
-            snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
-            snShieldBar2.anchorPoint = CGPointMake(0.0, 0.5)
-            snShieldBar2.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+            snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
+            snShieldBar2.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+            snShieldBar2.position = CGPoint(x: self.frame.midX - (180 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
             snShieldBar2.zPosition = 2.0
             snShieldBar2.alpha = 1.0
             self.addChild(snShieldBar2)
             // Shield bar 3
-            snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
-            snShieldBar3.anchorPoint = CGPointMake(0.0, 0.5)
-            snShieldBar3.position = CGPoint(x: CGRectGetMidX(self.frame) - (136 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+            snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
+            snShieldBar3.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+            snShieldBar3.position = CGPoint(x: self.frame.midX - (136 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
             snShieldBar3.zPosition = 2.0
             snShieldBar3.alpha = 1.0
             self.addChild(snShieldBar3)
             // Shield bar 4
-            snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clearColor(), size: CGSizeMake(flShieldSprite2Width, flShieldSprite2Height))
-            snShieldBar4.anchorPoint = CGPointMake(0.0, 0.5)
-            snShieldBar4.position = CGPoint(x: CGRectGetMidX(self.frame) - (92 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+            snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
+            snShieldBar4.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+            snShieldBar4.position = CGPoint(x: self.frame.midX - (92 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
             snShieldBar4.zPosition = 2.0
             snShieldBar4.alpha = 1.0
             self.addChild(snShieldBar4)
@@ -269,23 +271,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             let flBombWidth = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().width) * (self.frame.width/667.0)
             let flBombHeight = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().height) * (self.frame.height/375.0)
             // Bomb 1
-            snBomb1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
-            snBomb1.anchorPoint = CGPointMake(0.5, 0.5)
-            snBomb1.position = CGPoint(x: CGRectGetMidX(self.frame) - (180 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+            snBomb1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clear, size: CGSize(width: flBombWidth, height: flBombHeight))
+            snBomb1.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            snBomb1.position = CGPoint(x: self.frame.midX - (180 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
             snBomb1.zPosition = 2.0
             snBomb1.alpha = 1.0
             self.addChild(snBomb1)
             // Bomb 2
-            snBomb2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
-            snBomb2.anchorPoint = CGPointMake(0.5, 0.5)
-            snBomb2.position = CGPoint(x: CGRectGetMidX(self.frame) - (145 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+            snBomb2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clear, size: CGSize(width: flBombWidth, height: flBombHeight))
+            snBomb2.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            snBomb2.position = CGPoint(x: self.frame.midX - (145 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
             snBomb2.zPosition = 2.0
             snBomb2.alpha = 1.0
             self.addChild(snBomb2)
             // Bomb 3
-            snBomb3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clearColor(), size: CGSizeMake(flBombWidth, flBombHeight))
-            snBomb3.anchorPoint = CGPointMake(0.5, 0.5)
-            snBomb3.position = CGPoint(x: CGRectGetMidX(self.frame) - (110 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+            snBomb3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clear, size: CGSize(width: flBombWidth, height: flBombHeight))
+            snBomb3.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            snBomb3.position = CGPoint(x: self.frame.midX - (110 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
             snBomb3.zPosition = 2.0
             snBomb3.alpha = 1.0
             self.addChild(snBomb3)
@@ -293,17 +295,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             let flMenuWidth = (SKTexture(imageNamed: "Media/hud_pause.png").size().width) * (self.frame.width/667.0) * 0.85
             let flMenuHeight = (SKTexture(imageNamed: "Media/hud_pause.png").size().height) * (self.frame.height/375.0) * 0.85
             // Pause menu
-            snMenuPause = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_pause.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuWidth, flMenuHeight))
-            snMenuPause.anchorPoint = CGPointMake(1.0, 1.0)
-            snMenuPause.position = CGPoint(x: CGRectGetMidX(self.frame) - (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
+            snMenuPause = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_pause.png"), color: UIColor.clear, size: CGSize(width: flMenuWidth, height: flMenuHeight))
+            snMenuPause.anchorPoint = CGPoint(x: 1.0, y: 1.0)
+            snMenuPause.position = CGPoint(x: self.frame.midX - (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
             snMenuPause.zPosition = 2.0
             snMenuPause.alpha = 0.75
             snMenuPause.name = "MenuPause"
             self.addChild(snMenuPause)
             // Weapons menu
-            snMenuWeapons = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_weapons.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuWidth, flMenuHeight))
-            snMenuWeapons.anchorPoint = CGPointMake(0.0, 1.0)
-            snMenuWeapons.position = CGPoint(x: CGRectGetMidX(self.frame) + (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
+            snMenuWeapons = SKSpriteNode(texture: SKTexture(imageNamed: "Media/hud_weapons.png"), color: UIColor.clear, size: CGSize(width: flMenuWidth, height: flMenuHeight))
+            snMenuWeapons.anchorPoint = CGPoint(x: 0.0, y: 1.0)
+            snMenuWeapons.position = CGPoint(x: self.frame.midX + (2 * (self.frame.width/667.0)), y: self.frame.height - (3 * (self.frame.height/375.0)))
             snMenuWeapons.zPosition = 2.0
             snMenuWeapons.alpha = 0.75
             snMenuWeapons.name = "MenuWeapons"
@@ -311,8 +313,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             // "Power up to inventory" frame sprite
             let flOptCheckboxWidth = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().width) * (self.frame.width/667.0)
             let flOptCheckboxHeight = (SKTexture(imageNamed: "Media/checkbox_checked.png").size().height) * (self.frame.height/375.0)
-            snPowerUpInvFrame = SKSpriteNode(texture: SKTexture(imageNamed: "Media/checkbox_unchecked.png"), color: UIColor.clearColor(), size: CGSizeMake(flOptCheckboxWidth, flOptCheckboxHeight))
-            snPowerUpInvFrame.anchorPoint = CGPointMake(0.5, 0.5)
+            snPowerUpInvFrame = SKSpriteNode(texture: SKTexture(imageNamed: "Media/checkbox_unchecked.png"), color: UIColor.clear, size: CGSize(width: flOptCheckboxWidth, height: flOptCheckboxHeight))
+            snPowerUpInvFrame.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             snPowerUpInvFrame.position = CGPoint(x: self.frame.width - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0)), y: self.frame.height - (flOptCheckboxHeight/2) - (5 * (self.frame.height/375.0)))
             snPowerUpInvFrame.zPosition = 2.0
             snPowerUpInvFrame.alpha = 0.0
@@ -320,8 +322,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             // "Power up to inventory" item sprite
             let flPowerUpWidth = (SKTexture(imageNamed: "Media/pu_bomb_001.png").size().width) * (self.frame.width/667.0)
             let flPowerUpHeight = (SKTexture(imageNamed: "Media/pu_bomb_001.png").size().height) * (self.frame.height/375.0)
-            snPowerUpInv = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clearColor(), size: CGSizeMake(flPowerUpWidth, flPowerUpHeight))
-            snPowerUpInv.anchorPoint = CGPointMake(0.5, 0.5)
+            snPowerUpInv = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001.png"), color: UIColor.clear, size: CGSize(width: flPowerUpWidth, height: flPowerUpHeight))
+            snPowerUpInv.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             snPowerUpInv.position = snPowerUpInvFrame.position
             snPowerUpInv.zPosition = 2.0
             snPowerUpInv.alpha = 0.0
@@ -329,54 +331,54 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             // "Power up to inventory" text
             lbPowerUpInv = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
             lbPowerUpInv.text = ""
-            lbPowerUpInv.horizontalAlignmentMode = .Right
-            lbPowerUpInv.verticalAlignmentMode = .Center
+            lbPowerUpInv.horizontalAlignmentMode = .right
+            lbPowerUpInv.verticalAlignmentMode = .center
             lbPowerUpInv.fontSize = 17 * (self.frame.width/667.0)
             lbPowerUpInv.position = snPowerUpInvFrame.position
             lbPowerUpInv.position.x = lbPowerUpInv.position.x - (flOptCheckboxWidth/2) - (5 * (self.frame.width/667.0))
-            lbPowerUpInv.fontColor = UIColor.whiteColor()
+            lbPowerUpInv.fontColor = UIColor.white
             lbPowerUpInv.zPosition = 2.0
             lbPowerUpInv.alpha = 0.0
             self.addChild(lbPowerUpInv)
             // Highscore text line 1
             lbHighscoreTextLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
             lbHighscoreTextLine1.text = ""
-            lbHighscoreTextLine1.horizontalAlignmentMode = .Center
-            lbHighscoreTextLine1.verticalAlignmentMode = .Center
+            lbHighscoreTextLine1.horizontalAlignmentMode = .center
+            lbHighscoreTextLine1.verticalAlignmentMode = .center
             lbHighscoreTextLine1.fontSize = 20 * (self.frame.width/667.0)
-            lbHighscoreTextLine1.position = CGPoint(x: CGRectGetMidX(self.frame), y: 9*(self.frame.height / 12))
-            lbHighscoreTextLine1.fontColor = UIColor.whiteColor()
+            lbHighscoreTextLine1.position = CGPoint(x: self.frame.midX, y: 9*(self.frame.height / 12))
+            lbHighscoreTextLine1.fontColor = UIColor.white
             lbHighscoreTextLine1.zPosition = 2.2
             lbHighscoreTextLine1.alpha = 0.0
             self.addChild(lbHighscoreTextLine1)
             // Highscore text line 2
             lbHighscoreTextLine2 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
             lbHighscoreTextLine2.text = ""
-            lbHighscoreTextLine2.horizontalAlignmentMode = .Center
-            lbHighscoreTextLine2.verticalAlignmentMode = .Center
+            lbHighscoreTextLine2.horizontalAlignmentMode = .center
+            lbHighscoreTextLine2.verticalAlignmentMode = .center
             lbHighscoreTextLine2.fontSize = 20 * (self.frame.width/667.0)
-            lbHighscoreTextLine2.position = CGPoint(x: CGRectGetMidX(self.frame), y: 8*(self.frame.height / 12))
-            lbHighscoreTextLine2.fontColor = UIColor.whiteColor()
+            lbHighscoreTextLine2.position = CGPoint(x: self.frame.midX, y: 8*(self.frame.height / 12))
+            lbHighscoreTextLine2.fontColor = UIColor.white
             lbHighscoreTextLine2.zPosition = 2.2
             lbHighscoreTextLine2.alpha = 0.0
             self.addChild(lbHighscoreTextLine2)
             // Share line 1
             lbShareLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
             lbShareLine1.text = "Share your score: "
-            lbShareLine1.horizontalAlignmentMode = .Right
-            lbShareLine1.verticalAlignmentMode = .Center
+            lbShareLine1.horizontalAlignmentMode = .right
+            lbShareLine1.verticalAlignmentMode = .center
             lbShareLine1.fontSize = 20 * (self.frame.width/667.0)
-            lbShareLine1.position = CGPoint(x: CGRectGetMidX(self.frame) - 10, y: 3.5*(self.frame.height / 12))
-            lbShareLine1.fontColor = UIColor.whiteColor()
+            lbShareLine1.position = CGPoint(x: self.frame.midX - 10, y: 3.5*(self.frame.height / 12))
+            lbShareLine1.fontColor = UIColor.white
             lbShareLine1.zPosition = 2.2
             lbShareLine1.alpha = 0.0
             self.addChild(lbShareLine1)
             // Share "Twitter" Sprite
             let flShareTwitterWidth = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().width) * (self.frame.width/667.0) / 2.5
             let flShareTwitterHeight = (SKTexture(imageNamed: "Media/about_icon_twitter.png").size().height) * (self.frame.height/375.0) / 2.5
-            snShareTwitter = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_twitter.png"), color: UIColor.clearColor(), size: CGSizeMake(flShareTwitterWidth, flShareTwitterHeight))
-            snShareTwitter.anchorPoint = CGPointMake(0.0, 0.5)
-            snShareTwitter.position = CGPoint(x: CGRectGetMidX(self.frame) + 10, y: 3.5*(self.frame.height / 12))
+            snShareTwitter = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_twitter.png"), color: UIColor.clear, size: CGSize(width: flShareTwitterWidth, height: flShareTwitterHeight))
+            snShareTwitter.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+            snShareTwitter.position = CGPoint(x: self.frame.midX + 10, y: 3.5*(self.frame.height / 12))
             snShareTwitter.zPosition = 2.2
             snShareTwitter.alpha = 0.0
             snShareTwitter.name = "ShareTwitter"
@@ -384,47 +386,57 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             // Share "Facebook" Sprite
             let flShareFacebookWidth = (SKTexture(imageNamed: "Media/about_icon_facebook.png").size().width) * (self.frame.width/667.0) / 2.5
             let flShareFacebookHeight = (SKTexture(imageNamed: "Media/about_icon_facebook.png").size().height) * (self.frame.height/375.0) / 2.5
-            snShareFacebook = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_facebook.png"), color: UIColor.clearColor(), size: CGSizeMake(flShareFacebookWidth, flShareFacebookHeight))
-            snShareFacebook.anchorPoint = CGPointMake(0.0, 0.5)
-            snShareFacebook.position = CGPoint(x: CGRectGetMidX(self.frame) + 70, y: 3.5*(self.frame.height / 12))
+            snShareFacebook = SKSpriteNode(texture: SKTexture(imageNamed: "Media/about_icon_facebook.png"), color: UIColor.clear, size: CGSize(width: flShareFacebookWidth, height: flShareFacebookHeight))
+            snShareFacebook.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+            snShareFacebook.position = CGPoint(x: self.frame.midX + 70, y: 3.5*(self.frame.height / 12))
             snShareFacebook.zPosition = 2.2
             snShareFacebook.alpha = 0.0
             snShareFacebook.name = "ShareFacebook"
             self.addChild(snShareFacebook)
             // --- Sounds: Click ---
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/click_001", ofType:"wav")
-            let fileURL = NSURL(fileURLWithPath: path!)
+            var path = Bundle.main.path(forResource: "Media/sounds/click_001", ofType:"wav")
+            var fileURL = URL(fileURLWithPath: path!)
             do {
-                try apClick = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                try apClick = AVAudioPlayer(contentsOf: fileURL, fileTypeHint: nil)
             } catch {
                 print("Could not create audio player: \(error)")
                 return
             }
             apClick.numberOfLoops = 0
+            // --- Sounds: Shield ---
+            path = Bundle.main.path(forResource: "Media/sounds/shield_001", ofType:"wav")
+            fileURL = URL(fileURLWithPath: path!)
+            do {
+                try apShield = AVAudioPlayer(contentsOf: fileURL, fileTypeHint: nil)
+            } catch {
+                print("Could not create audio player: \(error)")
+                return
+            }
+            apShield.numberOfLoops = 0
             // Home button settings
-            NSNotificationCenter.defaultCenter().addObserver(
+            NotificationCenter.default.addObserver(
                 self,
-                selector: "applicationWillResignActive:",
-                name: UIApplicationWillResignActiveNotification,
+                selector: #selector(UIApplicationDelegate.applicationWillResignActive(_:)),
+                name: NSNotification.Name.UIApplicationWillResignActive,
                 object: nil)
             
             fctNewGame()
         } 
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
        /* Called when a touch begins */
         if self.speed > 0.0 {
             if (blGameStarted == false) && (blGameOver == false) {
                 self.fctPlayBackgroundMusic()
-                myLabel.hidden = true
+                myLabel.isHidden = true
                 blGameStarted = true
                 blGameOver = false
                 snBackground.fctMoveLeft()
             } else if blGameOver == false {
                 
-                if let location = touches.first?.locationInNode(self) {
-                    let touchedNode = nodeAtPoint(location)
+                if let location = touches.first?.location(in: self) {
+                    let touchedNode = atPoint(location)
                     
                     switch (touchedNode.name) {
                     case "MenuPause"?:
@@ -435,12 +447,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         fctPlayClickSound()
                     default:
                         for touch:AnyObject in touches {
-                            if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
-                                let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
+                            if touch.location(in: view).x <= (200.0 * (self.frame.height/375.0)) {
+                                let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
                                 snShip.fctMoveShipByY(deltaY)
                                 //print("left")
                             } else {
-                                flTouchMoveDist = touch.locationInView(view).x
+                                flTouchMoveDist = touch.location(in: view).x
                                 switch (iSelectedWeapon) {
                                 case 0:
                                     if blLaserFired == false {
@@ -472,8 +484,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 
             }
             if (blGameOver == true) {
-                if let location = touches.first?.locationInNode(self) {
-                    let touchedNode = nodeAtPoint(location)
+                if let location = touches.first?.location(in: self) {
+                    let touchedNode = atPoint(location)
                     
                     switch (touchedNode.name) {
                     case "ShareTwitter"?:
@@ -492,8 +504,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 }
             }
         } else {
-            if let location = touches.first?.locationInNode(self) {
-                let touchedNode = nodeAtPoint(location)
+            if let location = touches.first?.location(in: self) {
+                let touchedNode = atPoint(location)
                 
                 switch (touchedNode.name) {
                 case "MenuBack"?:
@@ -508,7 +520,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 case "MenuQuit"?:
                     iButtonPressed = 4
                     snPause.snMenuQuit.texture = SKTexture(imageNamed: "Media/menu_bottom_pressed.png")
-                    snPause.lbMenuQuit.fontColor = UIColor.blackColor()
+                    snPause.lbMenuQuit.fontColor = UIColor.black
                     fctPlayClickSound()
                 case "MenuWpnLaserCone"?:
                     if blLaserConePickedUp == true {
@@ -526,7 +538,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 case "MenuOptions"?:
                     iButtonPressed = 11
                     snPause.snMenuOptions.texture = SKTexture(imageNamed: "Media/menu_top_pressed.png")
-                    snPause.lbMenuOptions.fontColor = UIColor.blackColor()
+                    snPause.lbMenuOptions.fontColor = UIColor.black
                     fctPlayClickSound()
                 default:
                     ()
@@ -535,11 +547,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         }
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if (blGameOver == false) && (blGameStarted == true) && (self.speed > 0.0) {
             for touch in touches {
-                if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
-                    let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
+                if touch.location(in: view).x <= (200.0 * (self.frame.height/375.0)) {
+                    let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
                     if (deltaY >= (3 * (self.frame.height/375.0)) && deltaY <= (50 * (self.frame.height/375.0))) {
                         snShip.fctStartFlyAnimationLeft()
                         snShip.position.y = snShip.position.y + deltaY
@@ -556,14 +568,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         }
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         // Reset pressed sprites
         if snPause != nil {
             snPause.snMenuBack.texture = SKTexture(imageNamed: "Media/menu_back.png")
             snPause.snMenuQuit.texture = SKTexture(imageNamed: "Media/menu_bottom.png")
-            snPause.lbMenuQuit.fontColor = UIColor.whiteColor()
+            snPause.lbMenuQuit.fontColor = UIColor.white
             snPause.snMenuOptions.texture = SKTexture(imageNamed: "Media/menu_top.png")
-            snPause.lbMenuOptions.fontColor = UIColor.whiteColor()
+            snPause.lbMenuOptions.fontColor = UIColor.white
         }
         if snGameOverBack != nil {
             snGameOverBack.texture = SKTexture(imageNamed: "Media/menu_back.png")
@@ -576,8 +588,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             snShip.fctStartFlyAnimationFront()
         }
         if (blGameOver == true) {
-            if let location = touches.first?.locationInNode(self) {
-                let touchedNode = nodeAtPoint(location)
+            if let location = touches.first?.location(in: self) {
+                let touchedNode = atPoint(location)
                 
                 switch (touchedNode.name) {
                 case "ShareTwitter"?:
@@ -592,10 +604,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                     if (iButtonPressed == 10) {
                         snShip.removeFromParent()
                         //fctNewGame()
-                        let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.3)
+                        let transition = SKTransition.fade(with: UIColor.black, duration: 0.3)
                         
                         let nextScene = TLGameMenu(size: self.scene!.size)
-                        nextScene.scaleMode = .AspectFill
+                        nextScene.scaleMode = .aspectFill
                         
                         self.scene?.view?.presentScene(nextScene, transition: transition)
                         //fctNewGame()
@@ -613,14 +625,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         if (blGameOver == false)  && (blGameStarted == true) {
             if self.speed > 0.0 {
                 for touch in touches {
-                    if touch.locationInView(view).x <= (200.0 * (self.frame.height/375.0)) {
-                        let deltaY = (view!.frame.height - touch.locationInView(view).y) - snShip.position.y
+                    if touch.location(in: view).x <= (200.0 * (self.frame.height/375.0)) {
+                        let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
                         snShip.fctMoveShipByY(deltaY)
                     }
                 }
             }
-            if let location = touches.first?.locationInNode(self) {
-                let touchedNode = nodeAtPoint(location)
+            if let location = touches.first?.location(in: self) {
+                let touchedNode = atPoint(location)
                 
                 switch (touchedNode.name) {
                 case "MenuPause"?:
@@ -658,9 +670,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 case "MenuQuit"?:
                     if (iButtonPressed == 4) && (self.speed == 0.0) {
                         fctGameOver()
-                        let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
+                        let transition = SKTransition.fade(with: UIColor.black, duration: 0.2)
                         let nextScene = TLGameMenu(size: scene!.size)
-                        nextScene.scaleMode = .AspectFill
+                        nextScene.scaleMode = .aspectFill
                         scene?.view?.presentScene(nextScene, transition: transition)
                         if snPause != nil {
                             snPause.removeFromParent()
@@ -691,9 +703,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                     }
                 case "MenuOptions"?:
                     if (iButtonPressed == 11) && (self.speed == 0.0) {
-                        let transition = SKTransition.fadeWithColor(.blackColor(), duration: 0.2)
+                        let transition = SKTransition.fade(with: UIColor.black, duration: 0.2)
                         let nextScene = TLGameMenuOptions(size: scene!.size)
-                        nextScene.scaleMode = .AspectFill
+                        nextScene.scaleMode = .aspectFill
                         scene?.view?.presentScene(nextScene, transition: transition)
                     }
                 default:
@@ -704,8 +716,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             iButtonPressed = 0
             
             for touch in touches {
-                if touch.locationInView(view).x >= (200.0 * (self.frame.height/375.0)) {
-                    if touch.locationInView(view).x - flTouchMoveDist >= 100 {
+                if touch.location(in: view).x >= (200.0 * (self.frame.height/375.0)) {
+                    if touch.location(in: view).x - flTouchMoveDist >= 100 {
                         // Finger moved detected
                         if (blBombFired == false) && (iBombCount > 0) {
                             iBombCount = iBombCount - 1
@@ -718,7 +730,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         }
     }
     
-    override func update(currentTime: CFTimeInterval) {
+    override func update(_ currentTime: TimeInterval) {
         if self.speed > 0.0 {
             /* Called before each frame is rendered */
             flShipPosX = snShip.position.x
@@ -764,19 +776,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                     }
                     if aSnmeteorite.count == 0
                     {
-                        aSnmeteorite.append(TLMeteorite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
+                        aSnmeteorite.append(TLMeteorite(size: CGSize(width: flMetSize, height: flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
                         aSnmeteorite[0].blActive = false
                     }
                     allElements: for i in 0 ..< aSnmeteorite.count {
                         if aSnmeteorite[i].blActive == false {
-                            aSnmeteorite[i] = TLMeteorite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec)
+                            aSnmeteorite[i] = TLMeteorite(size: CGSize(width: flMetSize, height: flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec)
                             aSnmeteorite[i].blActive = true
                             addChild(aSnmeteorite[i])
                             aSnmeteorite[i].fctMoveLeft()
                             break allElements
                         }
                         if i == (aSnmeteorite.count - 1) {
-                            aSnmeteorite.append(TLMeteorite(size: CGSizeMake(flMetSize, flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
+                            aSnmeteorite.append(TLMeteorite(size: CGSize(width: flMetSize, height: flMetSize), rotSpeed: flRotSpeed, rotDirec: iRotDirec))
                             aSnmeteorite[i+1].blActive = true
                             addChild(aSnmeteorite[i+1])
                             aSnmeteorite[i+1].fctMoveLeft()
@@ -804,10 +816,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     
     func fctPlayBackgroundMusic() {
         if GameData.blMusicEnabled == true {
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/music_001", ofType:"mp3")
-            let fileURL = NSURL(fileURLWithPath: path!)
+            let path = Bundle.main.path(forResource: "Media/sounds/music_001", ofType:"mp3")
+            let fileURL = URL(fileURLWithPath: path!)
             do {
-                try apBackgroundMusic = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                try apBackgroundMusic = AVAudioPlayer(contentsOf: fileURL, fileTypeHint: nil)
             } catch {
                 print("Could not create audio player: \(error)")
                 return
@@ -827,12 +839,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         //snLaser.removeAllActions()
         if aSnLaser01.count == 0
         {
-            aSnLaser01.append(TLLaser(size: CGSizeMake(60 * (self.frame.width/667.0), 5 * (self.frame.height/375.0))))
+            aSnLaser01.append(TLLaser(size: CGSize(width: 60 * (self.frame.width/667.0), height: 5 * (self.frame.height/375.0))))
             aSnLaser01[0].blActive = false
         }
         allElements: for i in 0 ..< aSnLaser01.count {
             if aSnLaser01[i].blActive == false {
-                aSnLaser01[i] = TLLaser(size: CGSizeMake(60 * (self.frame.width/667.0), 5 * (self.frame.height/375.0)))
+                aSnLaser01[i] = TLLaser(size: CGSize(width: 60 * (self.frame.width/667.0), height: 5 * (self.frame.height/375.0)))
                 aSnLaser01[i].blActive = true
                 addChild(aSnLaser01[i])
                 aSnLaser01[i].fctMoveRight()
@@ -840,7 +852,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 break allElements
             }
             if i == (aSnLaser01.count - 1) {
-                aSnLaser01.append(TLLaser(size: CGSizeMake(60 * (self.frame.width/667.0), 5 * (self.frame.height/375.0))))
+                aSnLaser01.append(TLLaser(size: CGSize(width: 60 * (self.frame.width/667.0), height: 5 * (self.frame.height/375.0))))
                 aSnLaser01[i+1].blActive = true
                 addChild(aSnLaser01[i+1])
                 aSnLaser01[i+1].fctMoveRight()
@@ -854,12 +866,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         //snLaser.removeAllActions()
         if aSnLaserSphere.count == 0
         {
-            aSnLaserSphere.append(TLLaserSphere(size: CGSizeMake(41 * (self.frame.width/667.0), 41 * (self.frame.height/375.0))))
+            aSnLaserSphere.append(TLLaserSphere(size: CGSize(width: 41 * (self.frame.width/667.0), height: 41 * (self.frame.height/375.0))))
             aSnLaserSphere[0].blActive = false
         }
         allElements: for i in 0 ..< aSnLaserSphere.count {
             if aSnLaserSphere[i].blActive == false {
-                aSnLaserSphere[i] = TLLaserSphere(size: CGSizeMake(41 * (self.frame.width/667.0), 41 * (self.frame.height/375.0)))
+                aSnLaserSphere[i] = TLLaserSphere(size: CGSize(width: 41 * (self.frame.width/667.0), height: 41 * (self.frame.height/375.0)))
                 aSnLaserSphere[i].blActive = true
                 addChild(aSnLaserSphere[i])
                 aSnLaserSphere[i].fctMoveRight()
@@ -867,7 +879,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 break allElements
             }
             if i == (aSnLaserSphere.count - 1) {
-                aSnLaserSphere.append(TLLaserSphere(size: CGSizeMake(41 * (self.frame.width/667.0), 41 * (self.frame.height/375.0))))
+                aSnLaserSphere.append(TLLaserSphere(size: CGSize(width: 41 * (self.frame.width/667.0), height: 41 * (self.frame.height/375.0))))
                 aSnLaserSphere[i+1].blActive = true
                 addChild(aSnLaserSphere[i+1])
                 aSnLaserSphere[i+1].fctMoveRight()
@@ -881,12 +893,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         for iAngle in 0 ..< 3 {
             if aSnLaserCone.count == 0
             {
-                aSnLaserCone.append(TLLaserCone(size: CGSizeMake(40 * (self.frame.width/667.0), 5 * (self.frame.height/375.0)), angle: iAngle))
+                aSnLaserCone.append(TLLaserCone(size: CGSize(width: 40 * (self.frame.width/667.0), height: 5 * (self.frame.height/375.0)), angle: iAngle))
                 aSnLaserCone[0].blActive = false
             }
             allElements: for i in 0 ..< aSnLaserCone.count {
                 if aSnLaserCone[i].blActive == false {
-                    aSnLaserCone[i] = TLLaserCone(size: CGSizeMake(40 * (self.frame.width/667.0), 5 * (self.frame.height/375.0)), angle: iAngle)
+                    aSnLaserCone[i] = TLLaserCone(size: CGSize(width: 40 * (self.frame.width/667.0), height: 5 * (self.frame.height/375.0)), angle: iAngle)
                     aSnLaserCone[i].blActive = true
                     addChild(aSnLaserCone[i])
                     aSnLaserCone[i].fctMove(iAngle)
@@ -894,7 +906,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                     break allElements
                 }
                 if i == (aSnLaserCone.count - 1) {
-                    aSnLaserCone.append(TLLaserCone(size: CGSizeMake(40 * (self.frame.width/667.0), 5 * (self.frame.height/375.0)), angle: iAngle))
+                    aSnLaserCone.append(TLLaserCone(size: CGSize(width: 40 * (self.frame.width/667.0), height: 5 * (self.frame.height/375.0)), angle: iAngle))
                     aSnLaserCone[i+1].blActive = true
                     addChild(aSnLaserCone[i+1])
                     aSnLaserCone[i+1].fctMove(iAngle)
@@ -907,14 +919,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     
     func fctShootBomb() {
         blBombFired = true
-        snBombFired = TLBomb(size: CGSizeMake(25 * (self.frame.width/667.0), 25 * (self.frame.height/375.0)))
+        snBombFired = TLBomb(size: CGSize(width: 25 * (self.frame.width/667.0), height: 25 * (self.frame.height/375.0)))
         self.addChild(snBombFired)
         print("Bomb fired") // #debug
         snBombFired.fctMoveRight()
         snBombFired.fctPlayShootingSound()
     }
     
-    func didBeginContact(contact: SKPhysicsContact) {
+    func didBegin(_ contact: SKPhysicsContact) {
         let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if blGameOver == false {
             switch(contactMask) {
@@ -928,19 +940,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
@@ -972,6 +984,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                             if aSnmeteorite[i].blDestroyed == false {
                                 if snShip.iHealth > 100 {
                                     fctFadeInOutSKSpriteNode(snShip.snShipShield, time: 0.5, alpha: 0.75, pause: 0.1)
+                                    fctPlayShieldSound()
                                 }
                                 snShip.iHealth = snShip.iHealth - aSnmeteorite[i].iDamage
                                 aSnmeteorite[i].iHealth = 0
@@ -1138,19 +1151,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
@@ -1178,19 +1191,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                             if aSnmeteorite[i].iHealth <= 0 {
                                 if aSnmeteorite[i].iPowerUp > 0 {
                                     if aSnPowerUp.count == 0 {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[0].blActive = false
                                     }
                                     allElements: for j in 0 ..< aSnPowerUp.count {
                                         if aSnPowerUp[j].blActive == false {
-                                            aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                            aSnPowerUp[j] = TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                             aSnPowerUp[j].blActive = true
                                             addChild(aSnPowerUp[j])
                                             aSnPowerUp[j].fctMoveLeft()
                                             break allElements
                                         }
                                         if j == (aSnPowerUp.count - 1) {
-                                            aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                            aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                             aSnPowerUp[j+1].blActive = true
                                             addChild(aSnPowerUp[j+1])
                                             aSnPowerUp[j+1].fctMoveLeft()
@@ -1240,19 +1253,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
@@ -1277,19 +1290,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
                                 if aSnPowerUp.count == 0 {
-                                    aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                    aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                     aSnPowerUp[0].blActive = false
                                 }
                                 allElements: for j in 0 ..< aSnPowerUp.count {
                                     if aSnPowerUp[j].blActive == false {
-                                        aSnPowerUp[j] = TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
+                                        aSnPowerUp[j] = TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp)
                                         aSnPowerUp[j].blActive = true
                                         addChild(aSnPowerUp[j])
                                         aSnPowerUp[j].fctMoveLeft()
                                         break allElements
                                     }
                                     if j == (aSnPowerUp.count - 1) {
-                                        aSnPowerUp.append(TLPowerUp(size: CGSizeMake(30 * (self.frame.width/667.0), 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
+                                        aSnPowerUp.append(TLPowerUp(size: CGSize(width: 30 * (self.frame.width/667.0), height: 30 * (self.frame.height/375.0)), pos: aSnmeteorite[i].position, type: aSnmeteorite[i].iPowerUp))
                                         aSnPowerUp[j+1].blActive = true
                                         addChild(aSnPowerUp[j+1])
                                         aSnPowerUp[j+1].fctMoveLeft()
@@ -1343,25 +1356,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         lbGameOver = SKLabelNode(fontNamed: fnGameFont?.fontName)
         lbGameOver.text = "GAME OVER"
         lbGameOver.fontSize = 70 * (self.frame.width/667.0)
-        lbGameOver.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame) - (lbGameOver.frame.size.height/2))
-        lbGameOver.fontColor = UIColor.whiteColor()
+        lbGameOver.position = CGPoint(x: self.frame.midX, y: self.frame.midY - (lbGameOver.frame.size.height/2))
+        lbGameOver.fontColor = UIColor.white
         lbGameOver.zPosition = 2.2
         self.addChild(lbGameOver)
 //        // Pause screen sprite
-        let snBackground = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
-        snBackground.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-        snBackground.strokeColor = SKColor.blackColor()
+        let snBackground = SKShapeNode(rectOf: CGSize(width: self.frame.width, height: self.frame.height))
+        snBackground.position = CGPoint(x:self.frame.midX, y:self.frame.midY)
+        snBackground.strokeColor = SKColor.black
         snBackground.glowWidth = 0.0
         snBackground.lineWidth = 0.0
-        snBackground.fillColor = SKColor.blackColor()
+        snBackground.fillColor = SKColor.black
         snBackground.zPosition = 2.1
         snBackground.alpha = 0.7
         self.addChild(snBackground)
         // Menu "Back" Sprite
         let flMenuBackSpriteWidth = (SKTexture(imageNamed: "Media/menu_back.png").size().width) * (self.frame.width/667.0)
         let flMenuBackSpriteHeight = (SKTexture(imageNamed: "Media/menu_back.png").size().height) * (self.frame.height/375.0)
-        snGameOverBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
-        snGameOverBack.anchorPoint = CGPointMake(0.0, 0.5)
+        snGameOverBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clear, size: CGSize(width: flMenuBackSpriteWidth, height: flMenuBackSpriteHeight))
+        snGameOverBack.anchorPoint = CGPoint(x: 0.0, y: 0.5)
         snGameOverBack.position = CGPoint(x: 1*(self.frame.width / 16), y: 10*(self.frame.height / 12))
         snGameOverBack.zPosition = 2.2
         snGameOverBack.alpha = 1.0
@@ -1484,6 +1497,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         }
     }
     
+    func fctPlayShieldSound() {
+        if GameData.blSoundEffectsEnabled == true {
+            apShield.volume = GameData.flSoundsVolume
+            apShield.prepareToPlay()
+            apShield.play()
+        }
+    }
+    
     func fctCheckForNewHighscore () {
         var blNewHighscoreScore = false
         var blNewHighscoreTime = false
@@ -1496,7 +1517,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             if GameData.aHighscoresScore[row].iScore < iGameScore {
                 print("New Highscore: " + String(iGameScore) + " Score @ Rank: " + String(row + 1))
                 if row < (aSkHighscoresRows - 1) {
-                    for backrow in ((row + 1)...(aSkHighscoresRows - 1)).reverse() {
+                    for backrow in ((row + 1)...(aSkHighscoresRows - 1)).reversed() {
                         GameData.aHighscoresScore[backrow].iScore = GameData.aHighscoresScore[backrow - 1].iScore
                         GameData.aHighscoresScore[backrow].iTime = GameData.aHighscoresScore[backrow - 1].iTime
                         GameData.aHighscoresScore[backrow].strName = GameData.aHighscoresScore[backrow - 1].strName
@@ -1515,7 +1536,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             if GameData.aHighscoresTime[row].iTime < iGameTimeSec {
                 print("New Highscore: " + String(iGameTimeSec) + " Time @ Rank: " + String(row + 1))
                 if row < (aSkHighscoresRows - 1) {
-                    for backrow in ((row + 1)...(aSkHighscoresRows - 1)).reverse() {
+                    for backrow in ((row + 1)...(aSkHighscoresRows - 1)).reversed() {
                         GameData.aHighscoresTime[backrow].iScore = GameData.aHighscoresTime[backrow - 1].iScore
                         GameData.aHighscoresTime[backrow].iTime = GameData.aHighscoresTime[backrow - 1].iTime
                         GameData.aHighscoresTime[backrow].strName = GameData.aHighscoresTime[backrow - 1].strName
@@ -1566,23 +1587,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         }
         SDGameData.strHighscoreScore = strBuffer
         // Save data
-        NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path!)
+        //NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path)
+        SDGameData.fctSaveData()
     }
     
     func fctTweetScore() {
-        if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) {
+        if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
             // 2
-            var tweetSheet = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
+            let tweetSheet = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
             // 3
-            tweetSheet.setInitialText("Test Tweet")
-            self.view?.window?.rootViewController?.presentViewController(tweetSheet, animated: true, completion: nil)
+            tweetSheet?.setInitialText("Test Tweet")
+            self.view?.window?.rootViewController?.present(tweetSheet!, animated: true, completion: nil)
         } else {
             // 5
             print("error")
         }
     }
     
-    func applicationWillResignActive(notification: NSNotification) {
+    func applicationWillResignActive(_ notification: Notification) {
         //print("I'm out of focus!")
         if self.speed > 0.0 && blGameStarted == true {
             snPause = TLPause(size: CGSize(width: self.frame.width, height: self.frame.height))
@@ -1599,36 +1621,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         
         // code here...
         
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
-    func fctFadeInOutSKSpriteNode (node: SKSpriteNode, time: NSTimeInterval, alpha: CGFloat, pause: NSTimeInterval) {
+    func fctFadeInOutSKSpriteNode (_ node: SKSpriteNode, time: TimeInterval, alpha: CGFloat, pause: TimeInterval) {
         node.alpha = 0.0
         let deltaAlpha = alpha/5
         let deltaTime = time/10
         node.removeAllActions()
-        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
             node.alpha = node.alpha + deltaAlpha
-            node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+            node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                 node.alpha = node.alpha + deltaAlpha
-                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                     node.alpha = node.alpha + deltaAlpha
-                    node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                    node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                         node.alpha = node.alpha + deltaAlpha
-                        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                             node.alpha = node.alpha + deltaAlpha
-                            node.runAction(SKAction.rotateToAngle(0, duration: pause), completion: {() in
+                            node.run(SKAction.rotate(toAngle: 0, duration: pause), completion: {() in
                                 // Pause
-                                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                     // Fade out
                                     node.alpha = node.alpha - deltaAlpha
-                                    node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                    node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                         node.alpha = node.alpha - deltaAlpha
-                                        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                             node.alpha = node.alpha - deltaAlpha
-                                            node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                            node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                                 node.alpha = node.alpha - deltaAlpha
-                                                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                                     node.alpha = node.alpha - deltaAlpha
                                                     node.removeAllActions()
                                                 })
@@ -1644,33 +1666,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         })
     }
     
-    func fctFadeInOutSKLabelNode (node: SKLabelNode, time: NSTimeInterval, alpha: CGFloat, pause: NSTimeInterval) {
+    func fctFadeInOutSKLabelNode (_ node: SKLabelNode, time: TimeInterval, alpha: CGFloat, pause: TimeInterval) {
         node.alpha = 0.0
         let deltaAlpha = alpha/5
         let deltaTime = time/10
         node.removeAllActions()
-        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
             node.alpha = node.alpha + deltaAlpha
-            node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+            node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                 node.alpha = node.alpha + deltaAlpha
-                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                     node.alpha = node.alpha + deltaAlpha
-                    node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                    node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                         node.alpha = node.alpha + deltaAlpha
-                        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                             node.alpha = node.alpha + deltaAlpha
-                            node.runAction(SKAction.rotateToAngle(0, duration: pause), completion: {() in
+                            node.run(SKAction.rotate(toAngle: 0, duration: pause), completion: {() in
                                 // Pause
-                                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                     // Fade out
                                     node.alpha = node.alpha - deltaAlpha
-                                    node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                    node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                         node.alpha = node.alpha - deltaAlpha
-                                        node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                             node.alpha = node.alpha - deltaAlpha
-                                            node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                            node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                                 node.alpha = node.alpha - deltaAlpha
-                                                node.runAction(SKAction.rotateToAngle(0, duration: deltaTime), completion: {() in
+                                                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
                                                     node.alpha = node.alpha - deltaAlpha
                                                     node.removeAllActions()
                                                 })

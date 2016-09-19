@@ -10,11 +10,11 @@ import Social
 
 /// URLs
 private struct URL {
-    static let iTunesApp = NSURL(string: "apps://itunes.apple.com")
-    static let twitterApp = NSURL(string: "twitter://")
-    static let twitterWeb = NSURL(string: "https://twitter.com/")
-    static let facebookApp = NSURL(string: "facebook://")
-    static let facebookWeb = NSURL(string: "https://facebook.com/")
+    static let iTunesApp = Foundation.URL(string: "apps://itunes.apple.com")
+    static let twitterApp = Foundation.URL(string: "twitter://")
+    static let twitterWeb = Foundation.URL(string: "https://twitter.com/")
+    static let facebookApp = Foundation.URL(string: "facebook://")
+    static let facebookWeb = Foundation.URL(string: "https://facebook.com/")
 }
 
 /// Text strings
@@ -35,10 +35,10 @@ extension TLSocial where Self: SKScene {
         guard let twitterApp = URL.twitterApp else { return }
         guard let twitterWeb = URL.twitterWeb else { return }
         
-        if UIApplication.sharedApplication().canOpenURL(twitterApp){
-            UIApplication.sharedApplication().openURL(twitterApp)
+        if UIApplication.shared.canOpenURL(twitterApp){
+            UIApplication.shared.openURL(twitterApp)
         } else {
-            UIApplication.sharedApplication().openURL(twitterWeb)
+            UIApplication.shared.openURL(twitterWeb)
         }
     }
     
@@ -47,85 +47,85 @@ extension TLSocial where Self: SKScene {
         guard let facebookApp = URL.facebookApp else { return }
         guard let facebookWeb = URL.facebookWeb else { return }
         
-        if UIApplication.sharedApplication().canOpenURL(facebookApp){
-            UIApplication.sharedApplication().openURL(facebookApp)
+        if UIApplication.shared.canOpenURL(facebookApp){
+            UIApplication.shared.openURL(facebookApp)
         } else {
-            UIApplication.sharedApplication().openURL(facebookWeb)
+            UIApplication.shared.openURL(facebookWeb)
         }
     }
     
     /// Share to twitter
     func shareToTwitter() {
         
-        guard SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) else {
+        guard SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) else {
             showAlert()
             return
         }
         
         let twitterSheet = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-        twitterSheet.completionHandler = { result in
+        twitterSheet?.completionHandler = { result in
             
             switch result {
                 
-            case .Cancelled:
+            case .cancelled:
                 print("twitter message cancelled")
                 break
                 
-            case .Done:
+            case .done:
                 print("twitter message complete")
                 break
             }
         }
         
         let text = TextString.shareSheetText //
-        twitterSheet.setInitialText(text) // share sheet text for twitter will not work anymore if app is installed
-        self.view?.window?.rootViewController?.presentViewController(twitterSheet, animated: true, completion: nil)
+        twitterSheet?.setInitialText(text) // share sheet text for twitter will not work anymore if app is installed
+        self.view?.window?.rootViewController?.present(twitterSheet!, animated: true, completion: nil)
     }
     
     /// Share to facebook
     func shareToFacebook() {
         
-        guard SLComposeViewController.isAvailableForServiceType(SLServiceTypeFacebook) else {
+        guard SLComposeViewController.isAvailable(forServiceType: SLServiceTypeFacebook) else {
             showAlert()
             return
         }
         
         let facebookSheet = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
-        facebookSheet.completionHandler = { result in
+        facebookSheet?.completionHandler = { result in
             
             switch result {
                 
-            case .Cancelled:
+            case .cancelled:
                 print("facebook message cancelled")
                 break
                 
-            case .Done:
+            case .done:
                 print("facebook message complete")
                 break
             }
         }
         
         let text = TextString.shareSheetText //
-        facebookSheet.setInitialText(text) // share sheet text for twitter will not work anymore if app is installed
-        facebookSheet.addURL(NSURL(string: text))
-        self.view?.window?.rootViewController?.presentViewController(facebookSheet, animated: true, completion: nil)
+        facebookSheet?.setInitialText(text) // share sheet text for twitter will not work anymore if app is installed
+        facebookSheet?.add(Foundation.URL(string: text))
+        self.view?.window?.rootViewController?.present(facebookSheet!, animated: true, completion: nil)
     }
     
     /// Show alert
-    private func showAlert() {
-        let alertController = UIAlertController(title: TextString.error, message: TextString.enableSocial, preferredStyle: .Alert)
+    fileprivate func showAlert() {
+        let alertController = UIAlertController(title: TextString.error, message: TextString.enableSocial, preferredStyle: .alert)
         
-        let okAction = UIAlertAction(title: TextString.ok, style: .Cancel) { _ in }
+        let okAction = UIAlertAction(title: TextString.ok, style: .cancel) { _ in }
         alertController.addAction(okAction)
         
-        let settingsAction = UIAlertAction(title: TextString.settings, style: .Default) { _ in
+        let settingsAction = UIAlertAction(title: TextString.settings, style: .default) { _ in
             
-            if let url = NSURL(string: UIApplicationOpenSettingsURLString) {
-                UIApplication.sharedApplication().openURL(url)
+            if let url = Foundation.URL(string: UIApplicationOpenSettingsURLString) {
+                UIApplication.shared.openURL(url)
             }
         }
         alertController.addAction(settingsAction)
         
-        self.view?.window?.rootViewController?.presentViewController(alertController, animated: true, completion: nil)
+        self.view?.window?.rootViewController?.present(alertController, animated: true, completion: nil)
     }
 }

@@ -19,12 +19,12 @@ class TLLaserCone: SKSpriteNode {
     var apLaserConeShootingSound: AVAudioPlayer!
     
     init(size: CGSize, angle: Int) {
-        super.init(texture: SKTexture(imageNamed: "Media/effects/cone_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
-        self.anchorPoint = CGPointMake(0.0, 0.5)
+        super.init(texture: SKTexture(imageNamed: "Media/effects/cone_001.png"), color: UIColor.clear, size: CGSize(width: size.width, height: size.height))
+        self.anchorPoint = CGPoint(x: 0.0, y: 0.5)
         self.position = CGPoint(x: flShipPosX + (snShip.frame.size.width/2), y: flShipPosY)
         // --- physics body ---
-        self.physicsBody = SKPhysicsBody(rectangleOfSize: CGSizeMake(size.width, size.height), center: CGPoint(x: self.size.width / 2, y: 0))
-        self.physicsBody?.dynamic = false
+        self.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: size.width, height: size.height), center: CGPoint(x: self.size.width / 2, y: 0))
+        self.physicsBody?.isDynamic = false
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = true
         self.physicsBody?.categoryBitMask = enBodyType.laserCone.rawValue
@@ -42,10 +42,10 @@ class TLLaserCone: SKSpriteNode {
             self.zRotation = atan(((flScreenHeight / 2)) / (flScreenWidth - (self.position.x) + 50))
             if GameData.blSoundEffectsEnabled == true {
                 // Sounds for laser cone
-                let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_004", ofType:"wav")
-                let fileURL = NSURL(fileURLWithPath: path!)
+                let path = Bundle.main.path(forResource: "Media/sounds/laser_004", ofType:"wav")
+                let fileURL = URL(fileURLWithPath: path!)
                 do {
-                    try apLaserConeShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                    try apLaserConeShootingSound = AVAudioPlayer(contentsOf: fileURL, fileTypeHint: nil)
                 } catch {
                     print("Could not create audio player: \(error)")
                     return
@@ -66,25 +66,25 @@ class TLLaserCone: SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func fctMove(angle: Int) {
+    func fctMove(_ angle: Int) {
         switch (angle) {
         case 0:
-            let actShoot = SKAction.moveTo(CGPointMake(flScreenWidth + 50, self.position.y + (flScreenHeight / 2)), duration: 1.0)
+            let actShoot = SKAction.move(to: CGPoint(x: flScreenWidth + 50, y: self.position.y + (flScreenHeight / 2)), duration: 1.0)
             //(flScreenWidth, y: 0, duration: 1.0)
-            self.runAction(actShoot, completion: {() in
+            self.run(actShoot, completion: {() in
                 self.removeFromParent()
                 self.blActive = false
             })
         case 1:
-            let actShoot = SKAction.moveByX(flScreenWidth, y: 0, duration: 1.0)
-            self.runAction(actShoot, completion: {() in
+            let actShoot = SKAction.moveBy(x: flScreenWidth, y: 0, duration: 1.0)
+            self.run(actShoot, completion: {() in
                 self.removeFromParent()
                 self.blActive = false
             })
         case 2:
-            let actShoot = SKAction.moveTo(CGPointMake(flScreenWidth + 50, self.position.y - (flScreenHeight / 2)), duration: 1.0)
+            let actShoot = SKAction.move(to: CGPoint(x: flScreenWidth + 50, y: self.position.y - (flScreenHeight / 2)), duration: 1.0)
             //(flScreenWidth, y: 0, duration: 1.0)
-            self.runAction(actShoot, completion: {() in
+            self.run(actShoot, completion: {() in
                 self.removeFromParent()
                 self.blActive = false
             })

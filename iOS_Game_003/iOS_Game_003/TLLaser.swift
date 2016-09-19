@@ -16,12 +16,12 @@ class TLLaser: SKSpriteNode {
     var apLaserShootingSound: AVAudioPlayer!
     
     init(size: CGSize) {
-        super.init(texture: SKTexture(imageNamed: "Media/effects/laser_001.png"), color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
-        self.anchorPoint = CGPointMake(0.5, 0.5)
+        super.init(texture: SKTexture(imageNamed: "Media/effects/laser_001.png"), color: UIColor.clear, size: CGSize(width: size.width, height: size.height))
+        self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.position = CGPoint(x: flShipPosX + (snShip.frame.size.width/2) + (size.width/2), y: flShipPosY)
         // --- physics body ---
-        self.physicsBody = SKPhysicsBody(rectangleOfSize: CGSizeMake(size.width/2, size.height))
-        self.physicsBody?.dynamic = false
+        self.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: size.width/2, height: size.height))
+        self.physicsBody?.isDynamic = false
         self.physicsBody?.affectedByGravity = false
         self.physicsBody?.allowsRotation = false
         self.physicsBody?.categoryBitMask = enBodyType.laser.rawValue
@@ -30,10 +30,10 @@ class TLLaser: SKSpriteNode {
         self.zPosition = 1.1
         if GameData.blSoundEffectsEnabled == true {
             // Sounds for laser
-            let path = NSBundle.mainBundle().pathForResource("Media/sounds/laser_002", ofType:"wav")
-            let fileURL = NSURL(fileURLWithPath: path!)
+            let path = Bundle.main.path(forResource: "Media/sounds/laser_002", ofType:"wav")
+            let fileURL = URL(fileURLWithPath: path!)
             do {
-                try apLaserShootingSound = AVAudioPlayer(contentsOfURL: fileURL, fileTypeHint: nil)
+                try apLaserShootingSound = AVAudioPlayer(contentsOf: fileURL, fileTypeHint: nil)
             } catch {
                 print("Could not create audio player: \(error)")
                 return
@@ -49,8 +49,8 @@ class TLLaser: SKSpriteNode {
     }
     
     func fctMoveRight() {
-        let actShoot = SKAction.moveByX(flScreenWidth, y: 0, duration: 1.0)
-        self.runAction(actShoot, completion: {() in
+        let actShoot = SKAction.moveBy(x: flScreenWidth, y: 0, duration: 1.0)
+        self.run(actShoot, completion: {() in
             self.removeFromParent()
             self.blActive = false
         })

@@ -8,7 +8,7 @@
 
 import Foundation
 
-class TLSaveData: NSObject, NSCoding {
+class TLSaveData: NSObject {
     // Options
     var strPlayerName: String
     var blSoundEffectsEnabled: Bool
@@ -19,23 +19,24 @@ class TLSaveData: NSObject, NSCoding {
     var strHighscoreTime: String
     // Highscore by score
     var strHighscoreScore: String
+    var userDefaults: UserDefaults
     
     // MARK: Archiving Paths
     
-    static let DocumentsDirectory = NSFileManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
-    static let ArchiveURL = DocumentsDirectory.URLByAppendingPathComponent("SDGameData")
+    //static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+    //static let ArchiveURL = DocumentsDirectory.appendingPathComponent("SDGameData")
     
     // MARK: Types
     
-    struct PropertyKey {
-        static let strPlayerNameKey = "strPlayerName"
-        static let blSoundEffectsKey = "blSoundEffects"
-        static let blMusicKey = "blMusicKey"
-        static let flSoundVolumeKey = "flSoundVolume"
-        static let flMusicVolumeKey = "flMusicVolume"
-        static let strHighscoreTimeKey = "strHighscoreTime"
-        static let strHighscoreScoreKey = "strHighscoreScore"
-    }
+    //struct PropertyKey {
+    //    static let strPlayerNameKey = "strPlayerName"
+    //    static let blSoundEffectsKey = "blSoundEffects"
+    //    static let blMusicKey = "blMusicKey"
+    //    static let flSoundVolumeKey = "flSoundVolume"
+    //    static let flMusicVolumeKey = "flMusicVolume"
+    //    static let strHighscoreTimeKey = "strHighscoreTime"
+    //    static let strHighscoreScoreKey = "strHighscoreScore"
+    //}
     
     // MARK: Initialization
     
@@ -48,32 +49,57 @@ class TLSaveData: NSObject, NSCoding {
         self.flMusicVolume = flMusicVolume
         self.strHighscoreTime = strHighscoreTime
         self.strHighscoreScore = strHighscoreScore
+        self.userDefaults = UserDefaults.standard
         
-        super.init()
+        //super.init()
+    }
+    
+    func fctSaveData() {
+        userDefaults.setValue(self.strPlayerName, forKey: "strPlayerName")
+        userDefaults.set(self.blSoundEffectsEnabled, forKey: "blSoundEffectsEnabled")
+        userDefaults.set(self.blMusicEnabled, forKey: "blMusicEnabled")
+        userDefaults.set(self.flSoundsVolume, forKey: "flSoundsVolume")
+        userDefaults.set(self.flMusicVolume, forKey: "flMusicVolume")
+        userDefaults.setValue(self.strHighscoreTime, forKey: "strHighscoreTime")
+        userDefaults.setValue(self.strHighscoreScore, forKey: "strHighscoreScore")
+        
+        userDefaults.synchronize()
+    }
+    
+    func fctLoadData() {
+        //highscore = userDefaults.valueForKey("highscore")
+        
+        self.strPlayerName = userDefaults.value(forKey: "strPlayerName") as! String
+        self.blSoundEffectsEnabled = userDefaults.value(forKey: "blSoundEffectsEnabled") as! Bool
+        self.blMusicEnabled = userDefaults.value(forKey: "blMusicEnabled") as! Bool
+        self.flSoundsVolume = userDefaults.value(forKey: "flSoundsVolume") as! Float
+        self.flMusicVolume = userDefaults.value(forKey: "flMusicVolume") as! Float
+        self.strHighscoreTime = userDefaults.value(forKey: "strHighscoreTime") as! String
+        self.strHighscoreScore = userDefaults.value(forKey: "strHighscoreScore") as! String
     }
     
     // MARK: NSCoding
     
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(strPlayerName, forKey: PropertyKey.strPlayerNameKey)
-        aCoder.encodeObject(blSoundEffectsEnabled, forKey: PropertyKey.blSoundEffectsKey)
-        aCoder.encodeObject(blMusicEnabled, forKey: PropertyKey.blMusicKey)
-        aCoder.encodeObject(flSoundsVolume, forKey: PropertyKey.flSoundVolumeKey)
-        aCoder.encodeObject(flMusicVolume, forKey: PropertyKey.flMusicVolumeKey)
-        aCoder.encodeObject(strHighscoreTime, forKey: PropertyKey.strHighscoreTimeKey)
-        aCoder.encodeObject(strHighscoreScore, forKey: PropertyKey.strHighscoreScoreKey)
-    }
+   // func encode(with aCoder: NSCoder) {
+   //     aCoder.encode(strPlayerName, forKey: PropertyKey.strPlayerNameKey)
+   //     aCoder.encode(blSoundEffectsEnabled, forKey: PropertyKey.blSoundEffectsKey)
+   //     aCoder.encode(blMusicEnabled, forKey: PropertyKey.blMusicKey)
+   //     aCoder.encode(flSoundsVolume, forKey: PropertyKey.flSoundVolumeKey)
+   //     aCoder.encode(flMusicVolume, forKey: PropertyKey.flMusicVolumeKey)
+   //     aCoder.encode(strHighscoreTime, forKey: PropertyKey.strHighscoreTimeKey)
+   //     aCoder.encode(strHighscoreScore, forKey: PropertyKey.strHighscoreScoreKey)
+   // }
     
-    required convenience init?(coder aDecoder: NSCoder) {
-        let strPlayerName = aDecoder.decodeObjectForKey(PropertyKey.strPlayerNameKey) as! String
-        let blSoundEffectsEnabled = aDecoder.decodeObjectForKey(PropertyKey.blSoundEffectsKey) as! Bool
-        let blMusicEnabled = aDecoder.decodeObjectForKey(PropertyKey.blMusicKey) as! Bool
-        let flSoundsVolume = aDecoder.decodeObjectForKey(PropertyKey.flSoundVolumeKey) as! Float
-        let flMusicVolume = aDecoder.decodeObjectForKey(PropertyKey.flMusicVolumeKey) as! Float
-        let strHighscoreTime = aDecoder.decodeObjectForKey(PropertyKey.strHighscoreTimeKey) as! String
-        let strHighscoreScore = aDecoder.decodeObjectForKey(PropertyKey.strHighscoreScoreKey) as! String
+    //required convenience init?(coder aDecoder: NSCoder) {
+    //    let strPlayerName = aDecoder.decodeObject(forKey: PropertyKey.strPlayerNameKey) as! String
+    //    let blSoundEffectsEnabled = aDecoder.decodeObject(forKey: PropertyKey.blSoundEffectsKey) as! Bool
+    //    let blMusicEnabled = aDecoder.decodeObject(forKey: PropertyKey.blMusicKey) as! Bool
+    //    let flSoundsVolume = aDecoder.decodeObject(forKey: PropertyKey.flSoundVolumeKey) as! Float
+    //    let flMusicVolume = aDecoder.decodeObject(forKey: PropertyKey.flMusicVolumeKey) as! Float
+    //    let strHighscoreTime = aDecoder.decodeObject(forKey: PropertyKey.strHighscoreTimeKey) as! String
+    //    let strHighscoreScore = aDecoder.decodeObject(forKey: PropertyKey.strHighscoreScoreKey) as! String
         
         // Must call designated initializer.
-        self.init(strPlayerName: strPlayerName, blSoundEffectsEnabled: blSoundEffectsEnabled, blMusicEnabled: blMusicEnabled, flSoundsVolume: flSoundsVolume, flMusicVolume: flMusicVolume, strHighscoreTime: strHighscoreTime, strHighscoreScore: strHighscoreScore)
-    }
+    //    self.init(strPlayerName: strPlayerName, blSoundEffectsEnabled: blSoundEffectsEnabled, blMusicEnabled: blMusicEnabled, flSoundsVolume: flSoundsVolume, flMusicVolume: flMusicVolume, strHighscoreTime: strHighscoreTime, strHighscoreScore: strHighscoreScore)
+    //}
 }

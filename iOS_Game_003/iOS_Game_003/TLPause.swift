@@ -23,11 +23,11 @@ class TLPause: SKSpriteNode {
     init(size: CGSize) {
         //let txBackground_001 = SKTexture(imageNamed: "Media/reactor_001.png")
         
-        super.init(texture: nil,color: UIColor.clearColor(), size: CGSizeMake(size.width, size.height))
-        self.anchorPoint = CGPointMake(0.5, 0.5)
+        super.init(texture: nil,color: UIColor.clear, size: CGSize(width: size.width, height: size.height))
+        self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         // --- Part 001 ---
-        let snBackground_001 = SKSpriteNode(texture: nil,color: UIColor.blackColor(), size: CGSizeMake(size.width, size.height))
-        snBackground_001.anchorPoint = CGPointMake(0.5, 0.5)
+        let snBackground_001 = SKSpriteNode(texture: nil,color: UIColor.black, size: CGSize(width: size.width, height: size.height))
+        snBackground_001.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         snBackground_001.position = CGPoint(x: flScreenWidth / 2, y: flScreenHeight / 2)
         snBackground_001.alpha = 0.8
         snBackground_001.zPosition = 2.1
@@ -35,8 +35,8 @@ class TLPause: SKSpriteNode {
         // Menu "Back" Sprite
         let flMenuBackSpriteWidth = (SKTexture(imageNamed: "Media/menu_back.png").size().width) * (self.frame.width/667.0)
         let flMenuBackSpriteHeight = (SKTexture(imageNamed: "Media/menu_back.png").size().height) * (self.frame.height/375.0)
-        snMenuBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuBackSpriteWidth, flMenuBackSpriteHeight))
-        snMenuBack.anchorPoint = CGPointMake(0.0, 0.5)
+        snMenuBack = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_back.png"), color: UIColor.clear, size: CGSize(width: flMenuBackSpriteWidth, height: flMenuBackSpriteHeight))
+        snMenuBack.anchorPoint = CGPoint(x: 0.0, y: 0.5)
         snMenuBack.position = CGPoint(x: 1*(flScreenWidth / 16), y: 10*(flScreenHeight / 12))
         snMenuBack.zPosition = 2.2
         snMenuBack.alpha = 1.0
@@ -46,8 +46,8 @@ class TLPause: SKSpriteNode {
         let flMenuSpriteWidth = (SKTexture(imageNamed: "Media/menu_headline.png").size().width) * (self.frame.width/667.0)
         let flMenuSpriteHeight = (SKTexture(imageNamed: "Media/menu_headline.png").size().height) * (self.frame.height/375.0)
         // Menu "About" Sprite
-        snMenuPause = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_headline.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
-        snMenuPause.anchorPoint = CGPointMake(1.0, 0.5)
+        snMenuPause = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_headline.png"), color: UIColor.clear, size: CGSize(width: flMenuSpriteWidth, height: flMenuSpriteHeight))
+        snMenuPause.anchorPoint = CGPoint(x: 1.0, y: 0.5)
         snMenuPause.position = CGPoint(x: 15*(self.frame.width / 16), y: 10*(self.frame.height / 12))
         snMenuPause.zPosition = 2.2
         snMenuPause.alpha = 1.0
@@ -55,12 +55,12 @@ class TLPause: SKSpriteNode {
         addChild(snMenuPause)
         // Menu "About" Text
         lbMenuPause = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbMenuPause.horizontalAlignmentMode = .Center;
-        lbMenuPause.verticalAlignmentMode = .Center
+        lbMenuPause.horizontalAlignmentMode = .center;
+        lbMenuPause.verticalAlignmentMode = .center
         lbMenuPause.text = " GAME PAUSED"
         lbMenuPause.fontSize = 30 * (self.frame.width/667.0)
-        lbMenuPause.position = CGPoint(x: CGRectGetMidX(snMenuPause.frame), y: 10*(self.frame.height / 12))
-        lbMenuPause.fontColor = UIColor.whiteColor()
+        lbMenuPause.position = CGPoint(x: snMenuPause.frame.midX, y: 10*(self.frame.height / 12))
+        lbMenuPause.fontColor = UIColor.white
         lbMenuPause.zPosition = 2.2
         lbMenuPause.name = "MenuPause"
         self.addChild(lbMenuPause)
@@ -90,8 +90,8 @@ class TLPause: SKSpriteNode {
 //        lbPause.alpha = 1.0
 //        self.addChild(lbPause)
         // Menu "Quit" Sprite
-        snMenuQuit = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_bottom.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
-        snMenuQuit.anchorPoint = CGPointMake(0.5, 0.5)
+        snMenuQuit = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_bottom.png"), color: UIColor.clear, size: CGSize(width: flMenuSpriteWidth, height: flMenuSpriteHeight))
+        snMenuQuit.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         snMenuQuit.position = CGPoint(x: (self.frame.width / 2), y: 3*(self.frame.height / 12))
         snMenuQuit.zPosition = 2.2
         snMenuQuit.alpha = 1.0
@@ -99,18 +99,18 @@ class TLPause: SKSpriteNode {
         addChild(snMenuQuit)
         // Menu "Quit" Text
         lbMenuQuit = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbMenuQuit.horizontalAlignmentMode = .Center;
-        lbMenuQuit.verticalAlignmentMode = .Center
+        lbMenuQuit.horizontalAlignmentMode = .center;
+        lbMenuQuit.verticalAlignmentMode = .center
         lbMenuQuit.text = "QUIT"
         lbMenuQuit.fontSize = 30 * (self.frame.width/667.0)
         lbMenuQuit.position = CGPoint(x: (self.frame.width / 2), y: 3*(self.frame.height / 12))
-        lbMenuQuit.fontColor = UIColor.whiteColor()
+        lbMenuQuit.fontColor = UIColor.white
         lbMenuQuit.zPosition = 2.2
         lbMenuQuit.name = "MenuQuit"
         self.addChild(lbMenuQuit)
         // Menu "Options" Sprite
-        snMenuOptions = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_top.png"), color: UIColor.clearColor(), size: CGSizeMake(flMenuSpriteWidth, flMenuSpriteHeight))
-        snMenuOptions.anchorPoint = CGPointMake(0.5, 0.5)
+        snMenuOptions = SKSpriteNode(texture: SKTexture(imageNamed: "Media/menu_top.png"), color: UIColor.clear, size: CGSize(width: flMenuSpriteWidth, height: flMenuSpriteHeight))
+        snMenuOptions.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         snMenuOptions.position = CGPoint(x: (self.frame.width / 2), y: 5*(self.frame.height / 12))
         snMenuOptions.zPosition = 2.2
         snMenuOptions.alpha = 1.0
@@ -118,12 +118,12 @@ class TLPause: SKSpriteNode {
         addChild(snMenuOptions)
         // Menu "Options" Text
         lbMenuOptions = SKLabelNode(fontNamed: fnGameFont?.fontName)
-        lbMenuOptions.horizontalAlignmentMode = .Center;
-        lbMenuOptions.verticalAlignmentMode = .Center
+        lbMenuOptions.horizontalAlignmentMode = .center;
+        lbMenuOptions.verticalAlignmentMode = .center
         lbMenuOptions.text = "OPTIONS"
         lbMenuOptions.fontSize = 30 * (self.frame.width/667.0)
         lbMenuOptions.position = CGPoint(x: (self.frame.width / 2), y: 5*(self.frame.height / 12))
-        lbMenuOptions.fontColor = UIColor.whiteColor()
+        lbMenuOptions.fontColor = UIColor.white
         lbMenuOptions.zPosition = 2.2
         lbMenuOptions.name = "MenuOptions"
         self.addChild(lbMenuOptions)

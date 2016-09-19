@@ -7,6 +7,16 @@ ToDo
 - Improve sprites
 - Different ship sprites?
 - Achievements?
+- Asteroids Counter
+- More Shields
+- Horizontal movement
+- Sound for shields being hit
+
+ver 0.39
+- Migration to SWIFT 3.0
+- Sounds added for shields being hit
+- Achievements menu added
+- Scrolling trough achievements
 
 ver 0.38
 - New ship sprites

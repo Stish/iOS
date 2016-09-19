@@ -20,15 +20,15 @@ class GameViewController: UIViewController {
         
         // --- configure the view
         let skView = view as! SKView
-        skView.multipleTouchEnabled = true // no multitouch allowed
+        skView.isMultipleTouchEnabled = true // no multitouch allowed
         skView.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
         
         // --- create and configure the scene
         scGame = GameScene(size: skView.bounds.size)
-        scGame.scaleMode = .AspectFill
+        scGame.scaleMode = .aspectFill
         
         scGameStart = TLGameStart(size: skView.bounds.size)
-        scGameStart.scaleMode = .AspectFill
+        scGameStart.scaleMode = .aspectFill
         
         
         // --- present the scene
@@ -36,15 +36,15 @@ class GameViewController: UIViewController {
         skView.presentScene(scGameStart)
     }
     
-    override func shouldAutorotate() -> Bool {
+    override var shouldAutorotate : Bool {
         return true
     }
     
-    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
-            return .AllButUpsideDown
+    override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return .allButUpsideDown
         } else {
-            return .All
+            return .all
         }
     }
     
@@ -53,7 +53,7 @@ class GameViewController: UIViewController {
         // Release any cached data, images, etc that aren't in use.
     }
     
-    override func prefersStatusBarHidden() -> Bool {
+    override var prefersStatusBarHidden : Bool {
         return true
     }
 }

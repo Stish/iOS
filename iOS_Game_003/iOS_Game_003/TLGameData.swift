@@ -19,6 +19,6 @@ class TLGameData: NSObject {
     var blMusicEnabled = true
     var flSoundsVolume = Float(0.5)
     var flMusicVolume = Float(0.5)
-    
+    var iGameAchieve = 0 // bits = Achievements
     
 }
