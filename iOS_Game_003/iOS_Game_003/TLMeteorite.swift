@@ -42,7 +42,7 @@ class TLMeteorite: SKSpriteNode {
             iScore = 500
             //blHasPowerUp = true
             iPowerUp = Int(arc4random_uniform(UInt32(4)) + 1)
-            print("PowerUp Type: " + String(iPowerUp))
+            //print("PowerUp Type: " + String(iPowerUp)) // #debug
         case 94...96:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_005.png")
             iHealth = 200
@@ -50,7 +50,7 @@ class TLMeteorite: SKSpriteNode {
             iDamage = 200
             //blHasPowerUp = true
             iPowerUp = Int(arc4random_uniform(UInt32(4)) + 1)
-            print("PowerUp Type: " + String(iPowerUp))
+            //print("PowerUp Type: " + String(iPowerUp)) // #debug
         case 97...100:
             self.texture = SKTexture(imageNamed: "Media/objects/meteorite_006.png")
             iHealth = 200
@@ -58,7 +58,7 @@ class TLMeteorite: SKSpriteNode {
             iDamage = 200
             //blHasPowerUp = true
             iPowerUp = Int(arc4random_uniform(UInt32(4)) + 1)
-            print("PowerUp Type: " + String(iPowerUp))
+            //print("PowerUp Type: " + String(iPowerUp)) // #debug
         default:
             ()
         }
@@ -131,6 +131,9 @@ class TLMeteorite: SKSpriteNode {
         self.run(SKAction.rotate(toAngle: 0, duration: 0), completion: {() in
             self.addChild(lbScore)
         })
+        // --- Achievement ---
+        GameData.iMeteoriteCnt = GameData.iMeteoriteCnt + 1
+        print("### Asteroids destroyed: " + String(GameData.iMeteoriteCnt)) // #debug
         
         self.run(actExplode, completion: {() in
             lbScore.removeFromParent()

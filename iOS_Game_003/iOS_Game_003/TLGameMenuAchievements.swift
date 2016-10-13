@@ -17,6 +17,14 @@ class TLGameMenuAchievements: SKScene, SKPhysicsContactDelegate {
     var snAchieveIcon2: SKSpriteNode!
     var snAchieveTextBorder1: SKSpriteNode!
     var snAchieveTextBorder2: SKSpriteNode!
+    var lnAchieve1Text1: SKLabelNode!
+    var lnAchieve1Text2: SKLabelNode!
+    var lnAchieve1Text3: SKLabelNode!
+    var lnAchieve1Text4: SKLabelNode!
+    var lnAchieve2Text1: SKLabelNode!
+    var lnAchieve2Text2: SKLabelNode!
+    var lnAchieve2Text3: SKLabelNode!
+    var lnAchieve2Text4: SKLabelNode!
     var snAchieveSliderBody: SKSpriteNode!
     var snAchieveSliderKnob: SKSpriteNode!
     var iButtonPressed: Int!
@@ -111,6 +119,86 @@ class TLGameMenuAchievements: SKScene, SKPhysicsContactDelegate {
         snAchieveTextBorder2.alpha = 1.0
         snAchieveTextBorder2.name = "AchieveTextBorder2"
         addChild(snAchieveTextBorder2)
+        // Achievement 1 Text line 1
+        lnAchieve1Text1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lnAchieve1Text1.horizontalAlignmentMode = .left;
+        lnAchieve1Text1.verticalAlignmentMode = .center
+        lnAchieve1Text1.fontSize = 20 * (self.frame.width/667.0)
+        lnAchieve1Text1.fontColor = UIColor.white
+        lnAchieve1Text1.zPosition = 1.0
+        lnAchieve1Text1.text = "Blaster Master"
+        lnAchieve1Text1.position = CGPoint(x: 4.2*(self.frame.width / 16), y: 8*(self.frame.height / 12) - 1*(flAchieveTextBorderHeight/5))
+        self.addChild(lnAchieve1Text1)
+        // Achievement 1 Text line 2
+        lnAchieve1Text2 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lnAchieve1Text2.horizontalAlignmentMode = .left;
+        lnAchieve1Text2.verticalAlignmentMode = .center
+        lnAchieve1Text2.fontSize = 20 * (self.frame.width/667.0)
+        lnAchieve1Text2.fontColor = UIColor.lightGray
+        lnAchieve1Text2.zPosition = 1.0
+        lnAchieve1Text2.text = "Number of destroyed asteroids"
+        lnAchieve1Text2.position = CGPoint(x: 4.2*(self.frame.width / 16), y: 8*(self.frame.height / 12) - 2*(flAchieveTextBorderHeight/5))
+        self.addChild(lnAchieve1Text2)
+        // Achievement 1 Text line 3
+        lnAchieve1Text3 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lnAchieve1Text3.horizontalAlignmentMode = .left;
+        lnAchieve1Text3.verticalAlignmentMode = .center
+        lnAchieve1Text3.fontSize = 20 * (self.frame.width/667.0)
+        lnAchieve1Text3.fontColor = UIColor.lightGray
+        lnAchieve1Text3.zPosition = 1.0
+        lnAchieve1Text3.text = "Bla Bla Text"
+        lnAchieve1Text3.position = CGPoint(x: 4.2*(self.frame.width / 16), y: 8*(self.frame.height / 12) - 3*(flAchieveTextBorderHeight/5))
+        self.addChild(lnAchieve1Text3)
+        // Achievement 1 Text line 4
+        lnAchieve1Text4 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lnAchieve1Text4.horizontalAlignmentMode = .left;
+        lnAchieve1Text4.verticalAlignmentMode = .center
+        lnAchieve1Text4.fontSize = 20 * (self.frame.width/667.0)
+        lnAchieve1Text4.fontColor = UIColor.red
+        lnAchieve1Text4.zPosition = 1.0
+        lnAchieve1Text4.text = "Weapon power +1"
+        lnAchieve1Text4.position = CGPoint(x: 4.2*(self.frame.width / 16), y: 8*(self.frame.height / 12) - 4*(flAchieveTextBorderHeight/5))
+        self.addChild(lnAchieve1Text4)
+        // Achievement 2 Text line 1
+        lnAchieve2Text1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lnAchieve2Text1.horizontalAlignmentMode = .left;
+        lnAchieve2Text1.verticalAlignmentMode = .center
+        lnAchieve2Text1.fontSize = 20 * (self.frame.width/667.0)
+        lnAchieve2Text1.fontColor = UIColor.white
+        lnAchieve2Text1.zPosition = 1.0
+        lnAchieve2Text1.text = "Blaster Master"
+        lnAchieve2Text1.position = CGPoint(x: 4.2*(self.frame.width / 16), y: 4*(self.frame.height / 12) - 1*(flAchieveTextBorderHeight/5))
+        self.addChild(lnAchieve2Text1)
+        // Achievement 2 Text line 2
+        lnAchieve2Text2 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lnAchieve2Text2.horizontalAlignmentMode = .left;
+        lnAchieve2Text2.verticalAlignmentMode = .center
+        lnAchieve2Text2.fontSize = 20 * (self.frame.width/667.0)
+        lnAchieve2Text2.fontColor = UIColor.lightGray
+        lnAchieve2Text2.zPosition = 1.0
+        lnAchieve2Text2.text = "Number of destroyed asteroids"
+        lnAchieve2Text2.position = CGPoint(x: 4.2*(self.frame.width / 16), y: 4*(self.frame.height / 12) - 2*(flAchieveTextBorderHeight/5))
+        self.addChild(lnAchieve2Text2)
+        // Achievement 2 Text line 3
+        lnAchieve2Text3 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lnAchieve2Text3.horizontalAlignmentMode = .left;
+        lnAchieve2Text3.verticalAlignmentMode = .center
+        lnAchieve2Text3.fontSize = 20 * (self.frame.width/667.0)
+        lnAchieve2Text3.fontColor = UIColor.lightGray
+        lnAchieve2Text3.zPosition = 1.0
+        lnAchieve2Text3.text = "Bla Bla Text"
+        lnAchieve2Text3.position = CGPoint(x: 4.2*(self.frame.width / 16), y: 4*(self.frame.height / 12) - 3*(flAchieveTextBorderHeight/5))
+        self.addChild(lnAchieve2Text3)
+        // Achievement 2 Text line 4
+        lnAchieve2Text4 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+        lnAchieve2Text4.horizontalAlignmentMode = .left;
+        lnAchieve2Text4.verticalAlignmentMode = .center
+        lnAchieve2Text4.fontSize = 20 * (self.frame.width/667.0)
+        lnAchieve2Text4.fontColor = UIColor.red
+        lnAchieve2Text4.zPosition = 1.0
+        lnAchieve2Text4.text = "Weapon power +1"
+        lnAchieve2Text4.position = CGPoint(x: 4.2*(self.frame.width / 16), y: 4*(self.frame.height / 12) - 4*(flAchieveTextBorderHeight/5))
+        self.addChild(lnAchieve2Text4)
         // Slider body
         snAchieveSliderBody = SKSpriteNode(texture: SKTexture(imageNamed: "Media/slider_vertical_body.png"), color: UIColor.clear, size: CGSize(width: flAchieveSliderBodyWidth, height: flAchieveSliderBodyHeight))
         snAchieveSliderBody.anchorPoint = CGPoint(x: 0.5, y: 1.0)
@@ -131,6 +219,8 @@ class TLGameMenuAchievements: SKScene, SKPhysicsContactDelegate {
         iSliderPos = 0
         iSliderSteps = iAchieveCnt / 2
         flSliderDeltaY = CGFloat(flAchieveSliderBodyHeight - flAchieveSliderKnobHeight) / CGFloat(iSliderSteps - 1)
+        fctUpdateAchievements()
+        fctUpdateSlider()
         // --- Sounds: Click ---
         let path = Bundle.main.path(forResource: "Media/sounds/click_001", ofType:"wav")
         let fileURL = URL(fileURLWithPath: path!)
@@ -235,15 +325,31 @@ class TLGameMenuAchievements: SKScene, SKPhysicsContactDelegate {
         case 2:
             snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_05.png")
             snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_06.png")
-        case 3:
-            snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_07.png")
-            snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_08.png")
-        case 4:
-            snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_09.png")
-            snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_10.png")
+//        case 3:
+//            snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_07.png")
+//            snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_08.png")
+//        case 4:
+//            snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_09.png")
+//            snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_10.png")
         default:
             ()
         }
+        // Text Achievement 1
+        lnAchieve1Text1.text = GameData.aStrAchieveName[2 * iSliderPos]
+        lnAchieve1Text2.text = GameData.aStrAchieveText1[2 * iSliderPos]
+        lnAchieve1Text3.text = GameData.aStrAchieveText2[2 * iSliderPos]
+        lnAchieve1Text4.text = GameData.aStrAchieveText3[2 * iSliderPos]
+        // Text Achievement 2
+        lnAchieve2Text1.text = GameData.aStrAchieveName[(2 * iSliderPos) + 1]
+        lnAchieve2Text2.text = GameData.aStrAchieveText1[(2 * iSliderPos) + 1]
+        lnAchieve2Text3.text = GameData.aStrAchieveText2[(2 * iSliderPos) + 1]
+        lnAchieve2Text4.text = GameData.aStrAchieveText3[(2 * iSliderPos) + 1]
+    }
+    
+    func fctUpdateAchievements() {
+        // Achievement 01
+        GameData.aStrAchieveText2[0] = String(GameData.iMeteoriteCnt) + " / 1000000"
+        GameData.aStrAchieveName[1] = "Wreck-it " + GameData.strPlayerName
     }
 }
 

@@ -66,7 +66,9 @@ class TLPause: SKSpriteNode {
         self.addChild(lbMenuPause)
         //snInventory.zPosition = 2.2
         //self.view!.paused = true
-        print("Paused!")
+        
+        //print("Paused!") // #debug
+        
         // Pause screen sprite
 //        snPause = SKShapeNode(rectOfSize: CGSize(width: self.frame.width, height: self.frame.height))
 //        snPause.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))

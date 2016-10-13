@@ -6,11 +6,37 @@ ToDo
 - Add new game features to tutorial
 - Improve sprites
 - Different ship sprites?
-- Achievements?
-- Asteroids Counter
 - More Shields
 - Horizontal movement
-- Sound for shields being hit
+
+ver 0.40
+- Number of destroyed asteroids is tracked for achievements
+- Data for achievements are saved
+- 6 achievements added
+- Achievements:
+01:     "Master Blaster"
+Task:   Destroy 100000 asteroids
+Reward: New skin
+
+02:     "Wreck-it NAME"
+Task:   Get hit 30 times in one game
+Reward: Shields +1
+
+03:     "Gunslinger"
+Task:   Hit 300 asteroids without missing in one game with standard laser
+Reward: New weapon: Disruptor
+
+04:     "Dodge this!"
+Task:   Surviving 300s without hitting and being hit
+Reward: Vertical movement enabled
+
+05:     "I'm T.N.T., I'm dynamite"
+Task:   Get killed by own bomb explosion
+Reward: Bombs +1
+
+06:     "King of the impossible"
+Task:   Score 100000 points in one game
+Reward: New skin
 
 ver 0.39
 - Migration to SWIFT 3.0

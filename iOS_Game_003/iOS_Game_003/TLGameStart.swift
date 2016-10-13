@@ -89,11 +89,11 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
         }
         
         if blResetGameData == false {
-            SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy)
+            SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy, iMeteoriteCnt: GameData.iMeteoriteCnt, iAchieved: GameData.iAchieved)
             SDGameData.fctLoadData()
         }
         else {
-            SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy)
+            SDGameData = TLSaveData(strPlayerName: GameData.strPlayerName, blSoundEffectsEnabled: GameData.blSoundEffectsEnabled, blMusicEnabled: GameData.blMusicEnabled, flSoundsVolume: GameData.flSoundsVolume, flMusicVolume: GameData.flMusicVolume, strHighscoreTime: strHighscoreDummy, strHighscoreScore: strHighscoreDummy, iMeteoriteCnt: GameData.iMeteoriteCnt, iAchieved: GameData.iAchieved)
             SDGameData.fctSaveData()
         }
         GameData.strPlayerName = SDGameData.strPlayerName
@@ -101,6 +101,8 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
         GameData.blMusicEnabled = SDGameData.blMusicEnabled
         GameData.flSoundsVolume = SDGameData.flSoundsVolume
         GameData.flMusicVolume = SDGameData.flMusicVolume
+        GameData.iMeteoriteCnt = SDGameData.iMeteoriteCnt
+        GameData.iAchieved = SDGameData.iAchieved
         let aStrHighscoreTime = SDGameData.strHighscoreTime.components(separatedBy: "\t")
         for row in 0...(aStrHighscoreTime.count / 3) - 1 {
             GameData.aHighscoresTime[row].iScore = Int(aStrHighscoreTime[(row*3) + 0])
@@ -155,9 +157,9 @@ class TLGameStart: SKScene, SKPhysicsContactDelegate {
  */
         let testString = "Stish" + "\t" + "1234" + "\t" + "5678"
         let testStringArr = testString.components(separatedBy: "\t")
-        print("Name: " + testStringArr[0])
-        print("Time: " + testStringArr[1])
-        print("Score: " + testStringArr[2])
+        //print("Name: " + testStringArr[0]) // #debug
+        //print("Time: " + testStringArr[1]) // #debug
+        //print("Score: " + testStringArr[2]) // #debug
         
         // Highscore by score array
     }

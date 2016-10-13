@@ -20,6 +20,8 @@ class TLSaveData: NSObject {
     // Highscore by score
     var strHighscoreScore: String
     var userDefaults: UserDefaults
+    var iMeteoriteCnt: Int
+    var iAchieved: Int
     
     // MARK: Archiving Paths
     
@@ -40,7 +42,7 @@ class TLSaveData: NSObject {
     
     // MARK: Initialization
     
-    init?(strPlayerName: String, blSoundEffectsEnabled: Bool, blMusicEnabled: Bool, flSoundsVolume: Float, flMusicVolume: Float, strHighscoreTime: String, strHighscoreScore: String) {
+    init?(strPlayerName: String, blSoundEffectsEnabled: Bool, blMusicEnabled: Bool, flSoundsVolume: Float, flMusicVolume: Float, strHighscoreTime: String, strHighscoreScore: String, iMeteoriteCnt: Int, iAchieved: Int) {
         // Initialize stored properties.
         self.strPlayerName = strPlayerName
         self.blSoundEffectsEnabled = blSoundEffectsEnabled
@@ -49,6 +51,8 @@ class TLSaveData: NSObject {
         self.flMusicVolume = flMusicVolume
         self.strHighscoreTime = strHighscoreTime
         self.strHighscoreScore = strHighscoreScore
+        self.iMeteoriteCnt = iMeteoriteCnt
+        self.iAchieved = iAchieved
         self.userDefaults = UserDefaults.standard
         
         //super.init()
@@ -62,7 +66,8 @@ class TLSaveData: NSObject {
         userDefaults.set(self.flMusicVolume, forKey: "flMusicVolume")
         userDefaults.setValue(self.strHighscoreTime, forKey: "strHighscoreTime")
         userDefaults.setValue(self.strHighscoreScore, forKey: "strHighscoreScore")
-        
+        userDefaults.set(self.iMeteoriteCnt, forKey: "iMeteoriteCnt")
+        userDefaults.set(self.iAchieved, forKey: "iAchieved")
         userDefaults.synchronize()
     }
     
@@ -76,6 +81,8 @@ class TLSaveData: NSObject {
         self.flMusicVolume = userDefaults.value(forKey: "flMusicVolume") as! Float
         self.strHighscoreTime = userDefaults.value(forKey: "strHighscoreTime") as! String
         self.strHighscoreScore = userDefaults.value(forKey: "strHighscoreScore") as! String
+        self.iMeteoriteCnt = userDefaults.value(forKey: "iMeteoriteCnt") as! Int
+        self.iAchieved = userDefaults.value(forKey: "iAchieved") as! Int
     }
     
     // MARK: NSCoding

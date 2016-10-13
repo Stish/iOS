@@ -11,7 +11,7 @@ import AVFoundation
 import Social
 
 // Debugging
-var strVersion = "ver 0.39"
+var strVersion = "ver 0.40"
 var blGameTest = false
 var blResetGameData = false
 // --- Game positions ---
@@ -24,7 +24,7 @@ var SDGameData: TLSaveData!
 var GameData: TLGameData!
 var blScoreSwitchChecked = true
 let strHighscoreDummy = "0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"+"\t"+"0"+"\t"+"0"+"\t"+"-"
-let iAchieveCnt = Int(10)
+let iAchieveCnt = Int(6)
 //let strHighscoreDummy = "1"+"\t"+"11"+"\t"+"111"+"\t"+"2"+"\t"+"22"+"\t"+"222"+"\t"+"3"+"\t"+"33"+"\t"+"333"+"\t"+"4"+"\t"+"44"+"\t"+"444"+"\t"+"5"+"\t"+"55"+"\t"+"555"
 var aSkHighscoresColumns = 4
 var aSkHighscoresRows = 5
@@ -465,14 +465,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                         blLaserSphereFired = true
                                         iLaserSphereShootingPause = 0
                                         self.fctShootLaserSphere()
-                                        print("Laser spheres: " + String(aSnLaserSphere.count)) // #debug
+                                        //print("Laser spheres: " + String(aSnLaserSphere.count)) // #debug
                                     }
                                 case 2:
                                     if blLaserConeFired == false {
                                         blLaserConeFired = true
                                         iLaserConeShootingPause = 0
                                         self.fctShootLaserCone()
-                                        print("Laser cones: " + String(aSnLaserCone.count)) // #debug
+                                        //print("Laser cones: " + String(aSnLaserCone.count)) // #debug
                                     }
                                 default:
                                     ()
@@ -647,7 +647,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         //snInventory.zPosition = 2.2
                         self.speed = 0.0
                         //self.view!.paused = true
-                        print("Paused!")
+                        //print("Paused!") // #debug
                         // Inventory
                         snInventory = TLInventory(size: CGSize(width: self.frame.width, height: self.frame.height))
                         snInventory.zPosition = 2.2
@@ -921,7 +921,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         blBombFired = true
         snBombFired = TLBomb(size: CGSize(width: 25 * (self.frame.width/667.0), height: 25 * (self.frame.height/375.0)))
         self.addChild(snBombFired)
-        print("Bomb fired") // #debug
+        //print("Bomb fired") // #debug
         snBombFired.fctMoveRight()
         snBombFired.fctPlayShootingSound()
     }
@@ -1468,7 +1468,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         } else {
             snShieldBar4.alpha = 0.0
         }
-        print("Health: " + String(snShip.iHealth)) // #debug
+        //print("Health: " + String(snShip.iHealth)) // #debug
     }
     
     func fctUpdateBombs() {
@@ -1515,7 +1515,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         // Check for new highscores based on score
         for row in 0...aSkHighscoresRows - 1 {
             if GameData.aHighscoresScore[row].iScore < iGameScore {
-                print("New Highscore: " + String(iGameScore) + " Score @ Rank: " + String(row + 1))
+                //print("New Highscore: " + String(iGameScore) + " Score @ Rank: " + String(row + 1)) // #debug
                 if row < (aSkHighscoresRows - 1) {
                     for backrow in ((row + 1)...(aSkHighscoresRows - 1)).reversed() {
                         GameData.aHighscoresScore[backrow].iScore = GameData.aHighscoresScore[backrow - 1].iScore
@@ -1534,7 +1534,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         // Check for new highscores based on time
         for row in 0...aSkHighscoresRows - 1 {
             if GameData.aHighscoresTime[row].iTime < iGameTimeSec {
-                print("New Highscore: " + String(iGameTimeSec) + " Time @ Rank: " + String(row + 1))
+                //print("New Highscore: " + String(iGameTimeSec) + " Time @ Rank: " + String(row + 1)) // #debug
                 if row < (aSkHighscoresRows - 1) {
                     for backrow in ((row + 1)...(aSkHighscoresRows - 1)).reversed() {
                         GameData.aHighscoresTime[backrow].iScore = GameData.aHighscoresTime[backrow - 1].iScore
@@ -1586,6 +1586,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             }
         }
         SDGameData.strHighscoreScore = strBuffer
+        SDGameData.iMeteoriteCnt = GameData.iMeteoriteCnt
+        SDGameData.iAchieved = GameData.iAchieved
         // Save data
         //NSKeyedArchiver.archiveRootObject(SDGameData, toFile: TLSaveData.ArchiveURL.path)
         SDGameData.fctSaveData()
@@ -1613,7 +1615,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             //snInventory.zPosition = 2.2
             self.speed = 0.0
             //self.view!.paused = true
-            print("Paused!")
+            //print("Paused!") // #debug
         }
     }
     
