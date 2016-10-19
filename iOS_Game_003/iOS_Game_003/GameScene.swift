@@ -11,7 +11,7 @@ import AVFoundation
 import Social
 
 // Debugging
-var strVersion = "ver 0.40"
+var strVersion = "ver 0.41"
 var blGameTest = false
 var blResetGameData = false
 // --- Game positions ---
@@ -34,6 +34,14 @@ var blBombFired: Bool!
 var iSelectedWeapon: Int! // 0: Laser 1: Laser sphere 2: Laser cone
 var blLaserSpherePickedUp = false
 var blLaserConePickedUp = false
+var iSelectedShip = 0
+// --- Achievement goals ---
+let iAchieve1 = 60 // Number of destroyed astros
+let iAchieve2 = 2 // Getting hit in one game
+let iAchieve3 = 5 // Hits without misses
+let iAchieve4 = 30 // Seconds without being hit
+//let iAchieve5 = 0 // Getting killed by own bomb
+let iAchieve6 = 2000 // Score in one game
 // --- game speed ---
 let flmeteoriteSpeedInit = Double(2.9)
 let imeteoriteSpawnTimeInit = 18
@@ -107,6 +115,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var snShieldBar2: SKSpriteNode!
     var snShieldBar3: SKSpriteNode!
     var snShieldBar4: SKSpriteNode!
+    var snShieldBar5: SKSpriteNode!
     var snBomb1: SKSpriteNode!
     var snBomb2: SKSpriteNode!
     var snBomb3: SKSpriteNode!
@@ -130,6 +139,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var snShareFacebook: SKSpriteNode!
     var snGameOverBack: SKSpriteNode!
     var snPause: TLPause!
+    // Achievement
+    var iHitCnt: Int!
+    var iLaserFiredCnt: Int!
+    var iAstroHitCnt: Int!
+    var iShipMaxHealth: Int!
 
     override func didMove(to view: SKView) {
         if blGameStarted == false {
@@ -178,6 +192,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             flScreenWidth = view.frame.size.width
             flScreenHeight = view.frame.size.height
             iButtonPressed = 0
+            // Achievement
+            iHitCnt = 0
+            iLaserFiredCnt = 0
+            iAstroHitCnt = 0
             
             self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
             self.anchorPoint = CGPoint(x: 0, y: 0)
@@ -196,7 +214,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             snShip.position = CGPoint(x: 120.0 * (self.frame.width/667.0) , y: (view.frame.height/2) - (50 * (self.frame.height/375.0)))
             flShipPosX = snShip.position.x
             flShipPosY = snShip.position.y
-            snShip.iHealth = 500
+            //snShip.iHealth = iShipMaxHealth
             addChild(snShip)
 
             myLabel = SKLabelNode(fontNamed: fnGameFont?.fontName)
@@ -238,34 +256,76 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             let flShieldSprite1Height = (SKTexture(imageNamed: "Media/shield_point_001.png").size().height) * (self.frame.height/375.0)
             let flShieldSprite2Width = (SKTexture(imageNamed: "Media/shield_point_002.png").size().width) * (self.frame.width/667.0)
             let flShieldSprite2Height = (SKTexture(imageNamed: "Media/shield_point_002.png").size().height) * (self.frame.height/375.0)
-            // Shield bar 1
-            snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite1Width, height: flShieldSprite1Height))
-            snShieldBar1.anchorPoint = CGPoint(x: 0.0, y: 0.5)
-            snShieldBar1.position = CGPoint(x: self.frame.midX - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-            snShieldBar1.zPosition = 2.0
-            snShieldBar1.alpha = 1.0
-            self.addChild(snShieldBar1)
-            // Shield bar 2
-            snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
-            snShieldBar2.anchorPoint = CGPoint(x: 0.0, y: 0.5)
-            snShieldBar2.position = CGPoint(x: self.frame.midX - (180 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-            snShieldBar2.zPosition = 2.0
-            snShieldBar2.alpha = 1.0
-            self.addChild(snShieldBar2)
-            // Shield bar 3
-            snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
-            snShieldBar3.anchorPoint = CGPoint(x: 0.0, y: 0.5)
-            snShieldBar3.position = CGPoint(x: self.frame.midX - (136 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-            snShieldBar3.zPosition = 2.0
-            snShieldBar3.alpha = 1.0
-            self.addChild(snShieldBar3)
-            // Shield bar 4
-            snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
-            snShieldBar4.anchorPoint = CGPoint(x: 0.0, y: 0.5)
-            snShieldBar4.position = CGPoint(x: self.frame.midX - (92 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
-            snShieldBar4.zPosition = 2.0
-            snShieldBar4.alpha = 1.0
-            self.addChild(snShieldBar4)
+
+            if (GameData.iAchieved & (1<<1) == (1<<1)) {
+                iShipMaxHealth = 600
+                // Shield bar 1
+                snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001_2.png"), color: UIColor.clear, size: CGSize(width: 0.8*flShieldSprite1Width, height: flShieldSprite1Height))
+                snShieldBar1.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar1.position = CGPoint(x: self.frame.midX - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar1.zPosition = 2.0
+                snShieldBar1.alpha = 1.0
+                self.addChild(snShieldBar1)
+                // Shield bar 2
+                snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: 0.8*flShieldSprite2Width, height: flShieldSprite2Height))
+                snShieldBar2.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar2.position = CGPoint(x: self.frame.midX - (189 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar2.zPosition = 2.0
+                snShieldBar2.alpha = 1.0
+                self.addChild(snShieldBar2)
+                // Shield bar 3
+                snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: 0.8*flShieldSprite2Width, height: flShieldSprite2Height))
+                snShieldBar3.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar3.position = CGPoint(x: self.frame.midX - (154 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar3.zPosition = 2.0
+                snShieldBar3.alpha = 1.0
+                self.addChild(snShieldBar3)
+                // Shield bar 4
+                snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: 0.8*flShieldSprite2Width, height: flShieldSprite2Height))
+                snShieldBar4.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar4.position = CGPoint(x: self.frame.midX - (119 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar4.zPosition = 2.0
+                snShieldBar4.alpha = 1.0
+                self.addChild(snShieldBar4)
+                // Shield bar 5
+                snShieldBar5 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: 0.8*flShieldSprite2Width, height: flShieldSprite2Height))
+                snShieldBar5.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar5.position = CGPoint(x: self.frame.midX - (84 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar5.zPosition = 2.0
+                snShieldBar5.alpha = 1.0
+                self.addChild(snShieldBar5)
+
+            } else {
+                iShipMaxHealth = 500
+                // Shield bar 1
+                snShieldBar1 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_001.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite1Width, height: flShieldSprite1Height))
+                snShieldBar1.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar1.position = CGPoint(x: self.frame.midX - (225 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar1.zPosition = 2.0
+                snShieldBar1.alpha = 1.0
+                self.addChild(snShieldBar1)
+                // Shield bar 2
+                snShieldBar2 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
+                snShieldBar2.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar2.position = CGPoint(x: self.frame.midX - (180 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar2.zPosition = 2.0
+                snShieldBar2.alpha = 1.0
+                self.addChild(snShieldBar2)
+                // Shield bar 3
+                snShieldBar3 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
+                snShieldBar3.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar3.position = CGPoint(x: self.frame.midX - (136 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar3.zPosition = 2.0
+                snShieldBar3.alpha = 1.0
+                self.addChild(snShieldBar3)
+                // Shield bar 4
+                snShieldBar4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/shield_point_002.png"), color: UIColor.clear, size: CGSize(width: flShieldSprite2Width, height: flShieldSprite2Height))
+                snShieldBar4.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+                snShieldBar4.position = CGPoint(x: self.frame.midX - (92 * (self.frame.width/667.0)), y: 23 * (self.frame.height/375.0))
+                snShieldBar4.zPosition = 2.0
+                snShieldBar4.alpha = 1.0
+                self.addChild(snShieldBar4)
+            }
             fctUpdateShields()
             // Bombs
             let flBombWidth = (SKTexture(imageNamed: "Media/pu_bomb_001_empty.png").size().width) * (self.frame.width/667.0)
@@ -421,6 +481,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 object: nil)
             
             fctNewGame()
+            snShip.iHealth = iShipMaxHealth
         } 
     }
     
@@ -801,6 +862,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 if (iTime100ms % 10 == 0) && (blGameOver == false) && (blGameStarted == true) {
                     iGameTimeSec = iGameTimeSec + 1
                     lbGameTime.text = String(iGameTimeSec)
+                    if (iGameTimeSec == iAchieve4) && (iGameScore == 0) && (GameData.iAchieved & (1<<3) == 0) {
+                        GameData.iAchieved = GameData.iAchieved | (1<<3)
+                        SDGameData.iAchieved = GameData.iAchieved
+                        SDGameData.fctSaveData()
+                        print("### Achievement 4 achieved ###") // #debug
+                    }
                     if iGameTimeSec % iSpeedUpateCycleTimeSec == 0 {
                         if flmeteoriteSpeed > 0.1 {
                             flmeteoriteSpeed = flmeteoriteSpeed - 0.1
@@ -837,6 +904,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     
     func fctShootLaser01() {
         //snLaser.removeAllActions()
+        iLaserFiredCnt = iLaserFiredCnt + 1
         if aSnLaser01.count == 0
         {
             aSnLaser01.append(TLLaser(size: CGSize(width: 60 * (self.frame.width/667.0), height: 5 * (self.frame.height/375.0))))
@@ -936,6 +1004,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                 let firstNode = contact.bodyA.node
                 for i in 0 ..< aSnmeteorite.count {
                     if (secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i]) && (aSnmeteorite[i].blDestroyed == false) {
+                        iAstroHitCnt = iAstroHitCnt + 1
+                        if (iAstroHitCnt == iAchieve3) && (iLaserFiredCnt == iAchieve3) && (GameData.iAchieved & (1<<2) == 0) {
+                            GameData.iAchieved = GameData.iAchieved | (1<<2)
+                            SDGameData.iAchieved = GameData.iAchieved
+                            SDGameData.fctSaveData()
+                            print("### Achievement 3 achieved ###") // #debug
+                        }
                         aSnmeteorite[i].iHealth -= 100
                         if aSnmeteorite[i].iHealth <= 0 {
                             if aSnmeteorite[i].iPowerUp > 0 {
@@ -981,6 +1056,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                     let firstNode = contact.bodyA.node
                     for i in 0 ..< aSnmeteorite.count {
                         if secondNode == aSnmeteorite[i] || firstNode == aSnmeteorite[i] {
+                            iHitCnt = iHitCnt + 1
+                            if (iHitCnt >= iAchieve2) && (GameData.iAchieved & (1<<1) == 0) {
+                                GameData.iAchieved = GameData.iAchieved | (1<<1)
+                                SDGameData.iAchieved = GameData.iAchieved
+                                SDGameData.fctSaveData()
+                                print("### Achievement 2 achieved ###") // #debug
+                            }
                             if aSnmeteorite[i].blDestroyed == false {
                                 if snShip.iHealth > 100 {
                                     fctFadeInOutSKSpriteNode(snShip.snShipShield, time: 0.5, alpha: 0.75, pause: 0.1)
@@ -993,6 +1075,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                 fctUpdateShields()
                                 if aSnmeteorite[i].iPowerUp == 1 {
                                     iGameScore = iGameScore + 300
+                                    if (iGameScore >= iAchieve6) && (GameData.iAchieved & (1<<5) == 0) {
+                                        GameData.iAchieved = GameData.iAchieved | (1<<5)
+                                        SDGameData.iAchieved = GameData.iAchieved
+                                        SDGameData.fctSaveData()
+                                        print("### Achievement 6 achieved ###") // #debug
+                                    }
                                     if iBombCount < 3 {
                                         self.iBombCount = iBombCount + 1
                                         fctUpdateBombs()
@@ -1007,10 +1095,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                 }
                                 if aSnmeteorite[i].iPowerUp == 2 {
                                     iGameScore = iGameScore + 300
-                                    if snShip.iHealth < 500 {
+                                    if (iGameScore >= iAchieve6) && (GameData.iAchieved & (1<<5) == 0) {
+                                        GameData.iAchieved = GameData.iAchieved | (1<<5)
+                                        SDGameData.iAchieved = GameData.iAchieved
+                                        SDGameData.fctSaveData()
+                                        print("### Achievement 6 achieved ###") // #debug
+                                    }
+                                    if snShip.iHealth < iShipMaxHealth {
                                         snShip.iHealth = snShip.iHealth + 100
                                         fctUpdateShields()
-                                        lbPowerUpInv.text = "Shields +25%"
+                                        if iShipMaxHealth == 500 {
+                                            lbPowerUpInv.text = "Shields +25%"
+                                        } else {
+                                            lbPowerUpInv.text = "Shields +20%"
+                                        }
                                     } else {
                                         lbPowerUpInv.text = "Shields at 100%"
                                     }
@@ -1021,6 +1119,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                 }
                                 if aSnmeteorite[i].iPowerUp == 3 {
                                     iGameScore = iGameScore + 1000
+                                    if (iGameScore >= iAchieve6) && (GameData.iAchieved & (1<<5) == 0) {
+                                        GameData.iAchieved = GameData.iAchieved | (1<<5)
+                                        SDGameData.iAchieved = GameData.iAchieved
+                                        SDGameData.fctSaveData()
+                                        print("### Achievement 6 achieved ###") // #debug
+                                    }
                                     if blLaserSpherePickedUp == false {
                                         blLaserSpherePickedUp = true
                                         //iSelectedWeapon = 1
@@ -1035,6 +1139,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                 }
                                 if aSnmeteorite[i].iPowerUp == 4 {
                                     iGameScore = iGameScore + 1000
+                                    if (iGameScore >= iAchieve6) && (GameData.iAchieved & (1<<5) == 0) {
+                                        GameData.iAchieved = GameData.iAchieved | (1<<5)
+                                        SDGameData.iAchieved = GameData.iAchieved
+                                        SDGameData.fctSaveData()
+                                        print("### Achievement 6 achieved ###") // #debug
+                                    }
                                     if blLaserConePickedUp == false {
                                         blLaserConePickedUp = true
                                         //iSelectedWeapon = 2
@@ -1087,10 +1197,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                 fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                             }
                             if aSnPowerUp[i].iPowerUp == 2 {
-                                if snShip.iHealth < 500 {
+                                if snShip.iHealth < iShipMaxHealth {
                                     snShip.iHealth = snShip.iHealth + 100
                                     fctUpdateShields()
-                                    lbPowerUpInv.text = "Shields +25%"
+                                    if iShipMaxHealth == 500 {
+                                        lbPowerUpInv.text = "Shields +25%"
+                                    } else {
+                                        lbPowerUpInv.text = "Shields +20%"
+                                    }
                                 } else {
                                     lbPowerUpInv.text = "Shields at 100%"
                                 }
@@ -1231,7 +1345,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                             fctFadeInOutSKSpriteNode(snShip.snShipShield, time: 0.5, alpha: 0.75, pause: 0.1)
                         }
                         snShip.iHealth = snShip.iHealth - 100
-                        if snShip.iHealth <= 0 {
+                        if (snShip.iHealth <= 0)  && (GameData.iAchieved & (1<<4) == 0) {
+                            GameData.iAchieved = GameData.iAchieved | (1<<4)
+                            SDGameData.iAchieved = GameData.iAchieved
+                            SDGameData.fctSaveData()
+                            print("### Achievement 5 achieved ###") // #debug
+                            
                             self.fctGameOver()
                             self.fctCheckForNewHighscore()
                             self.fctSaveHighscoreData()
@@ -1442,8 +1561,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         blGameStarted = false
         iGameScore = 0
         lbGameScore.text = "0"
-        snShip.iHealth = 500
+        snShip.iHealth = iShipMaxHealth
         iBombCount = 0
+        // Achievement
+        iHitCnt = 0
+        iLaserFiredCnt = 0
+        iAstroHitCnt = 0
+
         fctUpdateShields()
     }
     
@@ -1467,6 +1591,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             snShieldBar4.alpha = 1.0
         } else {
             snShieldBar4.alpha = 0.0
+        }
+        if (snShip.iHealth > 500) && (iShipMaxHealth == 600) {
+            snShieldBar5.alpha = 1.0
+        } else {
+            snShieldBar5.alpha = 0.0
         }
         //print("Health: " + String(snShip.iHealth)) // #debug
     }

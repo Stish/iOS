@@ -79,6 +79,12 @@ class TLPowerUp: SKSpriteNode {
     func fctExplode() {
         self.blDestroyed = true
         iGameScore = iGameScore + iScore
+        if (iGameScore >= iAchieve6) && (GameData.iAchieved & (1<<5) == 0) {
+            GameData.iAchieved = GameData.iAchieved | (1<<5)
+            SDGameData.iAchieved = GameData.iAchieved
+            SDGameData.fctSaveData()
+            print("### Achievement 6 achieved ###") // #debug
+        }
         lbGameScore.text = String(iGameScore)
         self.removeAllActions()
         self.physicsBody?.categoryBitMask = 0

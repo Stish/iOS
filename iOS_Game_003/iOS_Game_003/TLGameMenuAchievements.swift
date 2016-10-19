@@ -319,12 +319,42 @@ class TLGameMenuAchievements: SKScene, SKPhysicsContactDelegate {
         case 0:
             snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_01.png")
             snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_02.png")
+            if GameData.iAchieved & (1<<0) == (1<<0) {
+                lnAchieve1Text4.fontColor = UIColor.green
+            } else {
+                lnAchieve1Text4.fontColor = UIColor.red
+            }
+            if GameData.iAchieved & (1<<1) == (1<<1) {
+                lnAchieve2Text4.fontColor = UIColor.green
+            } else {
+                lnAchieve2Text4.fontColor = UIColor.red
+            }
         case 1:
             snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_03.png")
             snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_04.png")
+            if GameData.iAchieved & (1<<2) == (1<<2) {
+                lnAchieve1Text4.fontColor = UIColor.green
+            } else {
+                lnAchieve1Text4.fontColor = UIColor.red
+            }
+            if GameData.iAchieved & (1<<3) == (1<<3) {
+                lnAchieve2Text4.fontColor = UIColor.green
+            } else {
+                lnAchieve2Text4.fontColor = UIColor.red
+            }
         case 2:
             snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_05.png")
             snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_06.png")
+            if GameData.iAchieved & (1<<4) == (1<<4) {
+                lnAchieve1Text4.fontColor = UIColor.green
+            } else {
+                lnAchieve1Text4.fontColor = UIColor.red
+            }
+            if GameData.iAchieved & (1<<5) == (1<<5) {
+                lnAchieve2Text4.fontColor = UIColor.green
+            } else {
+                lnAchieve2Text4.fontColor = UIColor.red
+            }
 //        case 3:
 //            snAchieveIcon1.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_07.png")
 //            snAchieveIcon2.texture = SKTexture(imageNamed: "Media/Achievements/achieve_icon_08.png")
@@ -348,7 +378,7 @@ class TLGameMenuAchievements: SKScene, SKPhysicsContactDelegate {
     
     func fctUpdateAchievements() {
         // Achievement 01
-        GameData.aStrAchieveText2[0] = String(GameData.iMeteoriteCnt) + " / 1000000"
+        GameData.aStrAchieveText2[0] = String(GameData.iMeteoriteCnt) + " / " + String(iAchieve1)
         GameData.aStrAchieveName[1] = "Wreck-it " + GameData.strPlayerName
     }
 }

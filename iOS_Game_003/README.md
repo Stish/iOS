@@ -1,17 +1,28 @@
 # iOS_Game_003
 
 ToDo
-- enemies
-- nebulas
+- Game name ideas: Astro Blast, Asteroid Blast
+- Enemies?
 - Add new game features to tutorial
-- Improve sprites
-- Different ship sprites?
-- More Shields
+- Different ship sprites
+- More shields
 - Horizontal movement
+- More bombs
+- Weapon disruptor
+- New commander skin
+
+ver 0.41
+- New game menu for selecting ship sprites
+- Story intro added (Text and portrait)
+- Typewriter text animation
+- Ship sprites are changed due to selection
+- Achievements icons added
+- Achievements can be achieved: 1, 2, 3, 4, 5, 6
+- Bonuses of achievements added: 1, 6, 2
 
 ver 0.40
 - Number of destroyed asteroids is tracked for achievements
-- Data for achievements are saved
+- Data for achievements is saved
 - 6 achievements added
 - Achievements:
 01:     "Master Blaster"
@@ -28,7 +39,7 @@ Reward: New weapon: Disruptor
 
 04:     "Dodge this!"
 Task:   Surviving 300s without hitting and being hit
-Reward: Vertical movement enabled
+Reward: Horizontal movement enabled
 
 05:     "I'm T.N.T., I'm dynamite"
 Task:   Get killed by own bomb explosion

@@ -31,34 +31,34 @@ class TLGameData: NSObject {
     override init() {
         // Achievement 01:
         aStrAchieveName.append("Master Blaster")
-        aStrAchieveText1.append("Destroy 1000000 asteroids.")
-        aStrAchieveText2.append("x/1000000")
-        aStrAchieveText3.append("Weapon power +1")
+        aStrAchieveText1.append("Destroy " + String(iAchieve1) + " asteroids.")
+        aStrAchieveText2.append("x/" + String(iAchieve1))
+        aStrAchieveText3.append("New ship skin.")
         // Achievement 02:
         aStrAchieveName.append("Wreck-it NAME")
-        aStrAchieveText1.append("Get hit 30 times in one game.")
+        aStrAchieveText1.append("Get hit " + String(iAchieve2) + " times in one game.")
         aStrAchieveText2.append("")
-        aStrAchieveText3.append("NA")
+        aStrAchieveText3.append("Shields +1.")
         // Achievement 03:
         aStrAchieveName.append("Gunslinger")
-        aStrAchieveText1.append("Hit 300 asteroids in one game")
+        aStrAchieveText1.append("Hit " + String(iAchieve3) + " asteroids in one game")
         aStrAchieveText2.append("without missing (Standard laser).")
-        aStrAchieveText3.append("NA")
+        aStrAchieveText3.append("New weapon: Disruptor.")
         // Achievement 04:
         aStrAchieveName.append("Dodge this!")
-        aStrAchieveText1.append("Surviving 300s without hitting")
+        aStrAchieveText1.append("Surviving " + String(iAchieve4) + " without hitting")
         aStrAchieveText2.append("and being hit.")
-        aStrAchieveText3.append("NA")
+        aStrAchieveText3.append("Horizontal movement enabled.")
         // Achievement 05:
         aStrAchieveName.append("I'm T.N.T., I'm dynamite")
         aStrAchieveText1.append("Get killed by the explosion")
         aStrAchieveText2.append("of your bomb.")
-        aStrAchieveText3.append("NA")
+        aStrAchieveText3.append("Bombs +1.")
         // Achievement 06:
         aStrAchieveName.append("King of the impossible")
-        aStrAchieveText1.append("Score 100000 points in one game.")
+        aStrAchieveText1.append("Score " + String(iAchieve6) + " points in one game.")
         aStrAchieveText2.append("")
-        aStrAchieveText3.append("NA")
+        aStrAchieveText3.append("New ship skin.")
 //        // Achievement 07:
 //        aStrAchieveName.append("Achievement 07")
 //        aStrAchieveText1.append("Bla Bla do that!")

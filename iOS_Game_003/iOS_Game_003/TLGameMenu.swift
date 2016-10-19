@@ -165,6 +165,10 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
             return
         }
         apClick.numberOfLoops = 0
+        // --- Achievements ---
+        if GameData.iMeteoriteCnt >= iAchieve1 {
+            GameData.iAchieved = GameData.iAchieved | (1<<0)
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -228,10 +232,13 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
             switch (touchedNode.name) {
             case "MenuPlay"?:
                 if iButtonPressed == 1 {
-                    let transition = SKTransition.fade(with: .black, duration: 0.4)
-                    gzGame = GameScene(size: scene!.size)
-                    gzGame.scaleMode = .aspectFill
-                    scene?.view?.presentScene(gzGame, transition: transition)
+                    let transition = SKTransition.fade(with: .black, duration: 0.2)
+                    //gzGame = GameScene(size: scene!.size)
+                    //gzGame.scaleMode = .aspectFill
+                    //scene?.view?.presentScene(gzGame, transition: transition)
+                    let nextScene = TLGameMenuPlay(size: scene!.size)
+                    nextScene.scaleMode = .aspectFill
+                    scene?.view?.presentScene(nextScene, transition: transition)
                     self.removeFromParent()
                 }
             case "MenuTutorial"?:
@@ -277,7 +284,6 @@ class TLGameMenu: SKScene, SKPhysicsContactDelegate {
                 ()
             }
         }
-        
         iButtonPressed = 0
         snMenuPlay.texture = SKTexture(imageNamed: "Media/menu_top.png")
         lbMenuPlay.fontColor = UIColor.white

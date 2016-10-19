@@ -12,6 +12,7 @@
 		FA19BBE11D2DA5E900157105 /* TLHighscoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBE01D2DA5E900157105 /* TLHighscoreManager.swift */; };
 		FA19BBE31D2EAA0B00157105 /* TLGameMenuOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBE21D2EAA0B00157105 /* TLGameMenuOptions.swift */; };
 		FA19BBE51D3001CD00157105 /* TLGameMenuAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19BBE41D3001CD00157105 /* TLGameMenuAbout.swift */; };
+		FA509F521DB4C6770087B455 /* TLGameMenuPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA509F511DB4C6770087B455 /* TLGameMenuPlay.swift */; };
 		FA9CA3641D81806E002E7D23 /* TLSocial.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9CA3631D81806E002E7D23 /* TLSocial.swift */; };
 		FA9CA3661D82AFCF002E7D23 /* TLPause.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9CA3651D82AFCF002E7D23 /* TLPause.swift */; };
 		FA9CA3681D882F08002E7D23 /* TLGameMenuAchievements.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9CA3671D882F08002E7D23 /* TLGameMenuAchievements.swift */; };
@@ -47,6 +48,7 @@
 		FA19BBE01D2DA5E900157105 /* TLHighscoreManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLHighscoreManager.swift; sourceTree = "<group>"; };
 		FA19BBE21D2EAA0B00157105 /* TLGameMenuOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameMenuOptions.swift; sourceTree = "<group>"; };
 		FA19BBE41D3001CD00157105 /* TLGameMenuAbout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameMenuAbout.swift; sourceTree = "<group>"; };
+		FA509F511DB4C6770087B455 /* TLGameMenuPlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameMenuPlay.swift; sourceTree = "<group>"; };
 		FA9CA3631D81806E002E7D23 /* TLSocial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLSocial.swift; sourceTree = "<group>"; };
 		FA9CA3651D82AFCF002E7D23 /* TLPause.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLPause.swift; sourceTree = "<group>"; };
 		FA9CA3671D882F08002E7D23 /* TLGameMenuAchievements.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGameMenuAchievements.swift; sourceTree = "<group>"; };
@@ -123,10 +125,12 @@
 				FAF15CDE1C22F9A600CB5827 /* TLMeteorite.swift */,
 				FAB0078E1D2D25C800ED7FCE /* TLGameStart.swift */,
 				FAB007921D2D423A00ED7FCE /* TLGameMenu.swift */,
+				FA509F511DB4C6770087B455 /* TLGameMenuPlay.swift */,
 				FAD12A061D3796A600338919 /* TLGameMenuTutorial.swift */,
 				FA19BBE21D2EAA0B00157105 /* TLGameMenuOptions.swift */,
 				FAD12A021D36636500338919 /* TLGameMenuHighscore.swift */,
 				FA19BBE41D3001CD00157105 /* TLGameMenuAbout.swift */,
+				FA9CA3671D882F08002E7D23 /* TLGameMenuAchievements.swift */,
 				FAD12A041D36804900338919 /* TLHighscoreMember.swift */,
 				FAADFBA61D46168F00AFADE2 /* TLLaserCone.swift */,
 				FAADFBA41D40FCB200AFADE2 /* TLLaserSphere.swift */,
@@ -140,7 +144,6 @@
 				FAEBD1481D78280C000A9212 /* TLSaveData.swift */,
 				FAEBD14A1D78458E000A9212 /* TLGameData.swift */,
 				FA9CA3651D82AFCF002E7D23 /* TLPause.swift */,
-				FA9CA3671D882F08002E7D23 /* TLGameMenuAchievements.swift */,
 			);
 			path = iOS_Game_003;
 			sourceTree = "<group>";
@@ -232,6 +235,7 @@
 				FAD12A071D3796A600338919 /* TLGameMenuTutorial.swift in Sources */,
 				FAADFBA51D40FCB200AFADE2 /* TLLaserSphere.swift in Sources */,
 				FA9CA3641D81806E002E7D23 /* TLSocial.swift in Sources */,
+				FA509F521DB4C6770087B455 /* TLGameMenuPlay.swift in Sources */,
 				FAF15CE31C2305CB00CB5827 /* TLLaser.swift in Sources */,
 				FAADFBAB1D47A72800AFADE2 /* TLInventory.swift in Sources */,
 				FAB0078F1D2D25C800ED7FCE /* TLGameStart.swift in Sources */,

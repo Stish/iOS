@@ -24,14 +24,26 @@ class TLShip: SKSpriteNode {
         aShipFlyFront.removeAll()
         aShipFlyLeft.removeAll()
         aShipFlyRight.removeAll()
-        
-        aShipFlyFront.append(SKTexture(imageNamed: "Media/ship.atlas/ship_001.png"))
-        aShipFlyFront.append(SKTexture(imageNamed: "Media/ship.atlas/ship_002"))
-        aShipFlyLeft.append(SKTexture(imageNamed: "Media/ship.atlas/ship_left_001"))
-        aShipFlyLeft.append(SKTexture(imageNamed: "Media/ship.atlas/ship_left_002"))
-        aShipFlyRight.append(SKTexture(imageNamed: "Media/ship.atlas/ship_right_001"))
-        aShipFlyRight.append(SKTexture(imageNamed: "Media/ship.atlas/ship_right_002"))
-        
+        switch (iSelectedShip) {
+        case 0:
+            aShipFlyFront.append(SKTexture(imageNamed: "Media/ship.atlas/ship_01_001.png"))
+            aShipFlyFront.append(SKTexture(imageNamed: "Media/ship.atlas/ship_01_002"))
+            aShipFlyLeft.append(SKTexture(imageNamed: "Media/ship.atlas/ship_01_left_001"))
+            aShipFlyLeft.append(SKTexture(imageNamed: "Media/ship.atlas/ship_01_left_002"))
+            aShipFlyRight.append(SKTexture(imageNamed: "Media/ship.atlas/ship_01_right_001"))
+            aShipFlyRight.append(SKTexture(imageNamed: "Media/ship.atlas/ship_01_right_002"))
+        case 1:
+            aShipFlyFront.append(SKTexture(imageNamed: "Media/ship.atlas/ship_02_001.png"))
+            aShipFlyFront.append(SKTexture(imageNamed: "Media/ship.atlas/ship_02_002"))
+            aShipFlyLeft.append(SKTexture(imageNamed: "Media/ship.atlas/ship_02_left_001"))
+            aShipFlyLeft.append(SKTexture(imageNamed: "Media/ship.atlas/ship_02_left_002"))
+            aShipFlyRight.append(SKTexture(imageNamed: "Media/ship.atlas/ship_02_right_001"))
+            aShipFlyRight.append(SKTexture(imageNamed: "Media/ship.atlas/ship_02_right_002"))
+        case 2:
+            ()
+        default:
+            ()
+        }
         super.init(texture: aShipFlyFront[0], color: UIColor.clear, size: CGSize(width: size.width, height: size.height))
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.fctStartFlyAnimationFront()

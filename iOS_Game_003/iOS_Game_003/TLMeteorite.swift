@@ -103,6 +103,12 @@ class TLMeteorite: SKSpriteNode {
         let actExplode = SKAction.animate(with: aExplosion_01, timePerFrame: 0.10)
         self.blDestroyed = true
         iGameScore = iGameScore + iScore
+        if (iGameScore >= iAchieve6) && (GameData.iAchieved & (1<<5) == 0) {
+            GameData.iAchieved = GameData.iAchieved | (1<<5)
+            SDGameData.iAchieved = GameData.iAchieved
+            SDGameData.fctSaveData()
+            print("### Achievement 6 achieved ###") // #debug
+        }
         lbGameScore.text = String(iGameScore)
         self.removeAllActions()
         self.physicsBody?.categoryBitMask = 0
@@ -133,6 +139,12 @@ class TLMeteorite: SKSpriteNode {
         })
         // --- Achievement ---
         GameData.iMeteoriteCnt = GameData.iMeteoriteCnt + 1
+        if (GameData.iMeteoriteCnt == iAchieve1) && (GameData.iAchieved & (1<<0) == 0) {
+            GameData.iAchieved = GameData.iAchieved | (1<<0)
+            SDGameData.iAchieved = GameData.iAchieved
+            SDGameData.fctSaveData()
+            print("### Achievement 1 achieved ###") // #debug
+        }
         print("### Asteroids destroyed: " + String(GameData.iMeteoriteCnt)) // #debug
         
         self.run(actExplode, completion: {() in
