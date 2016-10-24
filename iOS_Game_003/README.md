@@ -5,11 +5,13 @@ ToDo
 - Enemies?
 - Add new game features to tutorial
 - Different ship sprites
-- More shields
 - Horizontal movement
+- New commander skin
+
+ver 0.42
 - More bombs
 - Weapon disruptor
-- New commander skin
+- Bonuses of achievements added: 5, 3
 
 ver 0.41
 - New game menu for selecting ship sprites

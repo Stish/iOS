@@ -36,6 +36,11 @@ class TLPowerUp: SKSpriteNode {
                 self.size.width = 40 * (flScreenWidth/667.0)
                 self.size.height = 40 * (flScreenHeight/375.0)
                 self.iScore = 1000
+            case 5:
+                self.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_disruptor_2.png")
+                self.size.width = 40 * (flScreenWidth/667.0)
+                self.size.height = 40 * (flScreenHeight/375.0)
+                self.iScore = 1000
             default:
                 ()
         }

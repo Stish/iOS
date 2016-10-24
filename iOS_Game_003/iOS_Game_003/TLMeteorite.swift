@@ -57,7 +57,11 @@ class TLMeteorite: SKSpriteNode {
             iScore = 500
             iDamage = 200
             //blHasPowerUp = true
-            iPowerUp = Int(arc4random_uniform(UInt32(4)) + 1)
+            if (GameData.iAchieved & (1<<2) == (1<<2)) {
+                iPowerUp = Int(arc4random_uniform(UInt32(5)) + 1)
+            } else {
+                iPowerUp = Int(arc4random_uniform(UInt32(4)) + 1)
+            }
             //print("PowerUp Type: " + String(iPowerUp)) // #debug
         default:
             ()

@@ -12,6 +12,7 @@ import SpriteKit
 class TLInventory: SKSpriteNode {
     var snMenuWpnLaserCone: SKSpriteNode!
     var snMenuWpnLaserSphere: SKSpriteNode!
+    var snMenuWpnLaserDisruptor: SKSpriteNode!
     var snMenuWpnLaser: SKSpriteNode!
     var snMenuBack: SKSpriteNode!
     
@@ -40,22 +41,22 @@ class TLInventory: SKSpriteNode {
         // Weapons
         let flMenuWpnSpriteWidth = (SKTexture(imageNamed: "Media/wpn_laser_cone_unequipped.png").size().width) * (self.frame.width/667.0)
         let flMenuWpnSpriteHeight = (SKTexture(imageNamed: "Media/wpn_laser_cone_unequipped.png").size().height) * (self.frame.height/375.0)
-        // Weapon laser cone
-        snMenuWpnLaserCone = SKSpriteNode(texture: SKTexture(imageNamed: "Media/wpn_laser_cone_unequipped.png"), color: UIColor.clear, size: CGSize(width: flMenuWpnSpriteWidth, height: flMenuWpnSpriteHeight))
-        snMenuWpnLaserCone.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        snMenuWpnLaserCone.position = CGPoint(x: 5*(flScreenWidth / 16), y:flScreenHeight / 2)
-        snMenuWpnLaserCone.zPosition = 2.2
-        snMenuWpnLaserCone.alpha = 1.0
-        snMenuWpnLaserCone.name = "MenuWpnLaserCone"
-        self.addChild(snMenuWpnLaserCone)
         // Weapon laser
         snMenuWpnLaser = SKSpriteNode(texture: SKTexture(imageNamed: "Media/wpn_laser_unchecked.png"), color: UIColor.clear, size: CGSize(width: flMenuWpnSpriteWidth, height: flMenuWpnSpriteHeight))
         snMenuWpnLaser.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        snMenuWpnLaser.position = CGPoint(x: 8*(flScreenWidth / 16), y:flScreenHeight / 2)
+        snMenuWpnLaser.position = CGPoint(x: 5*(flScreenWidth / 16), y:flScreenHeight / 2)
         snMenuWpnLaser.zPosition = 2.2
         snMenuWpnLaser.alpha = 1.0
         snMenuWpnLaser.name = "MenuWpnLaser"
         self.addChild(snMenuWpnLaser)
+        // Weapon laser cone
+        snMenuWpnLaserCone = SKSpriteNode(texture: SKTexture(imageNamed: "Media/wpn_laser_cone_unequipped.png"), color: UIColor.clear, size: CGSize(width: flMenuWpnSpriteWidth, height: flMenuWpnSpriteHeight))
+        snMenuWpnLaserCone.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        snMenuWpnLaserCone.position = CGPoint(x: 8*(flScreenWidth / 16), y:flScreenHeight / 2)
+        snMenuWpnLaserCone.zPosition = 2.2
+        snMenuWpnLaserCone.alpha = 1.0
+        snMenuWpnLaserCone.name = "MenuWpnLaserCone"
+        self.addChild(snMenuWpnLaserCone)
         // Weapon laser sphere
         snMenuWpnLaserSphere = SKSpriteNode(texture: SKTexture(imageNamed: "Media/wpn_laser_sphere_unequipped.png"), color: UIColor.clear, size: CGSize(width: flMenuWpnSpriteWidth, height: flMenuWpnSpriteHeight))
         snMenuWpnLaserSphere.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -64,6 +65,20 @@ class TLInventory: SKSpriteNode {
         snMenuWpnLaserSphere.alpha = 1.0
         snMenuWpnLaserSphere.name = "MenuWpnLaserSphere"
         self.addChild(snMenuWpnLaserSphere)
+        // Achievement
+        if (GameData.iAchieved & (1<<2) == (1<<2)) {
+            snMenuWpnLaser.position = CGPoint(x: 3.5*(flScreenWidth / 16), y:flScreenHeight / 2)
+            snMenuWpnLaserCone.position = CGPoint(x: 6.5*(flScreenWidth / 16), y:flScreenHeight / 2)
+            snMenuWpnLaserSphere.position = CGPoint(x: 9.5*(flScreenWidth / 16), y:flScreenHeight / 2)
+            // Weapon laser sphere
+            snMenuWpnLaserDisruptor = SKSpriteNode(texture: SKTexture(imageNamed: "Media/wpn_laser_sphere_unequipped.png"), color: UIColor.clear, size: CGSize(width: flMenuWpnSpriteWidth, height: flMenuWpnSpriteHeight))
+            snMenuWpnLaserDisruptor.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            snMenuWpnLaserDisruptor.position = CGPoint(x: 12.5*(flScreenWidth / 16), y:flScreenHeight / 2)
+            snMenuWpnLaserDisruptor.zPosition = 2.2
+            snMenuWpnLaserDisruptor.alpha = 1.0
+            snMenuWpnLaserDisruptor.name = "MenuWpnLaserDisruptor"
+            self.addChild(snMenuWpnLaserDisruptor)
+        }
         fctUpdateWpns()
     }
     
@@ -85,6 +100,13 @@ class TLInventory: SKSpriteNode {
             } else {
                 snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_sphere_unequipped.png")
             }
+            if (GameData.iAchieved & (1<<2) == (1<<2)) {
+                if blLaserDisruptorPickedUp == true {
+                    snMenuWpnLaserDisruptor.texture = SKTexture(imageNamed: "Media/wpn_laser_disruptor_unchecked.png")
+                } else {
+                    snMenuWpnLaserDisruptor.texture = SKTexture(imageNamed: "Media/wpn_laser_disruptor_unequipped.png")
+                }
+            }
         case 1: // sphere
             snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_sphere_checked.png")
             snMenuWpnLaser.texture = SKTexture(imageNamed: "Media/wpn_laser_unchecked.png")
@@ -93,6 +115,13 @@ class TLInventory: SKSpriteNode {
             } else {
                 snMenuWpnLaserCone.texture = SKTexture(imageNamed: "Media/wpn_laser_cone_unequipped.png")
             }
+            if (GameData.iAchieved & (1<<2) == (1<<2)) {
+                if blLaserDisruptorPickedUp == true {
+                    snMenuWpnLaserDisruptor.texture = SKTexture(imageNamed: "Media/wpn_laser_disruptor_unchecked.png")
+                } else {
+                    snMenuWpnLaserDisruptor.texture = SKTexture(imageNamed: "Media/wpn_laser_disruptor_unequipped.png")
+                }
+            }
         case 2: // cone
             snMenuWpnLaserCone.texture = SKTexture(imageNamed: "Media/wpn_laser_cone_checked.png")
             snMenuWpnLaser.texture = SKTexture(imageNamed: "Media/wpn_laser_unchecked.png")
@@ -100,6 +129,28 @@ class TLInventory: SKSpriteNode {
                 snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_sphere_unchecked.png")
             } else {
                 snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_sphere_unequipped.png")
+            }
+            if (GameData.iAchieved & (1<<2) == (1<<2)) {
+                if blLaserDisruptorPickedUp == true {
+                    snMenuWpnLaserDisruptor.texture = SKTexture(imageNamed: "Media/wpn_laser_disruptor_unchecked.png")
+                } else {
+                    snMenuWpnLaserDisruptor.texture = SKTexture(imageNamed: "Media/wpn_laser_disruptor_unequipped.png")
+                }
+            }
+        case 3: // disruptor
+            if (GameData.iAchieved & (1<<2) == (1<<2)) {
+                snMenuWpnLaserDisruptor.texture = SKTexture(imageNamed: "Media/wpn_laser_disruptor_checked.png")
+                snMenuWpnLaser.texture = SKTexture(imageNamed: "Media/wpn_laser_unchecked.png")
+            }
+            if blLaserSpherePickedUp == true {
+                snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_sphere_unchecked.png")
+            } else {
+                snMenuWpnLaserSphere.texture = SKTexture(imageNamed: "Media/wpn_laser_sphere_unequipped.png")
+            }
+            if blLaserConePickedUp == true {
+                snMenuWpnLaserCone.texture = SKTexture(imageNamed: "Media/wpn_laser_cone_unchecked.png")
+            } else {
+                snMenuWpnLaserCone.texture = SKTexture(imageNamed: "Media/wpn_laser_cone_unequipped.png")
             }
         default:
             ()

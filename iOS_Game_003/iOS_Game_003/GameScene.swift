@@ -11,7 +11,7 @@ import AVFoundation
 import Social
 
 // Debugging
-var strVersion = "ver 0.41"
+var strVersion = "ver 0.42"
 var blGameTest = false
 var blResetGameData = false
 // --- Game positions ---
@@ -31,9 +31,10 @@ var aSkHighscoresRows = 5
 var iGameScore = 0
 var blGameOver = false
 var blBombFired: Bool!
-var iSelectedWeapon: Int! // 0: Laser 1: Laser sphere 2: Laser cone
+var iSelectedWeapon: Int! // 0: Laser 1: Laser sphere 2: Laser cone 3: Laser disruptor
 var blLaserSpherePickedUp = false
 var blLaserConePickedUp = false
+var blLaserDisruptorPickedUp = false
 var iSelectedShip = 0
 // --- Achievement goals ---
 let iAchieve1 = 60 // Number of destroyed astros
@@ -51,6 +52,7 @@ let iSpeedUpateCycleTimeSec = 18
 let iLaserShootInterval = 4
 let iLaserConeShootInterval = 4
 let iLaserSphereShootInterval = 10
+let iLaserDisruptorShootInterval = 12
 // --- game objects ---
 let imeteoriteSkinCnt = 6
 var flmeteoriteSizeMax = CGFloat(120)
@@ -69,6 +71,9 @@ var blGameStarted = false
 var blLaserFired = false
 var blLaserSphereFired = false
 var blLaserConeFired = false
+var blLaserDisruptorFired = false
+var blLaserDisruptorFiring = false
+var blLaserDisruptorEnabled = false
 
 // --- game fonts ---
 //let fnGameFont = UIFont(name: "HomespunTTBRK", size: 10)
@@ -109,6 +114,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var iTime10ms: Int!
     var iLaserShootingPause: Int!
     var iLaserSphereShootingPause: Int!
+    var iLaserDisruptorShootingPause: Int!
     var iLaserConeShootingPause: Int!
     var iGameRestartCnt: Int!
     var snShieldBar1: SKSpriteNode!
@@ -119,6 +125,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var snBomb1: SKSpriteNode!
     var snBomb2: SKSpriteNode!
     var snBomb3: SKSpriteNode!
+    var snBomb4: SKSpriteNode!
     var snMenuPause: SKSpriteNode!
     var snMenuWeapons: SKSpriteNode!
     var iBombCount: Int!
@@ -127,6 +134,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var lbPowerUpInv: SKLabelNode!
     var flTouchMoveDist: CGFloat!
     var snBombFired: TLBomb!
+    var snLaserDisruptor: TLDisruptor!
     var snNebula: TLNebula!
     var snInventory: TLInventory!
     var iButtonPressed: Int!
@@ -144,6 +152,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
     var iLaserFiredCnt: Int!
     var iAstroHitCnt: Int!
     var iShipMaxHealth: Int!
+    var iMaxBombs: Int!
 
     override func didMove(to view: SKView) {
         if blGameStarted == false {
@@ -186,6 +195,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             iTime10ms = 0
             iLaserShootingPause = 0
             iLaserSphereShootingPause = 0
+            iLaserDisruptorShootingPause = 0
             iLaserConeShootingPause = 0
             iGameRestartCnt = 0
             iBombCount = 0
@@ -196,6 +206,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             iHitCnt = 0
             iLaserFiredCnt = 0
             iAstroHitCnt = 0
+            iMaxBombs = 3
             
             self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
             self.anchorPoint = CGPoint(x: 0, y: 0)
@@ -351,6 +362,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             snBomb3.zPosition = 2.0
             snBomb3.alpha = 1.0
             self.addChild(snBomb3)
+            // Bomb 4
+            if (GameData.iAchieved & (1<<4) == (1<<4)) {
+                iMaxBombs = 4
+                snBomb4 = SKSpriteNode(texture: SKTexture(imageNamed: "Media/pu_bomb_001_empty.png"), color: UIColor.clear, size: CGSize(width: flBombWidth, height: flBombHeight))
+                snBomb4.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                snBomb4.position = CGPoint(x: self.frame.midX - (75 * (self.frame.width/667.0)), y: 60 * (self.frame.height/375.0))
+                snBomb4.zPosition = 2.0
+                snBomb4.alpha = 1.0
+                self.addChild(snBomb4)
+            }
             // Menus
             let flMenuWidth = (SKTexture(imageNamed: "Media/hud_pause.png").size().width) * (self.frame.width/667.0) * 0.85
             let flMenuHeight = (SKTexture(imageNamed: "Media/hud_pause.png").size().height) * (self.frame.height/375.0) * 0.85
@@ -509,9 +530,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                     default:
                         for touch:AnyObject in touches {
                             if touch.location(in: view).x <= (200.0 * (self.frame.height/375.0)) {
-                                let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
-                                snShip.fctMoveShipByY(deltaY)
-                                //print("left")
+                                if blLaserDisruptorFiring == false {
+                                    let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
+                                    snShip.fctMoveShipByY(deltaY)
+                                    //print("left")
+                                }
                             } else {
                                 flTouchMoveDist = touch.location(in: view).x
                                 switch (iSelectedWeapon) {
@@ -534,6 +557,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                         iLaserConeShootingPause = 0
                                         self.fctShootLaserCone()
                                         //print("Laser cones: " + String(aSnLaserCone.count)) // #debug
+                                    }
+                                case 3:
+                                    if blLaserDisruptorFired == false {
+                                        snShip.removeAllActions()
+                                        snShip.fctStartFlyAnimationFront()
+                                        //snShip.speed = 0.0
+                                        blLaserDisruptorFired = true
+                                        iLaserDisruptorShootingPause = 0
+                                        blLaserDisruptorFiring = true
+                                        self.fctShootDisruptor()
+                                        //print("#### Shooting disruptor!") // #debug
                                     }
                                 default:
                                     ()
@@ -596,6 +630,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                         iButtonPressed = 7
                         fctPlayClickSound()
                     }
+                case "MenuWpnLaserDisruptor"?:
+                    if blLaserDisruptorPickedUp == true {
+                        iButtonPressed = 12
+                        fctPlayClickSound()
+                    }
                 case "MenuOptions"?:
                     iButtonPressed = 11
                     snPause.snMenuOptions.texture = SKTexture(imageNamed: "Media/menu_top_pressed.png")
@@ -612,17 +651,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         if (blGameOver == false) && (blGameStarted == true) && (self.speed > 0.0) {
             for touch in touches {
                 if touch.location(in: view).x <= (200.0 * (self.frame.height/375.0)) {
-                    let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
-                    if (deltaY >= (3 * (self.frame.height/375.0)) && deltaY <= (50 * (self.frame.height/375.0))) {
-                        snShip.fctStartFlyAnimationLeft()
-                        snShip.position.y = snShip.position.y + deltaY
-                    } else if (deltaY <= (-3 * (self.frame.height/375.0)) && deltaY >= (-50 * (self.frame.height/375.0))) {
-                        snShip.fctStartFlyAnimationRight()
-                        snShip.position.y = snShip.position.y + deltaY
-                    } else if (deltaY < (3 * (self.frame.height/375.0)) && deltaY > (-3 * (self.frame.height/375.0))) {
-                        //snShip.fctStartFlyAnimationFront()
-                    } else {
-                        snShip.fctMoveShipByY(deltaY)
+                    if blLaserDisruptorFiring == false {
+                        let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
+                        if (deltaY >= (3 * (self.frame.height/375.0)) && deltaY <= (50 * (self.frame.height/375.0))) {
+                            snShip.fctStartFlyAnimationLeft()
+                            snShip.position.y = snShip.position.y + deltaY
+                        } else if (deltaY <= (-3 * (self.frame.height/375.0)) && deltaY >= (-50 * (self.frame.height/375.0))) {
+                            snShip.fctStartFlyAnimationRight()
+                            snShip.position.y = snShip.position.y + deltaY
+                        } else if (deltaY < (3 * (self.frame.height/375.0)) && deltaY > (-3 * (self.frame.height/375.0))) {
+                            //snShip.fctStartFlyAnimationFront()
+                        } else {
+                            snShip.fctMoveShipByY(deltaY)
+                        }
                     }
                 }
             }
@@ -687,8 +728,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             if self.speed > 0.0 {
                 for touch in touches {
                     if touch.location(in: view).x <= (200.0 * (self.frame.height/375.0)) {
-                        let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
-                        snShip.fctMoveShipByY(deltaY)
+                        if blLaserDisruptorFiring == false {
+                            let deltaY = (view!.frame.height - touch.location(in: view).y) - snShip.position.y
+                            snShip.fctMoveShipByY(deltaY)
+                        }
                     }
                 }
             }
@@ -762,6 +805,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                             snInventory.fctUpdateWpns()
                         }
                     }
+                case "MenuWpnLaserDisruptor"?:
+                    if (iButtonPressed == 12) && (self.speed == 0.0) {
+                        if blLaserDisruptorPickedUp == true {
+                            iSelectedWeapon = 3
+                            snInventory.fctUpdateWpns()
+                        }
+                    }
                 case "MenuOptions"?:
                     if (iButtonPressed == 11) && (self.speed == 0.0) {
                         let transition = SKTransition.fade(with: UIColor.black, duration: 0.2)
@@ -819,6 +869,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                     if iLaserConeShootingPause >= iLaserConeShootInterval {
                         iLaserConeShootingPause = 0
                         blLaserConeFired = false
+                    }
+                }
+                if blLaserDisruptorFired == true {
+                    iLaserDisruptorShootingPause = iLaserDisruptorShootingPause + 1
+                    if iLaserDisruptorShootingPause >= iLaserDisruptorShootInterval {
+                        iLaserDisruptorShootingPause = 0
+                        blLaserDisruptorFired = false
                     }
                 }
             }
@@ -994,6 +1051,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         snBombFired.fctPlayShootingSound()
     }
     
+    func fctShootDisruptor() {
+        blLaserDisruptorFired = true
+        flShipPosX = snShip.position.x
+        flShipPosY = snShip.position.y
+        snLaserDisruptor = TLDisruptor(size: CGSize(width: 667.0 * (self.frame.width/667.0), height: 21 * (self.frame.height/375.0)))
+        self.addChild(snLaserDisruptor)
+        //print("Bomb fired") // #debug
+        snLaserDisruptor.fctMoveRight()
+        snLaserDisruptor.fctPlayShootingSound()
+    }
+    
     func didBegin(_ contact: SKPhysicsContact) {
         let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
         if blGameOver == false {
@@ -1081,7 +1149,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                         SDGameData.fctSaveData()
                                         print("### Achievement 6 achieved ###") // #debug
                                     }
-                                    if iBombCount < 3 {
+                                    if iBombCount < iMaxBombs {
                                         self.iBombCount = iBombCount + 1
                                         fctUpdateBombs()
                                         lbPowerUpInv.text = "Bombs +1"
@@ -1157,6 +1225,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                     fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                     fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                 }
+                                if aSnmeteorite[i].iPowerUp == 5 {
+                                    iGameScore = iGameScore + 1000
+                                    if (iGameScore >= iAchieve6) && (GameData.iAchieved & (1<<5) == 0) {
+                                        GameData.iAchieved = GameData.iAchieved | (1<<5)
+                                        SDGameData.iAchieved = GameData.iAchieved
+                                        SDGameData.fctSaveData()
+                                        print("### Achievement 6 achieved ###") // #debug
+                                    }
+                                    if blLaserDisruptorPickedUp == false {
+                                        blLaserDisruptorPickedUp = true
+                                        //iSelectedWeapon = 2
+                                        lbPowerUpInv.text = "Weapon: Disruptor"
+                                    } else {
+                                        lbPowerUpInv.text = "Weapon is already known"
+                                    }
+                                    snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_disruptor.png")
+                                    fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                    fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                }
                                 aSnmeteorite[i].fctExplode()
                             }
                         }
@@ -1184,7 +1272,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                             aSnPowerUp[i].physicsBody?.categoryBitMask = 0
                             aSnPowerUp[i].physicsBody?.contactTestBitMask = 0
                             if aSnPowerUp[i].iPowerUp == 1 {
-                                if iBombCount < 3 {
+                                if iBombCount < iMaxBombs {
                                     self.iBombCount = iBombCount + 1
                                     fctUpdateBombs()
                                     lbPowerUpInv.text = "Bombs +1"
@@ -1235,6 +1323,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
                                     lbPowerUpInv.text = "Weapon is already known"
                                 }
                                 snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_cone.png")
+                                fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                                fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
+                            }
+                            if aSnPowerUp[i].iPowerUp == 5 {
+                                if blLaserDisruptorPickedUp == false {
+                                    blLaserDisruptorPickedUp = true
+                                    //iSelectedWeapon = 2
+                                    lbPowerUpInv.text = "Weapon: Disruptor"
+                                } else {
+                                    lbPowerUpInv.text = "Weapon is already known"
+                                }
+                                snPowerUpInv.texture = SKTexture(imageNamed: "Media/pu_wpn_laser_disruptor.png")
                                 fctFadeInOutSKSpriteNode(snPowerUpInvFrame, time: 1, alpha: 0.75, pause: 2)
                                 fctFadeInOutSKSpriteNode(snPowerUpInv, time: 1, alpha: 0.75, pause: 2)
                                 fctFadeInOutSKLabelNode(lbPowerUpInv, time: 1, alpha: 0.75, pause: 2)
@@ -1540,8 +1641,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         iButtonPressed = 0
         blLaserSpherePickedUp = false
         blLaserConePickedUp = false
+        blLaserDisruptorPickedUp = false
         blLaserFired = false
         blLaserSphereFired = false
+        blLaserDisruptorFired = false
         blLaserConeFired = false
         iSelectedWeapon = 0
         blBombFired = false
@@ -1592,10 +1695,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
         } else {
             snShieldBar4.alpha = 0.0
         }
-        if (snShip.iHealth > 500) && (iShipMaxHealth == 600) {
-            snShieldBar5.alpha = 1.0
-        } else {
-            snShieldBar5.alpha = 0.0
+        if (iShipMaxHealth == 600) {
+            if (snShip.iHealth > 500) {
+                snShieldBar5.alpha = 1.0
+            } else {
+                snShieldBar5.alpha = 0.0
+            }
         }
         //print("Health: " + String(snShip.iHealth)) // #debug
     }
@@ -1615,6 +1720,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate, TLSocial {
             snBomb3.texture = SKTexture(imageNamed: "Media/pu_bomb_001.png")
         } else {
             snBomb3.texture = SKTexture(imageNamed: "Media/pu_bomb_001_empty.png")
+        }
+        if iMaxBombs == 4 {
+            if iBombCount > 3 {
+                snBomb4.texture = SKTexture(imageNamed: "Media/pu_bomb_001.png")
+            } else {
+                snBomb4.texture = SKTexture(imageNamed: "Media/pu_bomb_001_empty.png")
+            }
         }
     }
     
