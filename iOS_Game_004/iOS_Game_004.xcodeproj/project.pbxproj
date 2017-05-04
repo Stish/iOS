@@ -17,6 +17,8 @@
 		FA19042B1EB0FAA7002EEA06 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FA1904291EB0FAA7002EEA06 /* LaunchScreen.storyboard */; };
 		FA1904331EB1044B002EEA06 /* Media in Resources */ = {isa = PBXBuildFile; fileRef = FA1904321EB1044B002EEA06 /* Media */; };
 		FA1904351EB1D2E4002EEA06 /* TLGame4Dots.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1904341EB1D2E4002EEA06 /* TLGame4Dots.swift */; };
+		FA1904391EBB44DF002EEA06 /* origa___.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA1904381EBB44DF002EEA06 /* origa___.ttf */; };
+		FA19043B1EBB5A4B002EEA06 /* Minecraft.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA19043A1EBB5A4A002EEA06 /* Minecraft.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@
 		FA19042C1EB0FAA7002EEA06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FA1904321EB1044B002EEA06 /* Media */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Media; sourceTree = "<group>"; };
 		FA1904341EB1D2E4002EEA06 /* TLGame4Dots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGame4Dots.swift; sourceTree = "<group>"; };
+		FA1904381EBB44DF002EEA06 /* origa___.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "origa___.ttf"; path = "Media/origa___.ttf"; sourceTree = "<group>"; };
+		FA19043A1EBB5A4A002EEA06 /* Minecraft.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Minecraft.ttf; path = Media/Minecraft.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +52,8 @@
 		FA19040E1EB0FAA7002EEA06 = {
 			isa = PBXGroup;
 			children = (
+				FA19043A1EBB5A4A002EEA06 /* Minecraft.ttf */,
+				FA1904381EBB44DF002EEA06 /* origa___.ttf */,
 				FA1904321EB1044B002EEA06 /* Media */,
 				FA1904191EB0FAA7002EEA06 /* iOS_Game_004 */,
 				FA1904181EB0FAA7002EEA06 /* Products */,
@@ -144,6 +150,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA19043B1EBB5A4B002EEA06 /* Minecraft.ttf in Resources */,
+				FA1904391EBB44DF002EEA06 /* origa___.ttf in Resources */,
 				FA1904261EB0FAA7002EEA06 /* Main.storyboard in Resources */,
 				FA19041D1EB0FAA7002EEA06 /* GameScene.sks in Resources */,
 				FA1904281EB0FAA7002EEA06 /* Assets.xcassets in Resources */,

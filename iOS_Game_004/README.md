@@ -8,6 +8,16 @@ ToDo
 - Settings:  
   - Sound on/off
 - Save score for each challenge
+- Save settings
+
+ver 0.11
+- New sounds for buttons
+- The tiles are now symmetrically arranged
+- Video mode for displaying touches (white circle)
+- Score added
+- Sound on/off button and functionality added
+- Game menu added
+- Game interface added to "4 Dots" challenge
 
 ver 0.10
 - Basic concept
