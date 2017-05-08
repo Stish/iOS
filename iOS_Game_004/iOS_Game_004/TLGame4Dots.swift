@@ -12,12 +12,21 @@ import AVFoundation
 class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
     
     var aSnGame4Dots = Array<SKShapeNode>()
+    var aSnDots = Array<Array<SKShapeNode>>()
     var snButtonBack: SKShapeNode!
     var snButtonBackPic: SKSpriteNode!
+    var snButtonTwitter: SKShapeNode!
+    var snButtonTwitterPic: SKSpriteNode!
+    var snButtonRetry: SKShapeNode!
+    var snButtonRetryPic: SKSpriteNode!
     var snButtonSound: SKShapeNode!
     var snButtonSoundPic: SKSpriteNode!
     var snButtonScore: SKShapeNode!
     var lbButtonScore: SKLabelNode!
+    var snScoreBoard: SKShapeNode!
+    var lbScoreBoardLine1: SKLabelNode!
+    var lbScoreBoardLine2: SKLabelNode!
+    var lbScoreBoardLine3: SKLabelNode!
     var iGame4DotsCnt = Int(4)
     var apC4: AVAudioPlayer!
     var apF4: AVAudioPlayer!
@@ -26,14 +35,51 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
     var apBack: AVAudioPlayer!
     var iSequence = Array<Int>()
     var iDotsInSequence = Int(0)
-    var iNumOfUseInputs = Int(0)
+    var iNumOfUserInputs = Int(0)
     var blUserInputAllowed = Bool(false)
     // ### Auxiliary var
     var strButtonPressedName = ""
+    var blGameStopped = Bool(false)
+    //var dwiSequence = Array<DispatchWorkItem>()
     
     override func didMove(to view: SKView) {
         /* Setup your scene here */
         self.backgroundColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 0/255.0, alpha: 1.0)
+        
+        // ### Dots array
+        aSnDots.removeAll()
+        for x in 0 ..< iDotsCntX {
+            var dotCol:[SKShapeNode] = []
+            for y in 0 ..< iDotsCntY {
+                let dot = SKShapeNode(rectOf: CGSize(width: 48 * flScreenWidthRatio, height: 48 * flScreenHeightRatio), cornerRadius: 5)
+                //let dot = SKSpriteNode(texture: SKTexture(imageNamed: "Media/dot_001.png"), color: UIColor.clear, size: CGSize(width: 51 * flScreenWidthRatio, height: 51 * flScreenHeightRatio))
+                //dot.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                dot.strokeColor = SKColor.blue
+                dot.glowWidth = 0.0
+                dot.lineWidth = 0.0
+                dot.fillColor = UIColor(red:   CGFloat(arc4random()) / CGFloat(UInt32.max),
+                                        green: CGFloat(arc4random()) / CGFloat(UInt32.max),
+                                        blue:  CGFloat(arc4random()) / CGFloat(UInt32.max),
+                                        alpha: 1.0)
+                dot.position = CGPoint(x: CGFloat((x * 2) + 1) * (flScreenWidth / 14), y: CGFloat((y * 2) + 1) * (flScreenHeight / 24))
+                dot.zPosition = 1.0
+                dot.alpha = 0.2
+                dot.name = "Dot"
+                self.addChild(dot)
+                dotCol.append(dot)
+            }
+            aSnDots.append(dotCol)
+        }
+        aSnDots[0][11].alpha = 0.0
+        aSnDots[2][11].alpha = 0.0
+        aSnDots[3][11].alpha = 0.0
+        aSnDots[4][11].alpha = 0.0
+        aSnDots[6][11].alpha = 0.0
+        aSnDots[2][5].alpha = 0.0
+        aSnDots[3][6].alpha = 0.0
+        aSnDots[3][4].alpha = 0.0
+        aSnDots[4][5].alpha = 0.0
+        // ### 4 Dots
         for i in 0 ..< iGame4DotsCnt {
             let dot = SKShapeNode(rectOf: CGSize(width: 48 * flScreenWidthRatio, height: 48 * flScreenHeightRatio), cornerRadius: 5)
             dot.strokeColor = SKColor.blue
@@ -48,11 +94,31 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
             self.addChild(dot)
             aSnGame4Dots.append(dot)
         }
-        
+        //dwiSequence.removeAll()
+        blGameStopped = false
         iSequence.removeAll()
         iSequence.append(fctRandomInt(min: 0, 3))
-        iDotsInSequence = 1
-        iNumOfUseInputs = 0
+        iSequence.append(fctRandomInt(min: 0, 3))
+        /*iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))
+        iSequence.append(fctRandomInt(min: 0, 3))*/
+        iDotsInSequence = iSequence.count
+        iNumOfUserInputs = 0
         blUserInputAllowed = false
         // print("##### " + String(iSequence[0])) // #debug
         
@@ -106,14 +172,14 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
         snButtonScore.strokeColor = SKColor.gray
         snButtonScore.glowWidth = 0.0
         snButtonScore.lineWidth = 2.0
-        snButtonScore.fillColor = UIColor.withAlphaComponent(SKColor.gray)(0.25)
+        snButtonScore.fillColor = UIColor.withAlphaComponent(SKColor.gray)(0.2)
         snButtonScore.position = CGPoint(x: 7 * (flScreenWidth / 14), y: 23 * (flScreenHeight / 24))
         snButtonScore.zPosition = 1.0
         snButtonScore.alpha = 1.0
         snButtonScore.name = "ButtonScore"
         self.addChild(snButtonScore)
         lbButtonScore = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
-        lbButtonScore.text = "999/999"
+        lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(iSequence.count)
         lbButtonScore.fontSize = 22 * flScreenWidthRatio
         lbButtonScore.position = CGPoint(x: 7 * (flScreenWidth / 14), y: 23 * (flScreenHeight / 24))
         lbButtonScore.fontColor = UIColor.gray
@@ -197,6 +263,8 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
             print(error)
         }
         fctUpdateInterface()
+        // ### Start sequence
+        fctPlaySequence(seq: iSequence)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -213,39 +281,101 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
             strButtonPressedName = ""
             switch (touchedNode.name) {
             case "Dot_0"?:
-                fctPlayC4()
-                aSnGame4Dots[0].fillColor = uiCol1
-                fctFadeInOutSKShapeNode(aSnGame4Dots[0], time: 0.7, alpha: 1.0, pause: 0.1)
-                
-                //fctPlaySequence(seq: iSequence)
-                //iSequence.append(fctRandomInt(min: 0, 3))
+                if blUserInputAllowed == true {
+                    iNumOfUserInputs = iNumOfUserInputs + 1
+                    if iSequence[iNumOfUserInputs - 1] == 0 {
+                        fctPlaySound(player: apC4)
+                        aSnGame4Dots[0].fillColor = uiCol1
+                        fctFadeInOutSKShapeNode(aSnGame4Dots[0], time: 0.7, alpha: 1.0, pause: 0.1)
+                        self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(self.iSequence.count)
+                    } else {
+                        fctShakeShape(shape: aSnGame4Dots[0])
+                        fctWrongSeq()
+                    }
+                    if (iNumOfUserInputs == iSequence.count) && (blGameStopped == false) {
+                        fctCorrectSeq()
+                        blUserInputAllowed = false
+                        iNumOfUserInputs = 0
+                        iSequence.append(fctRandomInt(min: 0, 3))
+                        iDotsInSequence = iSequence.count
+                        fctPlaySequence(seq: iSequence)
+                    }
+                }
             case "Dot_1"?:
-                fctPlayF4()
-                aSnGame4Dots[1].fillColor = uiCol4
-                fctFadeInOutSKShapeNode(aSnGame4Dots[1], time: 0.7, alpha: 1.0, pause: 0.1)
+                if blUserInputAllowed == true {
+                    iNumOfUserInputs = iNumOfUserInputs + 1
+                    if iSequence[iNumOfUserInputs - 1] == 1 {
+                        fctPlaySound(player: apF4)
+                        aSnGame4Dots[1].fillColor = uiCol4
+                        fctFadeInOutSKShapeNode(aSnGame4Dots[1], time: 0.7, alpha: 1.0, pause: 0.1)
+                        self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(self.iSequence.count)
+                    } else {
+                        fctShakeShape(shape: aSnGame4Dots[1])
+                        fctWrongSeq()
+                    }
+                    if (iNumOfUserInputs == iSequence.count) && (blGameStopped == false) {
+                        fctCorrectSeq()
+                        blUserInputAllowed = false
+                        iNumOfUserInputs = 0
+                        iSequence.append(fctRandomInt(min: 0, 3))
+                        iDotsInSequence = iSequence.count
+                        fctPlaySequence(seq: iSequence)
+                    }
+                }
             case "Dot_2"?:
-                fctPlayG4()
-                aSnGame4Dots[2].fillColor = uiCol5
-                fctFadeInOutSKShapeNode(aSnGame4Dots[2], time: 0.7, alpha: 1.0, pause: 0.1)
+                if blUserInputAllowed == true {
+                    iNumOfUserInputs = iNumOfUserInputs + 1
+                    if iSequence[iNumOfUserInputs - 1] == 2 {
+                        fctPlaySound(player: apG4)
+                        aSnGame4Dots[2].fillColor = uiCol5
+                        fctFadeInOutSKShapeNode(aSnGame4Dots[2], time: 0.7, alpha: 1.0, pause: 0.1)
+                        self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(self.iSequence.count)
+                    } else {
+                        fctShakeShape(shape: aSnGame4Dots[2])
+                        fctWrongSeq()
+                    }
+                    if (iNumOfUserInputs == iSequence.count) && (blGameStopped == false) {
+                        fctCorrectSeq()
+                        blUserInputAllowed = false
+                        iNumOfUserInputs = 0
+                        iSequence.append(fctRandomInt(min: 0, 3))
+                        iDotsInSequence = iSequence.count
+                        fctPlaySequence(seq: iSequence)
+                    }
+                }
             case "Dot_3"?:
-                fctPlayC5()
-                aSnGame4Dots[3].fillColor = uiCol8
-                fctFadeInOutSKShapeNode(aSnGame4Dots[3], time: 0.7, alpha: 1.0, pause: 0.1)
+                if blUserInputAllowed == true {
+                    iNumOfUserInputs = iNumOfUserInputs + 1
+                    if iSequence[iNumOfUserInputs - 1] == 3 {
+                        fctPlaySound(player: apC5)
+                        aSnGame4Dots[3].fillColor = uiCol8
+                        fctFadeInOutSKShapeNode(aSnGame4Dots[3], time: 0.7, alpha: 1.0, pause: 0.1)
+                        self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(self.iSequence.count)
+                    } else {
+                        fctShakeShape(shape: aSnGame4Dots[3])
+                        fctWrongSeq()
+                    }
+                    if (iNumOfUserInputs == iSequence.count) && (blGameStopped == false) {
+                        fctCorrectSeq()
+                        blUserInputAllowed = false
+                        iNumOfUserInputs = 0
+                        iSequence.append(fctRandomInt(min: 0, 3))
+                        iDotsInSequence = iSequence.count
+                        fctPlaySequence(seq: iSequence)
+                    }
+                }
             case "ButtonBack"?:
                 snButtonBack.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.7)
                 strButtonPressedName = "ButtonBack"
-//                fctPlayBack()
-//                snButtonBack.fillColor = UIColor.gray
-//                fctFadeInOutSKShapeNode(snButtonBack, time: 0.5, alpha: 1.0, pause: 0.1)
-//                let transition = SKTransition.fade(with: UIColor.black, duration: 0.3)
-//                let nextScene = GameScene(size: scene!.size)
-//                nextScene.scaleMode = .aspectFill
-//                scene?.view?.presentScene(nextScene, transition: transition)
-//                self.removeFromParent()
             case "ButtonSound"?:
                 snButtonSound.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.7)
                 strButtonPressedName = "ButtonSound"
-                //fctUpdateInterface()
+            case "ButtonRetry"?:
+                snButtonRetry.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.7)
+                strButtonPressedName = "ButtonRetry"
+            case "ButtonTwitter"?:
+                snButtonTwitter.fillColor = UIColor.withAlphaComponent(uiColTwitter)(0.7)
+                strButtonPressedName = "ButtonTwitter"
             default:
                 ()
             }
@@ -273,14 +403,39 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
             //fctUpdateInterface()
             case "ButtonBack"?:
                 if strButtonPressedName == "ButtonBack" {
-                    fctPlayBack()
+//                    if dwiSequence.count > 0 {
+//                        for i in 0..<dwiSequence.count {
+//                            dwiSequence[i].cancel()
+//                        }
+//                    }
+                    blBackPressed = true
+                    fctPlaySound(player: apBack)
                     snButtonBack.fillColor = UIColor.gray
                     fctFadeInOutSKShapeNode(snButtonBack, time: 0.5, alpha: 1.0, pause: 0.1)
-                    let transition = SKTransition.fade(with: UIColor.black, duration: 0.3)
+                    let transition = SKTransition.crossFade(withDuration: 0.75)
                     let nextScene = GameScene(size: scene!.size)
                     nextScene.scaleMode = .aspectFill
                     scene?.view?.presentScene(nextScene, transition: transition)
                     self.removeFromParent()
+                }
+            case "ButtonRetry"?:
+                if (strButtonPressedName == "ButtonRetry") && (blGameStopped == true) {
+                    fctPlaySound(player: apBack)
+                    //let transition = SKTransition.
+                    let transition = SKTransition.crossFade(withDuration: 0.75)
+                    let nextScene = TLGame4Dots(size: scene!.size)
+                    nextScene.scaleMode = .aspectFill
+                    scene?.view?.presentScene(nextScene, transition: transition)
+                    //DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1000)) {
+                    //sleep(1)
+                    self.removeFromParent()
+                    //}
+                }
+            case "ButtonTwitter"?:
+                if (strButtonPressedName == "ButtonTwitter") && (blGameStopped == true) {
+                    fctPlaySound(player: apBack)
+                    print("### Twitter") // #debug
+                    fctTweet(scene: self)
                 }
             default:
                 snButtonSound.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.25)
@@ -288,7 +443,6 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
             }
             fctUpdateInterface()
         }
-
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -296,57 +450,107 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
         
     }
     
-    func fctPlayC4() {
-        if blSoundEffectsEnabled == true {
-            apC4.volume = 1
-            apC4.currentTime = 0
-            apC4.prepareToPlay()
-            apC4.play()
-        }
-    }
-    
-    func fctPlayF4() {
-        if blSoundEffectsEnabled == true {
-            apF4.volume = 1
-            apF4.currentTime = 0
-            apF4.prepareToPlay()
-            apF4.play()
-        }
-    }
-    
-    func fctPlayG4() {
-        if blSoundEffectsEnabled == true {
-            apG4.volume = 1
-            apG4.currentTime = 0
-            apG4.prepareToPlay()
-            apG4.play()
-        }
-    }
-    
-    func fctPlayC5() {
-        if blSoundEffectsEnabled == true {
-            apC5.volume = 1
-            apC5.currentTime = 0
-            apC5.prepareToPlay()
-            apC5.play()
-        }
-    }
-    
-    func fctPlayBack() {
-        if blSoundEffectsEnabled == true {
-            apBack.volume = 1
-            apBack.currentTime = 0
-            apBack.prepareToPlay()
-            apBack.play()
-        }
-    }
-    
-    func fctRandomInt(min: Int, _ max: Int) -> Int {
-        guard min < max else {return min}
-        return Int(arc4random_uniform(UInt32(1 + max - min))) + min
-    }
-    
     func fctPlaySequence(seq: Array<Int>) {
+        if seq.count == 0 {
+            return
+        }
+        self.blUserInputAllowed = false
+        DispatchQueue.global().async {
+            usleep(500000)
+            for i in 0...seq.count {
+                if blBackPressed == true {
+                    return
+                }
+                usleep(700000)
+                DispatchQueue.main.async {
+                    self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(self.iSequence.count)
+                    if i < seq.count {
+                        switch (seq[i]) {
+                        case 0:
+                            fctPlaySound(player: self.apC4)
+                            self.aSnGame4Dots[0].fillColor = uiCol1
+                            fctFadeInOutSKShapeNode(self.aSnGame4Dots[0], time: 0.7, alpha: 1.0, pause: 0.1)
+                        case 1:
+                            fctPlaySound(player: self.apF4)
+                            self.aSnGame4Dots[1].fillColor = uiCol4
+                            fctFadeInOutSKShapeNode(self.aSnGame4Dots[1], time: 0.7, alpha: 1.0, pause: 0.1)
+                        case 2:
+                            fctPlaySound(player: self.apG4)
+                            self.aSnGame4Dots[2].fillColor = uiCol5
+                            fctFadeInOutSKShapeNode(self.aSnGame4Dots[2], time: 0.7, alpha: 1.0, pause: 0.1)
+                        case 3:
+                            fctPlaySound(player: self.apC5)
+                            self.aSnGame4Dots[3].fillColor = uiCol8
+                            fctFadeInOutSKShapeNode(self.aSnGame4Dots[3], time: 0.7, alpha: 1.0, pause: 0.1)
+                        default:
+                            ()
+                        }
+                    }
+                    else {
+                        print("#### Sequence finished!")
+                        self.blUserInputAllowed = true
+                        self.iNumOfUserInputs = 0
+                        self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(seq.count)
+                    }
+                }
+            }
+        }
+    }
+    
+//    func fctPlaySequence(seq: Array<Int>) {
+//        if seq.count == 0 {
+//            return
+//        }
+//        //var flSec = 0.0
+//        self.blUserInputAllowed = false
+//        dwiSequence.removeAll()
+//        var tTimeNow = NSDate().timeIntervalSince1970
+//        for i in 0...seq.count {
+//            //flSec = 0.5 * Double(i)
+//            //DispatchQueue.main.a
+//            dwiSequence.append(DispatchWorkItem {
+//                self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(self.iSequence.count)
+//                if i < seq.count {
+//                    switch (seq[i]) {
+//                    case 0:
+//                        //fctPlaySound(player: self.apC4)
+//                        self.aSnGame4Dots[0].fillColor = uiCol1
+//                        fctFadeInOutSKShapeNode(self.aSnGame4Dots[0], time: 0.7, alpha: 1.0, pause: 0.1)
+//                    case 1:
+//                        //fctPlaySound(player: self.apF4)
+//                        self.aSnGame4Dots[1].fillColor = uiCol4
+//                        fctFadeInOutSKShapeNode(self.aSnGame4Dots[1], time: 0.7, alpha: 1.0, pause: 0.1)
+//                    case 2:
+//                        //fctPlaySound(player: self.apG4)
+//                        self.aSnGame4Dots[2].fillColor = uiCol5
+//                        fctFadeInOutSKShapeNode(self.aSnGame4Dots[2], time: 0.7, alpha: 1.0, pause: 0.1)
+//                    case 3:
+//                        //fctPlaySound(player: self.apC5)
+//                        self.aSnGame4Dots[3].fillColor = uiCol8
+//                        fctFadeInOutSKShapeNode(self.aSnGame4Dots[3], time: 0.7, alpha: 1.0, pause: 0.1)
+//                    default:
+//                        ()
+//                    }
+//                }
+//                else {
+//                    print("#### Sequence finished!")
+//                    self.blUserInputAllowed = true
+//                    self.iNumOfUserInputs = 0
+//                    self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(seq.count)
+//                }
+//                print("### " + String(NSDate().timeIntervalSince1970))
+//            })
+//            //tTimeNow = tTimeNow + (0.7 * Double(i))
+//            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1) + .milliseconds(700 * i), execute: dwiSequence[i])
+////            if i < seq.count {
+////                print("### " + String(seq[i])) // #debug
+////            }
+//            //let time = DispatchTime.now() + Double(1) + Double(700 * i)
+//            //print("###" + String(time))
+//        }
+//    }
+    
+    /*func fctPlaySequence(seq: Array<Int>) {
         if seq.count == 0 {
             return
         }
@@ -354,25 +558,27 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
         self.blUserInputAllowed = false
         for i in 0...seq.count {
             //flSec = 0.5 * Double(i)
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(i * 700)) {
+            //DispatchQueue.main.a
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1) + .milliseconds(i * 700)) {
+                self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(self.iSequence.count)
                 if i < seq.count {
                     switch (seq[i]) {
                     case 0:
-                        self.fctPlayC4()
+                        fctPlaySound(player: self.apC4)
                         self.aSnGame4Dots[0].fillColor = uiCol1
-                        self.fctFadeInOutSKShapeNode(self.aSnGame4Dots[0], time: 0.7, alpha: 1.0, pause: 0.1)
+                        fctFadeInOutSKShapeNode(self.aSnGame4Dots[0], time: 0.7, alpha: 1.0, pause: 0.1)
                     case 1:
-                        self.fctPlayF4()
+                        fctPlaySound(player: self.apF4)
                         self.aSnGame4Dots[1].fillColor = uiCol4
-                        self.fctFadeInOutSKShapeNode(self.aSnGame4Dots[1], time: 0.7, alpha: 1.0, pause: 0.1)
+                        fctFadeInOutSKShapeNode(self.aSnGame4Dots[1], time: 0.7, alpha: 1.0, pause: 0.1)
                     case 2:
-                        self.fctPlayG4()
+                        fctPlaySound(player: self.apG4)
                         self.aSnGame4Dots[2].fillColor = uiCol5
-                        self.fctFadeInOutSKShapeNode(self.aSnGame4Dots[2], time: 0.7, alpha: 1.0, pause: 0.1)
+                        fctFadeInOutSKShapeNode(self.aSnGame4Dots[2], time: 0.7, alpha: 1.0, pause: 0.1)
                     case 3:
-                        self.fctPlayC5()
+                        fctPlaySound(player: self.apC5)
                         self.aSnGame4Dots[3].fillColor = uiCol8
-                        self.fctFadeInOutSKShapeNode(self.aSnGame4Dots[3], time: 0.7, alpha: 1.0, pause: 0.1)
+                        fctFadeInOutSKShapeNode(self.aSnGame4Dots[3], time: 0.7, alpha: 1.0, pause: 0.1)
                     default:
                         ()
                     }
@@ -380,11 +586,14 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
                 else {
                     print("#### Sequence finished!")
                     self.blUserInputAllowed = true
+                    self.iNumOfUserInputs = 0
+                    self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(seq.count)
                 }
             }
         }
         //seq.append(fctRandomInt(min: 0, 3))
-    }
+    }*/
+
     
     func fctUpdateInterface() {
         if blSoundEffectsEnabled == true {
@@ -392,66 +601,159 @@ class TLGame4Dots: SKScene, SKPhysicsContactDelegate {
         } else {
             snButtonSoundPic.texture = SKTexture(imageNamed: "Media/button_sound_off_001.png")
         }
-        snButtonSound.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.25)
-        snButtonBack.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.25)
+        snButtonSound.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.2)
+        snButtonBack.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.2)
+        if (snButtonRetry != nil) && (blGameStopped == true) {
+            snButtonRetry.fillColor = UIColor.withAlphaComponent(UIColor.gray)(0.2)
+        }
+        if (snButtonTwitter != nil) && (blGameStopped == true) {
+            snButtonTwitter.fillColor = UIColor.withAlphaComponent(uiColTwitter)(0.2)
+        }
+        //self.lbButtonScore.text = String(self.iNumOfUserInputs) + "/" + String(self.iSequence.count)
     }
     
-    func fctFadeInOutSKShapeNode (_ node: SKShapeNode, time: TimeInterval, alpha: CGFloat, pause: TimeInterval) {
-        //node.alpha = 0.0
-        
-        let deltaAlpha = alpha/5
-        let deltaTime = time/10
-        var sumAlpha = CGFloat(0.0)
-        
-        node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-        
-        node.removeAllActions()
-        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-            sumAlpha = sumAlpha + deltaAlpha
-            node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-            node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                sumAlpha = sumAlpha + deltaAlpha
-                node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                    sumAlpha = sumAlpha + deltaAlpha
-                    node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                    node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                        sumAlpha = sumAlpha + deltaAlpha
-                        node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                            sumAlpha = sumAlpha + deltaAlpha
-                            node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                            node.run(SKAction.rotate(toAngle: 0, duration: pause), completion: {() in
-                                // Pause
-                                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                    // Fade out
-                                    sumAlpha = sumAlpha - deltaAlpha
-                                    node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                    node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                        sumAlpha = sumAlpha - deltaAlpha
-                                        node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                            sumAlpha = sumAlpha - deltaAlpha
-                                            node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                            node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                                sumAlpha = sumAlpha - deltaAlpha
-                                                node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                                    sumAlpha = sumAlpha - deltaAlpha
-                                                    node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                                    node.removeAllActions()
-                                                    //print("finish!!") // #debug
-                                                })
-                                            })
-                                        })
-                                    })
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
+    func fctCorrectSeq() {
+        for x in 0 ..< iDotsCntX {
+            for y in 0 ..< iDotsCntY {
+                aSnDots[x][y].fillColor = UIColor(red: fctRandomCGFloat(min: 0, 127)/255.0, green: fctRandomCGFloat(min: 127, 255)/255.0, blue: fctRandomCGFloat(min: 0, 127)/255.0, alpha: 1.0)
+                //aSnDots[x][y].alpha = 0.5
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+            for x in 0 ..< iDotsCntX {
+                for y in 0 ..< iDotsCntY {
+                    self.aSnDots[x][y].fillColor = UIColor(red: fctRandColor(), green: fctRandColor(), blue: fctRandColor(), alpha: 1.0)
+                    //self.aSnDots[x][y].alpha = 0.15
+                }
+            }
+        }
     }
+    
+    func fctWrongSeq() {
+        blGameStopped = true
+        for x in 0 ..< iDotsCntX {
+            for y in 0 ..< iDotsCntY {
+                aSnDots[x][y].fillColor = UIColor(red: fctRandomCGFloat(min: 127, 255)/255.0, green: fctRandomCGFloat(min: 0, 127)/255.0, blue: fctRandomCGFloat(min: 0, 127)/255.0, alpha: 1.0)
+                //aSnDots[x][y].alpha = 0.5
+            }
+        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+//            for x in 0 ..< iDotsCntX {
+//                for y in 0 ..< iDotsCntY {
+//                    self.aSnDots[x][y].fillColor = UIColor(red: fctRandColor(), green: fctRandColor(), blue: fctRandColor(), alpha: 1.0)
+//                    //self.aSnDots[x][y].alpha = 0.15
+//                }
+//            }
+//        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
+            // ### Menu: Score board
+            let cgScoreWidth = CGFloat((48 * flScreenWidthRatio) + (8 * (flScreenWidth / 14)))
+            let cgScoreHeight = CGFloat((48 * flScreenHeightRatio) + (10 * (flScreenHeight / 24)))
+//            let cgScoreWidthDelta = CGFloat(cgScoreWidth / 10)
+//            let cgScoreHeightDelta = CGFloat(cgScoreHeight / 10)
+//            let cgScoreStartX = CGFloat((((flScreenWidth / 7) - (48 * flScreenWidthRatio)) / 2) + (-5 * (flScreenWidth / 14)))
+//            let cgScoreStartY = CGFloat((((flScreenHeight / 12) - (48 * flScreenHeightRatio)) / 2) + (-6 * (flScreenHeight / 24)))
+            
+            self.snScoreBoard = SKShapeNode(rectOf: CGSize(width: cgScoreWidth, height: cgScoreHeight), cornerRadius: 5)
+            //self.snScoreBoard = SKShapeNode(rect: CGRect(x: cgScoreStartX, y: cgScoreStartY, width: cgScoreWidthDelta, height: cgScoreHeightDelta) , cornerRadius: 5)
+            self.snScoreBoard.strokeColor = UIColor.withAlphaComponent(uiCol8)(0.5)
+            self.snScoreBoard.glowWidth = 0.0
+            self.snScoreBoard.lineWidth = 2.0
+            self.snScoreBoard.fillColor = UIColor.black //UIColor.withAlphaComponent(uiCol8)(0.2)
+            self.snScoreBoard.position = CGPoint(x: 7 * (flScreenWidth / 14), y: 12 * (flScreenHeight / 24))
+            self.snScoreBoard.zPosition = 1.0
+            self.snScoreBoard.alpha = 0.0
+            self.snScoreBoard.name = "ScoreBoard"
+            self.addChild(self.snScoreBoard)
+            // ### Menu: Score board text line 1
+            self.lbScoreBoardLine1 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+            self.lbScoreBoardLine1.text = "Wow! 10 in a row!"
+            self.lbScoreBoardLine1.fontSize = 22 * flScreenWidthRatio
+            self.lbScoreBoardLine1.position = CGPoint(x: 3 * (flScreenWidth / 14), y: 17 * (flScreenHeight / 24))
+            self.lbScoreBoardLine1.fontColor = UIColor.white
+            self.lbScoreBoardLine1.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.left
+            self.lbScoreBoardLine1.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center
+            self.lbScoreBoardLine1.zPosition = 1.0
+            self.lbScoreBoardLine1.alpha = 0.0
+            self.addChild(self.lbScoreBoardLine1)
+            // ### Menu: Score board text line 1
+            self.lbScoreBoardLine2 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+            self.lbScoreBoardLine2.text = "Wow! 10 in a row!"
+            self.lbScoreBoardLine2.fontSize = 22 * flScreenWidthRatio
+            self.lbScoreBoardLine2.position = CGPoint(x: 3 * (flScreenWidth / 14), y: 15 * (flScreenHeight / 24))
+            self.lbScoreBoardLine2.fontColor = UIColor.white
+            self.lbScoreBoardLine2.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.left
+            self.lbScoreBoardLine2.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center
+            self.lbScoreBoardLine2.zPosition = 1.0
+            self.lbScoreBoardLine2.alpha = 0.0
+            self.addChild(self.lbScoreBoardLine2)
+            // ### Menu: Score board text line 1
+            self.lbScoreBoardLine3 = SKLabelNode(fontNamed: fnGameTextFont?.fontName)
+            self.lbScoreBoardLine3.text = "Wow! 10 in a row!"
+            self.lbScoreBoardLine3.fontSize = 22 * flScreenWidthRatio
+            self.lbScoreBoardLine3.position = CGPoint(x: 3 * (flScreenWidth / 14), y: 13 * (flScreenHeight / 24))
+            self.lbScoreBoardLine3.fontColor = UIColor.white
+            self.lbScoreBoardLine3.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.left
+            self.lbScoreBoardLine3.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center
+            self.lbScoreBoardLine3.zPosition = 1.0
+            self.lbScoreBoardLine3.alpha = 0.0
+            self.addChild(self.lbScoreBoardLine3)
+            // ### Menu: Back lbScoreBoardLine1
+            self.snButtonTwitter = SKShapeNode(rectOf: CGSize(width: 48 * flScreenWidthRatio, height: 48 * flScreenHeightRatio), cornerRadius: 5)
+            self.snButtonTwitter.strokeColor = uiColTwitter
+            self.snButtonTwitter.glowWidth = 0.0
+            self.snButtonTwitter.lineWidth = 2.0
+            self.snButtonTwitter.fillColor = UIColor.withAlphaComponent(uiColTwitter)(0.2)
+            self.snButtonTwitter.position = CGPoint(x: 5 * (flScreenWidth / 14), y: 9 * (flScreenHeight / 24))
+            self.snButtonTwitter.zPosition = 1.0
+            self.snButtonTwitter.alpha = 0.0
+            self.snButtonTwitter.name = "ButtonTwitter"
+            self.addChild(self.snButtonTwitter)
+            self.snButtonTwitterPic = SKSpriteNode(texture: SKTexture(imageNamed: "Media/button_twitter_001.png"), color: UIColor.clear, size: CGSize(width: 40 * flScreenWidthRatio, height: 40 * flScreenHeightRatio))
+            self.snButtonTwitterPic.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            self.snButtonTwitterPic.position = CGPoint(x: 5 * (flScreenWidth / 14), y: 9 * (flScreenHeight / 24))
+            self.snButtonTwitterPic.zPosition = 1.0
+            self.snButtonTwitterPic.alpha = 0.0
+            self.snButtonTwitterPic.name = "ButtonTwitter"
+            self.addChild(self.snButtonTwitterPic)
+            // ### Menu: Back twitter
+            self.snButtonRetry = SKShapeNode(rectOf: CGSize(width: 48 * flScreenWidthRatio, height: 48 * flScreenHeightRatio), cornerRadius: 5)
+            self.snButtonRetry.strokeColor = SKColor.gray
+            self.snButtonRetry.glowWidth = 0.0
+            self.snButtonRetry.lineWidth = 2.0
+            self.snButtonRetry.fillColor = UIColor.withAlphaComponent(SKColor.gray)(0.2)
 
+            self.snButtonRetry.position = CGPoint(x: 9 * (flScreenWidth / 14), y: 9 * (flScreenHeight / 24))
+            self.snButtonRetry.zPosition = 1.0
+            self.snButtonRetry.alpha = 0.0
+            self.snButtonRetry.name = "ButtonRetry"
+            self.addChild(self.snButtonRetry)
+            self.snButtonRetryPic = SKSpriteNode(texture: SKTexture(imageNamed: "Media/button_retry_001.png"), color: UIColor.clear, size: CGSize(width: 40 * flScreenWidthRatio, height: 40 * flScreenHeightRatio))
+            self.snButtonRetryPic.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            self.snButtonRetryPic.position = CGPoint(x: 9 * (flScreenWidth / 14), y: 9 * (flScreenHeight / 24))
+            self.snButtonRetryPic.zPosition = 1.0
+            self.snButtonRetryPic.alpha = 0.0
+            self.snButtonRetryPic.name = "ButtonRetry"
+            self.addChild(self.snButtonRetryPic)
+            DispatchQueue.global().async {
+                for i in 0...9 {
+                    usleep(40000)
+                    DispatchQueue.main.async {
+                        self.snScoreBoard.alpha = self.snScoreBoard.alpha + 0.1
+                        self.snButtonTwitter.alpha = self.snButtonTwitter.alpha + 0.1
+                        self.snButtonTwitterPic.alpha = self.snButtonTwitterPic.alpha + 0.1
+                        self.snButtonRetry.alpha = self.snButtonRetry.alpha + 0.1
+                        self.snButtonRetryPic.alpha = self.snButtonRetryPic.alpha + 0.1
+                        self.lbScoreBoardLine1.alpha = self.lbScoreBoardLine1.alpha + 0.1
+                        self.lbScoreBoardLine2.alpha = self.lbScoreBoardLine1.alpha + 0.1
+                        self.lbScoreBoardLine3.alpha = self.lbScoreBoardLine1.alpha + 0.1
+                        //self.snScoreBoard.path = UIBezierPath(roundedRect: CGRect(x: cgScoreStartX, y: cgScoreStartY, width:  CGFloat(i + 1) * cgScoreWidthDelta, height: CGFloat(i + 1) * cgScoreHeightDelta), cornerRadius: 5).cgPath
+                        //self.snScoreBoard.path = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width:  CGFloat(i + 1) * cgScoreWidthDelta, height: CGFloat(i+1) * cgScoreHeightDelta), cornerRadius: 5).cgPath
+                        //self.snScoreBoard.yScale = self.snScoreBoard.yScale + cgScoreHeightDelta
+                        }
+                    }
+                }
+            }
+        //snScoreBoard
+    }
 }

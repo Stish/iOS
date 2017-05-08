@@ -19,6 +19,7 @@
 		FA1904351EB1D2E4002EEA06 /* TLGame4Dots.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1904341EB1D2E4002EEA06 /* TLGame4Dots.swift */; };
 		FA1904391EBB44DF002EEA06 /* origa___.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA1904381EBB44DF002EEA06 /* origa___.ttf */; };
 		FA19043B1EBB5A4B002EEA06 /* Minecraft.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FA19043A1EBB5A4A002EEA06 /* Minecraft.ttf */; };
+		FA19043F1EBCA0BC002EEA06 /* TLFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA19043E1EBCA0BC002EEA06 /* TLFunctions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		FA1904341EB1D2E4002EEA06 /* TLGame4Dots.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLGame4Dots.swift; sourceTree = "<group>"; };
 		FA1904381EBB44DF002EEA06 /* origa___.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "origa___.ttf"; path = "Media/origa___.ttf"; sourceTree = "<group>"; };
 		FA19043A1EBB5A4A002EEA06 /* Minecraft.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Minecraft.ttf; path = Media/Minecraft.ttf; sourceTree = "<group>"; };
+		FA19043E1EBCA0BC002EEA06 /* TLFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TLFunctions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 				FA1904291EB0FAA7002EEA06 /* LaunchScreen.storyboard */,
 				FA19042C1EB0FAA7002EEA06 /* Info.plist */,
 				FA1904341EB1D2E4002EEA06 /* TLGame4Dots.swift */,
+				FA19043E1EBCA0BC002EEA06 /* TLFunctions.swift */,
 			);
 			path = iOS_Game_004;
 			sourceTree = "<group>";
@@ -168,6 +171,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA19043F1EBCA0BC002EEA06 /* TLFunctions.swift in Sources */,
 				FA1904351EB1D2E4002EEA06 /* TLGame4Dots.swift in Sources */,
 				FA1904211EB0FAA7002EEA06 /* GameScene.swift in Sources */,
 				FA1904231EB0FAA7002EEA06 /* GameViewController.swift in Sources */,

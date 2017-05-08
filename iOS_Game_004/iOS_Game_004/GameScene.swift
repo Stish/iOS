@@ -24,7 +24,6 @@ var iDotsCntY = Int(12)
 // ### Shapes
 var snDot: SKSpriteNode!
 var snDotClick: SKShapeNode!
-var aSnDots = Array<Array<SKShapeNode>>()
 // ### Game attributes
 var blSoundEffectsEnabled = Bool(true)
 // ### Game colors
@@ -36,15 +35,20 @@ let uiCol5 = UIColor(red: 0/255.0, green: 130/255.0, blue: 54/255.0, alpha: 1.0)
 let uiCol6 = UIColor(red: 217/255.0, green: 222/255.0, blue: 1/255.0, alpha: 1.0)
 let uiCol7 = UIColor(red: 239/255.0, green: 109/255.0, blue: 7/255.0, alpha: 1.0)
 let uiCol8 = UIColor(red: 224/255.0, green: 68/255.0, blue: 81/255.0, alpha: 1.0)
+let uiColTwitter = UIColor(red: 46/255.0, green: 192/255.0, blue: 251/255.0, alpha: 1.0)
+let uiColScoreBckgrd = UIColor(red: 32/255.0, green: 11/255.0, blue: 13/255.0, alpha: 1.0)
 // ### Fonts
 let fnGameFont = UIFont(name: "OrigamiMommy", size: 10)
 let fnGameTextFont = UIFont(name: "Minecraft", size: 10)
+
+var blBackPressed = Bool(false)
 
 class GameScene: SKScene {
     
     //private var label : SKLabelNode?
     //private var spinnyNode : SKShapeNode?
     var apClick: AVAudioPlayer!
+    var aSnDots = Array<Array<SKShapeNode>>()
     // ### Game menu
     var snGameMenu1: SKShapeNode!
     var slGameMenu1: SKLabelNode!
@@ -345,8 +349,9 @@ class GameScene: SKScene {
             switch (touchedNode.name) {
             case "Game4Dots"?:
                 if strButtonPressedName == "Game4Dots" {
-                    let transition = SKTransition.fade(with: .black, duration: 0.3)
-                    fctPlayClick()
+                    blBackPressed = false
+                    let transition = SKTransition.crossFade(withDuration: 0.75)
+                    fctPlaySound(player: apClick)
                     let nextScene = TLGame4Dots(size: scene!.size)
                     nextScene.scaleMode = .aspectFill
                     scene?.view?.presentScene(nextScene, transition: transition)
@@ -392,19 +397,6 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
-    }
-    
-    func fctRandColor() -> CGFloat {
-        return CGFloat(arc4random()) / CGFloat(UInt32.max)
-    }
-    
-    func fctPlayClick() {
-        if blSoundEffectsEnabled == true {
-            apClick.volume = 1
-            apClick.currentTime = 0
-            apClick.prepareToPlay()
-            apClick.play()
-        }
     }
     
     func fctDisplayMenu() {
@@ -454,63 +446,4 @@ class GameScene: SKScene {
         }
         //aSnDots[6][11].alpha = 0.0
     }
-    
-    func fctFadeInOutSKShapeNode (_ node: SKShapeNode, time: TimeInterval, alpha: CGFloat, pause: TimeInterval) {
-        //node.alpha = 0.0
-        
-        let deltaAlpha = alpha/5
-        let deltaTime = time/10
-        var sumAlpha = CGFloat(0.0)
-        
-        node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-        
-        node.removeAllActions()
-        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-            sumAlpha = sumAlpha + deltaAlpha
-            node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-            node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                sumAlpha = sumAlpha + deltaAlpha
-                node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                    sumAlpha = sumAlpha + deltaAlpha
-                    node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                    node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                        sumAlpha = sumAlpha + deltaAlpha
-                        node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                            sumAlpha = sumAlpha + deltaAlpha
-                            node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                            node.run(SKAction.rotate(toAngle: 0, duration: pause), completion: {() in
-                                // Pause
-                                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                    // Fade out
-                                    sumAlpha = sumAlpha - deltaAlpha
-                                    node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                    node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                        sumAlpha = sumAlpha - deltaAlpha
-                                        node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                        node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                            sumAlpha = sumAlpha - deltaAlpha
-                                            node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                            node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                                sumAlpha = sumAlpha - deltaAlpha
-                                                node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                                node.run(SKAction.rotate(toAngle: 0, duration: deltaTime), completion: {() in
-                                                    sumAlpha = sumAlpha - deltaAlpha
-                                                    node.fillColor = UIColor.withAlphaComponent(node.fillColor)(sumAlpha)
-                                                    node.removeAllActions()
-                                                    //print("finish!!") // #debug
-                                                })
-                                            })
-                                        })
-                                    })
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    }
-
 }

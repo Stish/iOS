@@ -10,6 +10,19 @@ ToDo
 - Save score for each challenge
 - Save settings
 
+ver 0.12
+- App icon added
+- Some functions have been moved and rewritten
+- Shake function added, which can shake any shape for wrong user input
+- Problems with playing the sequence solved
+- Twitter functionality added
+- "Game over" screen added with retry button and twitter button
+- Basic game functions of "4 Dots" added:  
+  - Sequence starts with 1 tune
+  - If the user input is in the right order, one new tune is added to the sequence and the whole sequence is played. The user cannot interact with the dots, while the sequence is played.
+  - Back button cancels the playing sequence
+  - If the user input is wrong, the wrong dot shakes
+
 ver 0.11
 - New sounds for buttons
 - The tiles are now symmetrically arranged
